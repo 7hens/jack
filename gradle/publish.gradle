@@ -1,0 +1,25 @@
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = USER_ORG
+    groupId = GROUP_ID
+    artifactId = project.name
+    publishVersion = VERSION
+    desc = DESCRIPTION
+    website = WEBSITE
+}
+
+apply plugin: 'maven'
+
+group = GROUP_ID
+version = VERSION
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            def userHome = System.getProperty('user.home')
+            def localMavenRepo = 'file://' + new File(userHome, '.m2/repository').absolutePath
+            repository(url: uri(localMavenRepo))
+        }
+    }
+}

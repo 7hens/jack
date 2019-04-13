@@ -1,0 +1,7 @@
+apply plugin: 'java'
+apply from: '../gradle/publish.gradle'
+
+//compileOptions {
+//    sourceCompatibility = '1.8'
+//    targetCompatibility = '1.8'
+//}

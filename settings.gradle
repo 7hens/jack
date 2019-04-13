@@ -1,0 +1,5 @@
+rootProject.name = 'Jack'
+
+include ':sample'
+include ':jack'
+include ':jack-android'
