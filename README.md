@@ -1,9 +1,10 @@
 # Jack
 
-[ ![Download](https://api.bintray.com/packages/7hens/maven/jack-android/images/download.svg) ](https://bintray.com/7hens/maven/jack-android/_latestVersion)
-[ ![github](https://img.shields.io/badge/link-github-lightgrey.svg) ](https://github.com/7hens/jack)
-[ ![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg) ](https://github.com/7hens/jack/blob/master/LICENSE)
-[ ![996.icu](https://img.shields.io/badge/link-996.icu-red.svg) ](https://996.icu)
+[![Download](https://api.bintray.com/packages/7hens/maven/jack-android/images/download.svg)](https://bintray.com/7hens/maven/jack-android/_latestVersion)
+[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/7hens/jack/blob/master/LICENSE)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
+[![github](https://img.shields.io/github/stars/7hens/jack.svg?style=social)](https://github.com/7hens/jack)
+
 
 一个模拟 Kotlin 的轻量级的库。
 
