@@ -130,7 +130,6 @@ public class PropertyDemo {
     private JGetter<String> title = new JProperty<String>()
             .get(() -> "hello world");
 
-    
     public String getContent() {
         return content.get();
     }
@@ -151,7 +150,7 @@ public class PropertyDemo {
 class PropertyDemo {
     private var contentInternal: String
     
-    val content: String
+    var content: String
         get() = contentInternal
         set(value) {
             contentInternal = value
