@@ -10,7 +10,7 @@ public final class JLazy<T> implements JGetter<T> {
         this.creator = creator;
     }
 
-    private JOnce<T> once = new JOnce<>();
+    private JOnce.Func<T> once = JOnce.func();
 
     @Override
     public T get() {
