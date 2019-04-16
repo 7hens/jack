@@ -5,8 +5,7 @@
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 [![github](https://img.shields.io/github/stars/7hens/jack.svg?style=social)](https://github.com/7hens/jack)
 
-
-一个模拟 Kotlin 的轻量级的库。
+一个模拟 Kotlin 的轻量级的库。[项目地址](https://github.com/7hens/jack)
 
 > 公司项目不让用 Kotlin，所以我就用 Java 写了个模拟 Kotlin 的库。哈哈~
 
