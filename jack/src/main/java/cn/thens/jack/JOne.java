@@ -22,6 +22,14 @@ public class JOne<T> implements JGetter<T> {
         return of(() -> value);
     }
 
+    public static void run(JAction.P0 func) {
+        func.invoke();
+    }
+
+    public static <R> R run(JFunc.P0<R> func) {
+        return func.invoke();
+    }
+
     public boolean isNotNull() {
         return get() != null;
     }
