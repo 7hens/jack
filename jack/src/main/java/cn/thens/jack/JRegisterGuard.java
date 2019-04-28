@@ -12,10 +12,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class JRegisterGuard {
     private static final JAction.P0 NO_ACTION = System.out::println;
 
-    public static JRegisterGuard atomic() {
-        return new AtomicImpl();
-    }
-
     /**
      * 注册。
      *
@@ -43,37 +39,37 @@ public abstract class JRegisterGuard {
         return doOnEach(NO_ACTION, onUnregister);
     }
 
+    public JRegisterGuard doOnEvent(JAction.P1<Boolean> onEvent) {
+        return doOnEach(() -> onEvent.invoke(true), () -> onEvent.invoke(false));
+    }
+
     public JRegisterGuard doOnEach(JAction.P0 onRegister, JAction.P0 onUnregister) {
-        final JRegisterGuard self = this;
-        return new JRegisterGuard() {
+        return new Wrapper(this) {
             @Override
             public boolean register() {
-                if (self.register()) return true;
+                if (super.register()) return true;
                 onRegister.invoke();
                 return false;
             }
 
             @Override
             public boolean unregister() {
-                if (self.unregister()) return true;
+                if (super.unregister()) return true;
                 onUnregister.invoke();
                 return false;
-            }
-
-            @Override
-            public boolean isRegistered() {
-                return self.isRegistered();
             }
         };
     }
 
-    private static class AtomicImpl extends JRegisterGuard {
+    public static class Atomic extends JRegisterGuard {
         private AtomicBoolean isRegistered = new AtomicBoolean(false);
 
+        @Override
         public boolean register() {
             return !isRegistered.compareAndSet(false, true);
         }
 
+        @Override
         public boolean unregister() {
             return !isRegistered.compareAndSet(true, false);
         }
@@ -81,6 +77,29 @@ public abstract class JRegisterGuard {
         @Override
         public boolean isRegistered() {
             return isRegistered.get();
+        }
+    }
+
+    public static class Wrapper extends JRegisterGuard {
+        private final JRegisterGuard base;
+
+        public Wrapper(JRegisterGuard base) {
+            this.base = base;
+        }
+
+        @Override
+        public boolean register() {
+            return base.register();
+        }
+
+        @Override
+        public boolean unregister() {
+            return base.unregister();
+        }
+
+        @Override
+        public boolean isRegistered() {
+            return base.isRegistered();
         }
     }
 }
