@@ -43,12 +43,54 @@ public class JOne<T> implements JGetter<T> {
         return clazz.isAssignableFrom(get().getClass());
     }
 
+    @SuppressWarnings("unchecked")
+    public <U> JOne<U> cast(Class<U> clazz) {
+        if (is(clazz)) return of((JGetter<U>) this);
+        throw new ClassCastException();
+    }
+
     public JOne<T> elvis(T newValue) {
         return isNotNull() ? this : of(newValue);
     }
 
     public JOne<T> elvis(JFunc.P0<T> func) {
         return isNotNull() ? this : of(func.invoke());
+    }
+
+    public boolean in(Iterable<T> iterable) {
+        for (T item : iterable) {
+            if (equals(get(), item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public final boolean in(Object... items) {
+        for (Object item : items) {
+            if (equals(get(), item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof JOne) {
+            return equals(get(), ((JOne) o).get());
+        }
+        return equals(get(), o);
+    }
+
+    @Override
+    public int hashCode() {
+        T value = get();
+        return value != null ? value.hashCode() : super.hashCode();
+    }
+
+    private static boolean equals(Object a, Object b) {
+        return a == null ? b == null : a.equals(b);
     }
 
     public <U> JOne<U> map(JFunc.P1<T, U> func) {
@@ -70,12 +112,6 @@ public class JOne<T> implements JGetter<T> {
     public JOne<T> also(JAction.P1<T> func) {
         func.invoke(get());
         return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <U> JOne<U> cast(Class<U> clazz) {
-        if (is(clazz)) return of((JGetter<U>) this);
-        throw new ClassCastException();
     }
 
     public JOne<T> unsafe() {
