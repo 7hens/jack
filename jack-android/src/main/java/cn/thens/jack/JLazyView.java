@@ -12,9 +12,9 @@ import android.view.Window;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class JLazyView {
 
-    private final JFunc.P1<Integer, ? extends View> finder;
+    private final JFunc.F1<Integer, ? extends View> finder;
 
-    private JLazyView(JFunc.P1<Integer, ? extends View> finder) {
+    private JLazyView(JFunc.F1<Integer, ? extends View> finder) {
         this.finder = finder;
     }
 
@@ -23,11 +23,11 @@ public final class JLazyView {
         return JLazy.create(() -> (T) finder.invoke(id));
     }
 
-    public static JLazyView create(JFunc.P1<Integer, ? extends View> finder) {
+    public static JLazyView create(JFunc.F1<Integer, ? extends View> finder) {
         return new JLazyView(finder);
     }
 
-    public static JLazyView create(JFunc.P0<? extends View> view) {
+    public static JLazyView create(JFunc.F0<? extends View> view) {
         return create(id -> view.invoke().findViewById(id));
     }
 

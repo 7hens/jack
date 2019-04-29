@@ -1,6 +1,6 @@
 package cn.thens.jack;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"unused"})
 public interface JGetter<T> {
     T get();
 }

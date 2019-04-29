@@ -1,49 +1,252 @@
 package cn.thens.jack;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
-public interface JFunc<R> {
+@SuppressWarnings({"unused", "WeakerAccess", "unchecked"})
+public final class JFunc {
+    private JFunc() {
+    }
 
-    interface P0<R> extends JFunc<R> {
+    public static void run(A0 func) {
+        func.call();
+    }
+
+    public static <R> R run(F0<R> func) {
+        return func.invoke();
+    }
+
+    public interface F<R> {
+    }
+
+    public interface F0<R> extends F<R> {
         R invoke();
     }
 
-    interface P1<P1, R> extends JFunc<R> {
+    public interface F1<P1, R> extends F<R> {
         R invoke(P1 p1);
     }
 
-    interface P2<P1, P2, R> extends JFunc<R> {
+    public interface F2<P1, P2, R> extends F<R> {
         R invoke(P1 p1, P2 p2);
     }
 
-    interface P3<P1, P2, P3, R> extends JFunc<R> {
+    public interface F3<P1, P2, P3, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3);
     }
 
-    interface P4<P1, P2, P3, P4, R> extends JFunc<R> {
+    public interface F4<P1, P2, P3, P4, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4);
     }
 
-    interface P5<P1, P2, P3, P4, P5, R> extends JFunc<R> {
+    public interface F5<P1, P2, P3, P4, P5, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
     }
 
-    interface P6<P1, P2, P3, P4, P5, P6, R> extends JFunc<R> {
+    public interface F6<P1, P2, P3, P4, P5, P6, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6);
     }
 
-    interface P7<P1, P2, P3, P4, P5, P6, P7, R> extends JFunc<R> {
+    public interface F7<P1, P2, P3, P4, P5, P6, P7, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7);
     }
 
-    interface P8<P1, P2, P3, P4, P5, P6, P7, P8, R> extends JFunc<R> {
+    public interface F8<P1, P2, P3, P4, P5, P6, P7, P8, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8);
     }
 
-    interface P9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> extends JFunc<R> {
+    public interface F9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> extends F<R> {
         R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
     }
 
-    interface Pn<R> extends JFunc<R> {
-        R invoke(Object... params);
+    public interface Fn<R> extends F<R> {
+        R invoke(Object... objects);
+    }
+
+    public interface A {
+    }
+
+    public interface A0 extends A {
+        void call();
+    }
+
+    public interface A1<P1> extends A {
+        void call(P1 p1);
+    }
+
+    public interface A2<P1, P2> extends A {
+        void call(P1 p1, P2 p2);
+    }
+
+    public interface A3<P1, P2, P3> extends A {
+        void call(P1 p1, P2 p2, P3 p3);
+    }
+
+    public interface A4<P1, P2, P3, P4> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4);
+    }
+
+    public interface A5<P1, P2, P3, P4, P5> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
+    }
+
+    public interface A6<P1, P2, P3, P4, P5, P6> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6);
+    }
+
+    public interface A7<P1, P2, P3, P4, P5, P6, P7> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7);
+    }
+
+    public interface A8<P1, P2, P3, P4, P5, P6, P7, P8> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8);
+    }
+
+    public interface A9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends A {
+        void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
+    }
+
+    public interface An extends A {
+        void call(Object... objects);
+    }
+
+    private static Empty EMPTY = new Empty();
+
+    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R> Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
+        return EMPTY;
+    }
+
+    public static final class Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
+            A0,
+            A1<P1>,
+            A2<P1, P2>,
+            A3<P1, P2, P3>,
+            A4<P1, P2, P3, P4>,
+            A5<P1, P2, P3, P4, P5>,
+            A6<P1, P2, P3, P4, P5, P6>,
+            A7<P1, P2, P3, P4, P5, P6, P7>,
+            A8<P1, P2, P3, P4, P5, P6, P7, P8>,
+            A9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
+            An,
+            F0<R>,
+            F1<P1, R>,
+            F2<P1, P2, R>,
+            F3<P1, P2, P3, R>,
+            F4<P1, P2, P3, P4, R>,
+            F5<P1, P2, P3, P4, P5, R>,
+            F6<P1, P2, P3, P4, P5, P6, R>,
+            F7<P1, P2, P3, P4, P5, P6, P7, R>,
+            F8<P1, P2, P3, P4, P5, P6, P7, P8, R>,
+            F9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>,
+            Fn<R> {
+
+        private Empty() {
+        }
+
+        @Override
+        public void call() {
+        }
+
+        @Override
+        public void call(P1 p1) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+
+        }
+
+        @Override
+        public void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+
+        }
+
+        @Override
+        public void call(Object... objects) {
+
+        }
+
+        @Override
+        public R invoke() {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+            return null;
+        }
+
+        @Override
+        public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+            return null;
+        }
+
+        @Override
+        public R invoke(Object... objects) {
+            return null;
+        }
     }
 }

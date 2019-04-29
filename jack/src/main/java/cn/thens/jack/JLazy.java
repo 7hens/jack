@@ -2,11 +2,11 @@ package cn.thens.jack;
 
 import java.lang.reflect.Constructor;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"unused"})
 public final class JLazy<T> implements JGetter<T> {
-    private final JFunc.P0<? extends T> creator;
+    private final JFunc.F0<? extends T> creator;
 
-    private JLazy(JFunc.P0<? extends T> creator) {
+    private JLazy(JFunc.F0<? extends T> creator) {
         this.creator = creator;
     }
 
@@ -29,7 +29,7 @@ public final class JLazy<T> implements JGetter<T> {
         });
     }
 
-    public static <T> JLazy<T> create(final JFunc.P0<? extends T> creator) {
+    public static <T> JLazy<T> create(final JFunc.F0<? extends T> creator) {
         return new JLazy<>(creator);
     }
 }

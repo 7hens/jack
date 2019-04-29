@@ -4,58 +4,43 @@ package cn.thens.jack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 原子注册和注销。
- *
  * @author 7hens
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class JRegisterGuard {
-    private static final JAction.P0 NO_ACTION = System.out::println;
+    private static final JFunc.A0 NO_ACTION = System.out::println;
 
-    /**
-     * 注册。
-     *
-     * @return 是否已注册。
-     */
     public abstract boolean register();
 
-    /**
-     * 注销。
-     *
-     * @return 是否已注销。
-     */
     public abstract boolean unregister();
 
-    /**
-     * 查看是否已注册。
-     */
     public abstract boolean isRegistered();
 
-    public JRegisterGuard doOnRegister(JAction.P0 onRegister) {
+    public JRegisterGuard doOnRegister(JFunc.A0 onRegister) {
         return doOnEach(onRegister, NO_ACTION);
     }
 
-    public JRegisterGuard doOnUnregister(JAction.P0 onUnregister) {
+    public JRegisterGuard doOnUnregister(JFunc.A0 onUnregister) {
         return doOnEach(NO_ACTION, onUnregister);
     }
 
-    public JRegisterGuard doOnEvent(JAction.P1<Boolean> onEvent) {
-        return doOnEach(() -> onEvent.invoke(true), () -> onEvent.invoke(false));
+    public JRegisterGuard doOnEvent(JFunc.A1<Boolean> onEvent) {
+        return doOnEach(() -> onEvent.call(true), () -> onEvent.call(false));
     }
 
-    public JRegisterGuard doOnEach(JAction.P0 onRegister, JAction.P0 onUnregister) {
+    public JRegisterGuard doOnEach(JFunc.A0 onRegister, JFunc.A0 onUnregister) {
         return new Wrapper(this) {
             @Override
             public boolean register() {
                 if (super.register()) return true;
-                onRegister.invoke();
+                onRegister.call();
                 return false;
             }
 
             @Override
             public boolean unregister() {
                 if (super.unregister()) return true;
-                onUnregister.invoke();
+                onUnregister.call();
                 return false;
             }
         };
