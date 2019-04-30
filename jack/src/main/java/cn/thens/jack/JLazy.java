@@ -14,7 +14,7 @@ public final class JLazy<T> implements JGetter<T> {
 
     @Override
     public T get() {
-        return once.invoke(creator);
+        return once.call(creator);
     }
 
     public static <T> JLazy<T> create(final Class<? extends T> clazz) {
