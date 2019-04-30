@@ -13,9 +13,13 @@ public final class JOne<T> implements JGetter<T> {
         return getter.get();
     }
 
+    public Class<?> type() {
+        return isNull() ? null : get().getClass();
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (o instanceof JGetter) {
+        if (o instanceof JOne) {
             return equals(get(), ((JOne) o).get());
         }
         return equals(get(), o);
@@ -61,8 +65,16 @@ public final class JOne<T> implements JGetter<T> {
         return isNotNull() ? this : of(func.call());
     }
 
-    public <U> JOne<U> safe(JFunc.F1<JOne<T>, JOne<U>> func) {
+    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
         return isNotNull() ? func.call(this) : of(null);
+    }
+
+    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
+        try {
+            return func.call(this);
+        } catch (Throwable e) {
+            return of(null);
+        }
     }
 
     public boolean is(Class<?> clazz) {
@@ -70,10 +82,14 @@ public final class JOne<T> implements JGetter<T> {
         return clazz.isAssignableFrom(get().getClass());
     }
 
+    public boolean isNot(Class<?> clazz) {
+        return !is(clazz);
+    }
+
     @SuppressWarnings("unchecked")
     public <U> JOne<U> as(Class<U> clazz) {
         if (is(clazz)) return of((JGetter<U>) this);
-        return of(null);
+        throw new ClassCastException("expected " + clazz + ", but found " + type());
     }
 
     public boolean in(Iterable<T> iterable) {
