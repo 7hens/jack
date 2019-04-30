@@ -114,7 +114,7 @@ public final class JOnce {
     }
 
     public static <R>
-    JFunc.Fn<R> wrap(final JFunc.Fn<R> func) {
+    JFunc.FN<R> wrap(final JFunc.FN<R> func) {
         final Func<R> once = func();
         return params -> once.call(() -> func.call(params));
     }
@@ -178,7 +178,7 @@ public final class JOnce {
         return (p1, p2, p3, p4, p5, p6, p7, p8, p9) -> once.run(() -> func.run(p1, p2, p3, p4, p5, p6, p7, p8, p9));
     }
 
-    public static JFunc.An wrap(final JFunc.An func) {
+    public static JFunc.AN wrap(final JFunc.AN func) {
         final Action once = action();
         return params -> once.run(() -> func.run(params));
     }

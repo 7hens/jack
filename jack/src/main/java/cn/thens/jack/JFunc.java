@@ -56,7 +56,7 @@ public final class JFunc {
         void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
     }
 
-    public interface An extends A {
+    public interface AN extends A {
         void run(Object... objects);
     }
 
@@ -103,7 +103,7 @@ public final class JFunc {
         R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
     }
 
-    public interface Fn<R> extends F<R> {
+    public interface FN<R> extends F<R> {
         R call(Object... objects);
     }
 
@@ -124,7 +124,7 @@ public final class JFunc {
             A7<P1, P2, P3, P4, P5, P6, P7>,
             A8<P1, P2, P3, P4, P5, P6, P7, P8>,
             A9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
-            An,
+            AN,
             F0<R>,
             F1<P1, R>,
             F2<P1, P2, R>,
@@ -135,7 +135,7 @@ public final class JFunc {
             F7<P1, P2, P3, P4, P5, P6, P7, R>,
             F8<P1, P2, P3, P4, P5, P6, P7, P8, R>,
             F9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>,
-            Fn<R> {
+            FN<R> {
 
         private Empty() {
         }
