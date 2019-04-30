@@ -9,7 +9,7 @@ public class OneDemo {
                 .map(Integer::parseInt)
                 .as(long.class)
                 .get();
-        int i = JFunc.run(() -> 12);
+        int i = JFunc.call(() -> 12);
         JFunc.run(() -> System.out.println("hello, world"));
     }
 }

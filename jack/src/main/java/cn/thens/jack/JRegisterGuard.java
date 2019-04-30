@@ -25,7 +25,7 @@ public abstract class JRegisterGuard {
     }
 
     public JRegisterGuard doOnEvent(JFunc.A1<Boolean> onEvent) {
-        return doOnEach(() -> onEvent.call(true), () -> onEvent.call(false));
+        return doOnEach(() -> onEvent.run(true), () -> onEvent.run(false));
     }
 
     public JRegisterGuard doOnEach(JFunc.A0 onRegister, JFunc.A0 onUnregister) {
@@ -33,14 +33,14 @@ public abstract class JRegisterGuard {
             @Override
             public boolean register() {
                 if (super.register()) return true;
-                onRegister.call();
+                onRegister.run();
                 return false;
             }
 
             @Override
             public boolean unregister() {
                 if (super.unregister()) return true;
-                onUnregister.call();
+                onUnregister.run();
                 return false;
             }
         };

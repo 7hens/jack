@@ -58,11 +58,11 @@ public final class JOne<T> implements JGetter<T> {
     }
 
     public JOne<T> elvis(JFunc.F0<T> func) {
-        return isNotNull() ? this : of(func.invoke());
+        return isNotNull() ? this : of(func.call());
     }
 
     public <U> JOne<U> safe(JFunc.F1<JOne<T>, JOne<U>> func) {
-        return isNotNull() ? func.invoke(this) : of(null);
+        return isNotNull() ? func.call(this) : of(null);
     }
 
     public boolean is(Class<?> clazz) {
@@ -97,7 +97,7 @@ public final class JOne<T> implements JGetter<T> {
     }
 
     public <U> JOne<U> map(JFunc.F1<T, U> func) {
-        return of(func.invoke(get()));
+        return of(func.call(get()));
     }
 
     public <U> JOne<U> map(U value) {
@@ -105,7 +105,7 @@ public final class JOne<T> implements JGetter<T> {
     }
 
     public <U> JOne<U> flatMap(JFunc.F1<T, JOne<U>> func) {
-        return func.invoke(get());
+        return func.call(get());
     }
 
     public <U> JOne<U> flatMap(JOne<U> one) {
@@ -113,16 +113,16 @@ public final class JOne<T> implements JGetter<T> {
     }
 
     public JOne<T> also(JFunc.A1<T> func) {
-        func.call(get());
+        func.run(get());
         return this;
     }
 
     public JOne<T> apply(JFunc.A1<JOne<T>> func) {
-        func.call(this);
+        func.run(this);
         return this;
     }
 
     public <U> U with(JFunc.F1<JOne<T>, U> func) {
-        return func.invoke(this);
+        return func.call(this);
     }
 }

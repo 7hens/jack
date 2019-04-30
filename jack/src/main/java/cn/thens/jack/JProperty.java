@@ -4,7 +4,7 @@ package cn.thens.jack;
 public final class JProperty<T> {
 
     public JGetter<T> get(final JFunc.F0<T> getter) {
-        return getter::invoke;
+        return getter::call;
     }
 
     public JGetter<T> get(T value) {
@@ -15,12 +15,12 @@ public final class JProperty<T> {
         return new JSetter<T>() {
             @Override
             public void set(T t) {
-                setter.call(t);
+                setter.run(t);
             }
 
             @Override
             public T get() {
-                return getter.invoke();
+                return getter.call();
             }
         };
     }
