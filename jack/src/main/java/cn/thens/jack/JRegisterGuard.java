@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class JRegisterGuard {
-    private static final JFunc.A0 NO_ACTION = System.out::println;
-
     public abstract boolean register();
 
     public abstract boolean unregister();
@@ -17,11 +15,11 @@ public abstract class JRegisterGuard {
     public abstract boolean isRegistered();
 
     public JRegisterGuard doOnRegister(JFunc.A0 onRegister) {
-        return doOnEach(onRegister, NO_ACTION);
+        return doOnEach(onRegister, JFunc.empty());
     }
 
     public JRegisterGuard doOnUnregister(JFunc.A0 onUnregister) {
-        return doOnEach(NO_ACTION, onUnregister);
+        return doOnEach(JFunc.empty(), onUnregister);
     }
 
     public JRegisterGuard doOnEvent(JFunc.A1<Boolean> onEvent) {
