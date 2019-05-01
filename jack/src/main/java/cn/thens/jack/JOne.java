@@ -1,9 +1,5 @@
 package cn.thens.jack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 @SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall", "unchecked"})
 public final class JOne<T> implements JGetter<T> {
     private final JGetter<T> getter;
@@ -24,12 +20,6 @@ public final class JOne<T> implements JGetter<T> {
 
     public static <T> JOne<T> of(T value) {
         return of(() -> value);
-    }
-
-    public static <T> JOne<List<T>> list(T... elements) {
-        List<T> list = new ArrayList<>(elements.length);
-        Collections.addAll(list, elements);
-        return of(list);
     }
 
     public static boolean equals(Object a, Object b) {
@@ -120,19 +110,15 @@ public final class JOne<T> implements JGetter<T> {
         return false;
     }
 
-    public <U> JOne<U> map(JFunc.F1<T, U> func) {
-        return of(func.call(get()));
-    }
-
-    public <U> JOne<U> map(U value) {
+    public <U> JOne<U> reset(U value) {
         return of(value);
     }
 
-    public <U> JOne<U> flatMap(JFunc.F1<T, JOne<U>> func) {
-        return func.call(get());
+    public <U> JOne<U> let(JFunc.F1<T, U> func) {
+        return of(func.call(get()));
     }
 
-    public JOne<T> also(JFunc.A1<? super T> func) {
+    public JOne<T> also(JFunc.A1<T> func) {
         func.run(get());
         return this;
     }
@@ -142,7 +128,7 @@ public final class JOne<T> implements JGetter<T> {
         return this;
     }
 
-    public <U> U with(JFunc.F1<JOne<T>, U> func) {
+    public <U> U eval(JFunc.F1<JOne<T>, U> func) {
         return func.call(this);
     }
 
@@ -150,8 +136,12 @@ public final class JOne<T> implements JGetter<T> {
         return value;
     }
 
+    public <U> JOne<U> call(JFunc.F1<JOne<T>, JOne<U>> func) {
+        return func.call(this);
+    }
+
     public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
-        return isNotNull() ? func.call(this) : empty();
+        return isNotNull() ? call(func) : empty();
     }
 
     public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
