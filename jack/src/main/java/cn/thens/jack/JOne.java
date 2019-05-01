@@ -1,13 +1,21 @@
 package cn.thens.jack;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 @SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall", "unchecked"})
 public final class JOne<T> implements JGetter<T> {
-    private static final JOne EMPTY = of(null);
-
     private final JGetter<T> getter;
 
     private JOne(JGetter<T> getter) {
         this.getter = getter;
+    }
+
+    private static final JOne EMPTY = of(null);
+
+    public static <T> JOne<T> empty() {
+        return EMPTY;
     }
 
     public static <T> JOne<T> of(JGetter<T> getter) {
@@ -18,8 +26,10 @@ public final class JOne<T> implements JGetter<T> {
         return of(() -> value);
     }
 
-    public static <T> JOne<T> empty() {
-        return EMPTY;
+    public static <T> JOne<List<T>> list(T... elements) {
+        List<T> list = new ArrayList<>(elements.length);
+        Collections.addAll(list, elements);
+        return of(list);
     }
 
     public static boolean equals(Object a, Object b) {
@@ -71,18 +81,6 @@ public final class JOne<T> implements JGetter<T> {
         return isNotNull() ? this : of(getter.get());
     }
 
-    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
-        return isNotNull() ? func.call(this) : empty();
-    }
-
-    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
-        try {
-            return func.call(this);
-        } catch (Throwable e) {
-            return empty();
-        }
-    }
-
     public boolean is(Class<?> clazz) {
         if (isNull()) return false;
         return clazz.isAssignableFrom(type());
@@ -92,9 +90,14 @@ public final class JOne<T> implements JGetter<T> {
         return !is(clazz);
     }
 
-    public <U> JOne<U> as(Class<U> clazz) {
+    public <U> JOne<U> cast(Class<U> clazz) {
         if (is(clazz)) return of((JGetter<U>) this);
         throw new ClassCastException("expected " + clazz + ", but found " + type());
+    }
+
+    public <U> JOne<U> as(Class<U> clazz) {
+        if (is(clazz)) return of((JGetter<U>) this);
+        return empty();
     }
 
     public boolean in(Iterable<T> iterable) {
@@ -129,11 +132,7 @@ public final class JOne<T> implements JGetter<T> {
         return func.call(get());
     }
 
-    public <U> JOne<U> flatMap(JOne<U> one) {
-        return one;
-    }
-
-    public JOne<T> also(JFunc.A1<T> func) {
+    public JOne<T> also(JFunc.A1<? super T> func) {
         func.run(get());
         return this;
     }
@@ -145,5 +144,21 @@ public final class JOne<T> implements JGetter<T> {
 
     public <U> U with(JFunc.F1<JOne<T>, U> func) {
         return func.call(this);
+    }
+
+    public <U> U with(U value) {
+        return value;
+    }
+
+    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
+        return isNotNull() ? func.call(this) : empty();
+    }
+
+    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
+        try {
+            return func.call(this);
+        } catch (Throwable e) {
+            return empty();
+        }
     }
 }
