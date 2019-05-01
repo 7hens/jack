@@ -13,7 +13,7 @@ public final class JInit implements JGetter<Boolean> {
 
     public void check() {
         if (peek()) return;
-        throw new RuntimeException("Init is uninitialized");
+        throw new RuntimeException("JInit is uninitialized");
     }
 
     public boolean peek() {

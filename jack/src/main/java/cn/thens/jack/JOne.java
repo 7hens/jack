@@ -1,11 +1,29 @@
 package cn.thens.jack;
 
-@SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall"})
+@SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall", "unchecked"})
 public final class JOne<T> implements JGetter<T> {
+    private static final JOne EMPTY = of(null);
+
     private final JGetter<T> getter;
 
-    protected JOne(JGetter<T> getter) {
+    private JOne(JGetter<T> getter) {
         this.getter = getter;
+    }
+
+    public static <T> JOne<T> of(JGetter<T> getter) {
+        return new JOne<>(getter);
+    }
+
+    public static <T> JOne<T> of(T value) {
+        return of(() -> value);
+    }
+
+    public static <T> JOne<T> empty() {
+        return EMPTY;
+    }
+
+    public static boolean equals(Object a, Object b) {
+        return a == null ? b == null : a.equals(b);
     }
 
     @Override
@@ -14,7 +32,7 @@ public final class JOne<T> implements JGetter<T> {
     }
 
     public Class<?> type() {
-        return isNull() ? null : get().getClass();
+        return get().getClass();
     }
 
     @Override
@@ -28,25 +46,13 @@ public final class JOne<T> implements JGetter<T> {
     @Override
     public int hashCode() {
         T value = get();
-        return value != null ? value.hashCode() : super.hashCode();
+        return value != null ? value.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         T value = get();
         return value == null ? "null" : value.toString();
-    }
-
-    public static <T> JOne<T> of(JGetter<T> getter) {
-        return new JOne<>(getter);
-    }
-
-    public static <T> JOne<T> of(T value) {
-        return of(() -> value);
-    }
-
-    public static boolean equals(Object a, Object b) {
-        return a == null ? b == null : a.equals(b);
     }
 
     public boolean isNotNull() {
@@ -61,32 +67,31 @@ public final class JOne<T> implements JGetter<T> {
         return isNotNull() ? this : of(newValue);
     }
 
-    public JOne<T> elvis(JFunc.F0<T> func) {
-        return isNotNull() ? this : of(func.call());
+    public JOne<T> elvis(JGetter<T> getter) {
+        return isNotNull() ? this : of(getter.get());
     }
 
     public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
-        return isNotNull() ? func.call(this) : of(null);
+        return isNotNull() ? func.call(this) : empty();
     }
 
     public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
         try {
             return func.call(this);
         } catch (Throwable e) {
-            return of(null);
+            return empty();
         }
     }
 
     public boolean is(Class<?> clazz) {
         if (isNull()) return false;
-        return clazz.isAssignableFrom(get().getClass());
+        return clazz.isAssignableFrom(type());
     }
 
     public boolean isNot(Class<?> clazz) {
         return !is(clazz);
     }
 
-    @SuppressWarnings("unchecked")
     public <U> JOne<U> as(Class<U> clazz) {
         if (is(clazz)) return of((JGetter<U>) this);
         throw new ClassCastException("expected " + clazz + ", but found " + type());

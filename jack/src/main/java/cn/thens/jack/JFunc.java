@@ -13,6 +13,13 @@ public final class JFunc {
         return func.call();
     }
 
+    private static Empty EMPTY = new Empty();
+
+    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
+    Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
+        return EMPTY;
+    }
+
     public interface A {
     }
 
@@ -105,12 +112,6 @@ public final class JFunc {
 
     public interface FN<R> extends F<R> {
         R call(Object... objects);
-    }
-
-    private static Empty EMPTY = new Empty();
-
-    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R> Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
-        return EMPTY;
     }
 
     public static final class Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
