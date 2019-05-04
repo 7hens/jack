@@ -45,14 +45,12 @@ public final class JOne<T> implements JGetter<T> {
 
     @Override
     public int hashCode() {
-        T value = get();
-        return value != null ? value.hashCode() : 0;
+        return isNotNull() ? get().hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        T value = get();
-        return value == null ? "null" : value.toString();
+        return isNull() ? "null" : get().toString();
     }
 
     public boolean isNotNull() {
@@ -110,7 +108,7 @@ public final class JOne<T> implements JGetter<T> {
         return false;
     }
 
-    public <U> JOne<U> reset(U value) {
+    public <U> JOne<U> set(U value) {
         return of(value);
     }
 
@@ -123,30 +121,26 @@ public final class JOne<T> implements JGetter<T> {
         return this;
     }
 
+    public <U> U with(U value) {
+        return value;
+    }
+
     public JOne<T> apply(JFunc.A1<JOne<T>> func) {
         func.run(this);
         return this;
     }
 
-    public <U> U eval(JFunc.F1<JOne<T>, U> func) {
-        return func.call(this);
+    public <U> JOne<U> call(JFunc.F1<JOne<T>, U> func) {
+        return of(func.call(this));
     }
 
-    public <U> U with(U value) {
-        return value;
-    }
-
-    public <U> JOne<U> call(JFunc.F1<JOne<T>, JOne<U>> func) {
-        return func.call(this);
-    }
-
-    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, JOne<U>> func) {
+    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, U> func) {
         return isNotNull() ? call(func) : empty();
     }
 
-    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, JOne<U>> func) {
+    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, U> func) {
         try {
-            return func.call(this);
+            return of(func.call(this));
         } catch (Throwable e) {
             return empty();
         }
