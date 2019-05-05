@@ -1,6 +1,9 @@
-package cn.thens.jack;
+package cn.thens.jack.property;
 
 import java.lang.reflect.Constructor;
+
+import cn.thens.jack.func.JFunc;
+import cn.thens.jack.func.JOnce;
 
 @SuppressWarnings({"unused"})
 public final class JLazy<T> implements JGetter<T> {

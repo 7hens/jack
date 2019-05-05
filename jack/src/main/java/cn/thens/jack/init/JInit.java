@@ -1,6 +1,8 @@
-package cn.thens.jack;
+package cn.thens.jack.init;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import cn.thens.jack.property.JGetter;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class JInit implements JGetter<Boolean> {

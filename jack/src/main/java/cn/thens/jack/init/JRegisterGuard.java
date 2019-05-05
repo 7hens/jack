@@ -1,7 +1,9 @@
-package cn.thens.jack;
+package cn.thens.jack.init;
 
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import cn.thens.jack.func.JAction;
 
 /**
  * @author 7hens
@@ -14,31 +16,31 @@ public abstract class JRegisterGuard {
 
     public abstract boolean isRegistered();
 
-    public JRegisterGuard doOnRegister(JFunc.A0 onRegister) {
-        return doOnEach(onRegister, JFunc.empty());
+    public JRegisterGuard doOnRegister(JAction.A0 onRegister) {
+        return doOnEach(onRegister, JAction.empty());
     }
 
-    public JRegisterGuard doOnUnregister(JFunc.A0 onUnregister) {
-        return doOnEach(JFunc.empty(), onUnregister);
+    public JRegisterGuard doOnUnregister(JAction.A0 onUnregister) {
+        return doOnEach(JAction.empty(), onUnregister);
     }
 
-    public JRegisterGuard doOnEvent(JFunc.A1<Boolean> onEvent) {
-        return doOnEach(() -> onEvent.run(true), () -> onEvent.run(false));
+    public JRegisterGuard doOnEvent(JAction.A1<Boolean> onEvent) {
+        return doOnEach(() -> onEvent.call(true), () -> onEvent.call(false));
     }
 
-    public JRegisterGuard doOnEach(JFunc.A0 onRegister, JFunc.A0 onUnregister) {
+    public JRegisterGuard doOnEach(JAction.A0 onRegister, JAction.A0 onUnregister) {
         return new Wrapper(this) {
             @Override
             public boolean register() {
                 if (super.register()) return true;
-                onRegister.run();
+                onRegister.call();
                 return false;
             }
 
             @Override
             public boolean unregister() {
                 if (super.unregister()) return true;
-                onUnregister.run();
+                onUnregister.call();
                 return false;
             }
         };

@@ -6,6 +6,10 @@ import android.app.Fragment;
 import android.view.View;
 import android.view.Window;
 
+import cn.thens.jack.func.JFunc;
+import cn.thens.jack.property.JGetter;
+import cn.thens.jack.property.JLazy;
+
 /**
  * @author 7hens
  */

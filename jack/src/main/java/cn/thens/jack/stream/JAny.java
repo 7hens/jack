@@ -1,24 +1,28 @@
-package cn.thens.jack;
+package cn.thens.jack.stream;
+
+import cn.thens.jack.func.JAction;
+import cn.thens.jack.func.JFunc;
+import cn.thens.jack.property.JGetter;
 
 @SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall", "unchecked"})
-public final class JOne<T> implements JGetter<T> {
+public final class JAny<T> implements JGetter<T> {
     private final JGetter<T> getter;
 
-    private JOne(JGetter<T> getter) {
+    private JAny(JGetter<T> getter) {
         this.getter = getter;
     }
 
-    private static final JOne EMPTY = of(null);
+    private static final JAny EMPTY = of(null);
 
-    public static <T> JOne<T> empty() {
+    public static <T> JAny<T> empty() {
         return EMPTY;
     }
 
-    public static <T> JOne<T> of(JGetter<T> getter) {
-        return new JOne<>(getter);
+    public static <T> JAny<T> of(JGetter<T> getter) {
+        return new JAny<>(getter);
     }
 
-    public static <T> JOne<T> of(T value) {
+    public static <T> JAny<T> of(T value) {
         return of(() -> value);
     }
 
@@ -37,8 +41,8 @@ public final class JOne<T> implements JGetter<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof JOne) {
-            return equals(get(), ((JOne) o).get());
+        if (o instanceof JAny) {
+            return equals(get(), ((JAny) o).get());
         }
         return equals(get(), o);
     }
@@ -61,11 +65,11 @@ public final class JOne<T> implements JGetter<T> {
         return get() == null;
     }
 
-    public JOne<T> elvis(T newValue) {
+    public JAny<T> elvis(T newValue) {
         return isNotNull() ? this : of(newValue);
     }
 
-    public JOne<T> elvis(JGetter<T> getter) {
+    public JAny<T> elvis(JGetter<T> getter) {
         return isNotNull() ? this : of(getter.get());
     }
 
@@ -78,12 +82,12 @@ public final class JOne<T> implements JGetter<T> {
         return !is(clazz);
     }
 
-    public <U> JOne<U> cast(Class<U> clazz) {
+    public <U> JAny<U> cast(Class<U> clazz) {
         if (is(clazz)) return of((JGetter<U>) this);
         throw new ClassCastException("expected " + clazz + ", but found " + type());
     }
 
-    public <U> JOne<U> as(Class<U> clazz) {
+    public <U> JAny<U> as(Class<U> clazz) {
         if (is(clazz)) return of((JGetter<U>) this);
         return empty();
     }
@@ -108,16 +112,16 @@ public final class JOne<T> implements JGetter<T> {
         return false;
     }
 
-    public <U> JOne<U> set(U value) {
+    public <U> JAny<U> set(U value) {
         return of(value);
     }
 
-    public <U> JOne<U> let(JFunc.F1<T, U> func) {
+    public <U> JAny<U> let(JFunc.F1<T, U> func) {
         return of(func.call(get()));
     }
 
-    public JOne<T> also(JFunc.A1<T> func) {
-        func.run(get());
+    public JAny<T> also(JAction.A1<T> func) {
+        func.call(get());
         return this;
     }
 
@@ -125,20 +129,20 @@ public final class JOne<T> implements JGetter<T> {
         return value;
     }
 
-    public JOne<T> apply(JFunc.A1<JOne<T>> func) {
-        func.run(this);
+    public JAny<T> apply(JAction.A1<JAny<T>> func) {
+        func.call(this);
         return this;
     }
 
-    public <U> JOne<U> call(JFunc.F1<JOne<T>, U> func) {
+    public <U> JAny<U> call(JFunc.F1<JAny<T>, U> func) {
         return of(func.call(this));
     }
 
-    public <U> JOne<U> safeCall(JFunc.F1<JOne<T>, U> func) {
+    public <U> JAny<U> safeCall(JFunc.F1<JAny<T>, U> func) {
         return isNotNull() ? call(func) : empty();
     }
 
-    public <U> JOne<U> catchError(JFunc.F1<JOne<T>, U> func) {
+    public <U> JAny<U> catchError(JFunc.F1<JAny<T>, U> func) {
         try {
             return of(func.call(this));
         } catch (Throwable e) {

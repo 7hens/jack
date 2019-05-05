@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
-import cn.thens.jack.JGetter;
+import cn.thens.jack.property.JGetter;
 import cn.thens.jack.JLazyView;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,12 +1,8 @@
-package cn.thens.jack;
+package cn.thens.jack.func;
 
 @SuppressWarnings({"unused", "WeakerAccess", "unchecked"})
 public final class JFunc {
     private JFunc() {
-    }
-
-    public static void run(A0 func) {
-        func.run();
     }
 
     public static <R> R call(F0<R> func) {
@@ -20,54 +16,7 @@ public final class JFunc {
         return EMPTY;
     }
 
-    public interface A {
-    }
-
-    public interface A0 extends A {
-        void run();
-    }
-
-    public interface A1<P1> extends A {
-        void run(P1 p1);
-    }
-
-    public interface A2<P1, P2> extends A {
-        void run(P1 p1, P2 p2);
-    }
-
-    public interface A3<P1, P2, P3> extends A {
-        void run(P1 p1, P2 p2, P3 p3);
-    }
-
-    public interface A4<P1, P2, P3, P4> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4);
-    }
-
-    public interface A5<P1, P2, P3, P4, P5> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
-    }
-
-    public interface A6<P1, P2, P3, P4, P5, P6> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6);
-    }
-
-    public interface A7<P1, P2, P3, P4, P5, P6, P7> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7);
-    }
-
-    public interface A8<P1, P2, P3, P4, P5, P6, P7, P8> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8);
-    }
-
-    public interface A9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends A {
-        void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
-    }
-
-    public interface AN extends A {
-        void run(Object... objects);
-    }
-
-    public interface F<R> extends A {
+    public interface F<R> extends JAction.A {
     }
 
     public interface F0<R> extends F<R> {
@@ -115,17 +64,6 @@ public final class JFunc {
     }
 
     public static final class Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
-            A0,
-            A1<P1>,
-            A2<P1, P2>,
-            A3<P1, P2, P3>,
-            A4<P1, P2, P3, P4>,
-            A5<P1, P2, P3, P4, P5>,
-            A6<P1, P2, P3, P4, P5, P6>,
-            A7<P1, P2, P3, P4, P5, P6, P7>,
-            A8<P1, P2, P3, P4, P5, P6, P7, P8>,
-            A9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
-            AN,
             F0<R>,
             F1<P1, R>,
             F2<P1, P2, R>,
@@ -139,50 +77,6 @@ public final class JFunc {
             FN<R> {
 
         private Empty() {
-        }
-
-        @Override
-        public void run() {
-        }
-
-        @Override
-        public void run(P1 p1) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-        }
-
-        @Override
-        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
-        }
-
-        @Override
-        public void run(Object... objects) {
         }
 
         @Override

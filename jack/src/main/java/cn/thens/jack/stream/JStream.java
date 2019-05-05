@@ -1,4 +1,4 @@
-package cn.thens.jack;
+package cn.thens.jack.stream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,6 +9,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import cn.thens.jack.func.JAction;
+import cn.thens.jack.func.JFunc;
 
 @SuppressWarnings({"WeakerAccess", "NullableProblems", "unused"})
 public abstract class JStream<T> implements Iterable<T> {
@@ -108,17 +111,17 @@ public abstract class JStream<T> implements Iterable<T> {
         return accumulator;
     }
 
-    public JStream<T> forEach(JFunc.A1<T> func) {
+    public JStream<T> forEach(JAction.A1<T> func) {
         for (T item : this) {
-            func.run(item);
+            func.call(item);
         }
         return this;
     }
 
-    public JStream<T> forEachIndexed(JFunc.A2<Integer, T> func) {
+    public JStream<T> forEachIndexed(JAction.A2<Integer, T> func) {
         int index = 0;
         for (T item : this) {
-            func.run(index++, item);
+            func.call(index++, item);
         }
         return this;
     }
