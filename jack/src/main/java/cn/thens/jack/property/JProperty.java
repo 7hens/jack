@@ -6,7 +6,7 @@ import cn.thens.jack.func.JFunc;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class JProperty<T> {
 
-    public JGetter<T> get(final JFunc.F0<T> getter) {
+    public JGetter<T> get(final JFunc.T0<T> getter) {
         return getter::call;
     }
 
@@ -14,7 +14,7 @@ public final class JProperty<T> {
         return get(() -> value);
     }
 
-    public JSetter<T> set(final JAction.A1<T> setter, final JFunc.F0<T> getter) {
+    public JSetter<T> set(final JAction.T1<T> setter, final JFunc.T0<T> getter) {
         return new JSetter<T>() {
             @Override
             public void set(T t) {
@@ -28,24 +28,24 @@ public final class JProperty<T> {
         };
     }
 
-    public JSetter<T> set(final JAction.A1<T> setter, final T value) {
+    public JSetter<T> set(final JAction.T1<T> setter, final T value) {
         return set(setter, () -> value);
     }
 
-    public SetterSupplier<T> set(final JAction.A1<T> setter) {
+    public SetterSupplier<T> set(final JAction.T1<T> setter) {
         return new SetterSupplier<>(this, setter);
     }
 
     public static class SetterSupplier<T> {
-        private final JAction.A1<T> setter;
+        private final JAction.T1<T> setter;
         private final JProperty<T> jProperty;
 
-        SetterSupplier(JProperty<T> jProperty, JAction.A1<T> setter) {
+        SetterSupplier(JProperty<T> jProperty, JAction.T1<T> setter) {
             this.jProperty = jProperty;
             this.setter = setter;
         }
 
-        public JSetter<T> get(JFunc.F0<T> getter) {
+        public JSetter<T> get(JFunc.T0<T> getter) {
             return jProperty.set(setter, getter);
         }
 

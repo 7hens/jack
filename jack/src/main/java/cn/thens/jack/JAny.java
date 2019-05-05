@@ -1,4 +1,4 @@
-package cn.thens.jack.stream;
+package cn.thens.jack;
 
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JFunc;
@@ -102,7 +102,7 @@ public final class JAny<T> implements JGetter<T> {
         return false;
     }
 
-    public final boolean in(Object... items) {
+    public boolean in(Object... items) {
         T value = get();
         for (Object item : items) {
             if (equals(value, item)) {
@@ -116,11 +116,11 @@ public final class JAny<T> implements JGetter<T> {
         return of(value);
     }
 
-    public <U> JAny<U> let(JFunc.F1<T, U> func) {
+    public <U> JAny<U> let(JFunc.T1<T, U> func) {
         return of(func.call(get()));
     }
 
-    public JAny<T> also(JAction.A1<T> func) {
+    public JAny<T> also(JAction.T1<T> func) {
         func.call(get());
         return this;
     }
@@ -129,20 +129,20 @@ public final class JAny<T> implements JGetter<T> {
         return value;
     }
 
-    public JAny<T> apply(JAction.A1<JAny<T>> func) {
+    public JAny<T> apply(JAction.T1<JAny<T>> func) {
         func.call(this);
         return this;
     }
 
-    public <U> JAny<U> call(JFunc.F1<JAny<T>, U> func) {
+    public <U> JAny<U> call(JFunc.T1<JAny<T>, U> func) {
         return of(func.call(this));
     }
 
-    public <U> JAny<U> safeCall(JFunc.F1<JAny<T>, U> func) {
+    public <U> JAny<U> safeCall(JFunc.T1<JAny<T>, U> func) {
         return isNotNull() ? call(func) : empty();
     }
 
-    public <U> JAny<U> catchError(JFunc.F1<JAny<T>, U> func) {
+    public <U> JAny<U> catchError(JFunc.T1<JAny<T>, U> func) {
         try {
             return of(func.call(this));
         } catch (Throwable e) {

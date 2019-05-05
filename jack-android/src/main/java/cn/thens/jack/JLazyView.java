@@ -16,9 +16,9 @@ import cn.thens.jack.property.JLazy;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class JLazyView {
 
-    private final JFunc.F1<Integer, ? extends View> finder;
+    private final JFunc.T1<Integer, ? extends View> finder;
 
-    private JLazyView(JFunc.F1<Integer, ? extends View> finder) {
+    private JLazyView(JFunc.T1<Integer, ? extends View> finder) {
         this.finder = finder;
     }
 
@@ -27,11 +27,11 @@ public final class JLazyView {
         return JLazy.create(() -> (T) finder.call(id));
     }
 
-    public static JLazyView create(JFunc.F1<Integer, ? extends View> finder) {
+    public static JLazyView create(JFunc.T1<Integer, ? extends View> finder) {
         return new JLazyView(finder);
     }
 
-    public static JLazyView create(JFunc.F0<? extends View> view) {
+    public static JLazyView create(JFunc.T0<? extends View> view) {
         return create(id -> view.call().findViewById(id));
     }
 

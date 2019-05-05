@@ -16,19 +16,19 @@ public abstract class JRegisterGuard {
 
     public abstract boolean isRegistered();
 
-    public JRegisterGuard doOnRegister(JAction.A0 onRegister) {
+    public JRegisterGuard doOnRegister(JAction.T0 onRegister) {
         return doOnEach(onRegister, JAction.empty());
     }
 
-    public JRegisterGuard doOnUnregister(JAction.A0 onUnregister) {
+    public JRegisterGuard doOnUnregister(JAction.T0 onUnregister) {
         return doOnEach(JAction.empty(), onUnregister);
     }
 
-    public JRegisterGuard doOnEvent(JAction.A1<Boolean> onEvent) {
+    public JRegisterGuard doOnEvent(JAction.T1<Boolean> onEvent) {
         return doOnEach(() -> onEvent.call(true), () -> onEvent.call(false));
     }
 
-    public JRegisterGuard doOnEach(JAction.A0 onRegister, JAction.A0 onUnregister) {
+    public JRegisterGuard doOnEach(JAction.T0 onRegister, JAction.T0 onUnregister) {
         return new Wrapper(this) {
             @Override
             public boolean register() {

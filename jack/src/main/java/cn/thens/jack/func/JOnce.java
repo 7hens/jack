@@ -20,7 +20,7 @@ public final class JOnce {
         private Func() {
         }
 
-        public R call(JFunc.F0<? extends R> func) {
+        public R call(JFunc.T0<? extends R> func) {
             if (result != null) return result;
             if (shouldEnter.compareAndSet(true, false)) {
                 try {
@@ -45,7 +45,7 @@ public final class JOnce {
         private Action() {
         }
 
-        public void call(JAction.A0 func) {
+        public void call(JAction.T0 func) {
             once.call(() -> {
                 func.call();
                 return ONCE_RESULT;
@@ -54,174 +54,174 @@ public final class JOnce {
     }
 
     public static <R>
-    JFunc.F0<R>
-    wrap(final JFunc.F0<R> func) {
+    JFunc.T0<R>
+    wrap(final JFunc.T0<R> func) {
         final Func<R> once = func();
         return () ->
                 once.call(func);
     }
 
     public static <P1, R>
-    JFunc.F1<P1, R>
-    wrap(final JFunc.F1<P1, R> func) {
+    JFunc.T1<P1, R>
+    wrap(final JFunc.T1<P1, R> func) {
         final Func<R> once = func();
         return p1 ->
                 once.call(() -> func.call(p1));
     }
 
     public static <P1, P2, R>
-    JFunc.F2<P1, P2, R>
-    wrap(final JFunc.F2<P1, P2, R> func) {
+    JFunc.T2<P1, P2, R>
+    wrap(final JFunc.T2<P1, P2, R> func) {
         final Func<R> once = func();
         return (p1, p2) ->
                 once.call(() -> func.call(p1, p2));
     }
 
     public static <P1, P2, P3, R>
-    JFunc.F3<P1, P2, P3, R>
-    wrap(final JFunc.F3<P1, P2, P3, R> func) {
+    JFunc.T3<P1, P2, P3, R>
+    wrap(final JFunc.T3<P1, P2, P3, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3) ->
                 once.call(() -> func.call(p1, p2, p3));
     }
 
     public static <P1, P2, P3, P4, R>
-    JFunc.F4<P1, P2, P3, P4, R>
-    wrap(final JFunc.F4<P1, P2, P3, P4, R> func) {
+    JFunc.T4<P1, P2, P3, P4, R>
+    wrap(final JFunc.T4<P1, P2, P3, P4, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4) ->
                 once.call(() -> func.call(p1, p2, p3, p4));
     }
 
     public static <P1, P2, P3, P4, P5, R>
-    JFunc.F5<P1, P2, P3, P4, P5, R>
-    wrap(final JFunc.F5<P1, P2, P3, P4, P5, R> func) {
+    JFunc.T5<P1, P2, P3, P4, P5, R>
+    wrap(final JFunc.T5<P1, P2, P3, P4, P5, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4, p5) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5));
     }
 
     public static <P1, P2, P3, P4, P5, P6, R>
-    JFunc.F6<P1, P2, P3, P4, P5, P6, R>
-    wrap(final JFunc.F6<P1, P2, P3, P4, P5, P6, R> func) {
+    JFunc.T6<P1, P2, P3, P4, P5, P6, R>
+    wrap(final JFunc.T6<P1, P2, P3, P4, P5, P6, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4, p5, p6) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, R>
-    JFunc.F7<P1, P2, P3, P4, P5, P6, P7, R>
-    wrap(final JFunc.F7<P1, P2, P3, P4, P5, P6, P7, R> func) {
+    JFunc.T7<P1, P2, P3, P4, P5, P6, P7, R>
+    wrap(final JFunc.T7<P1, P2, P3, P4, P5, P6, P7, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4, p5, p6, p7) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, R>
-    JFunc.F8<P1, P2, P3, P4, P5, P6, P7, P8, R>
-    wrap(final JFunc.F8<P1, P2, P3, P4, P5, P6, P7, P8, R> func) {
+    JFunc.T8<P1, P2, P3, P4, P5, P6, P7, P8, R>
+    wrap(final JFunc.T8<P1, P2, P3, P4, P5, P6, P7, P8, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4, p5, p6, p7, p8) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7, p8));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    JFunc.F9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    wrap(final JFunc.F9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
+    JFunc.T9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
+    wrap(final JFunc.T9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
         final Func<R> once = func();
         return (p1, p2, p3, p4, p5, p6, p7, p8, p9) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7, p8, p9));
     }
 
     public static <R>
-    JFunc.FN<R>
-    wrap(final JFunc.FN<R> func) {
+    JFunc.TN<R>
+    wrap(final JFunc.TN<R> func) {
         final Func<R> once = func();
         return params ->
                 once.call(() -> func.call(params));
     }
 
-    public static JAction.A0
-    wrap(final JAction.A0 func) {
+    public static JAction.T0
+    wrap(final JAction.T0 func) {
         final Action once = action();
         return () ->
                 once.call(func);
     }
 
     public static <P1>
-    JAction.A1<P1>
-    wrap(final JAction.A1<P1> func) {
+    JAction.T1<P1>
+    wrap(final JAction.T1<P1> func) {
         final Action once = action();
         return p1 ->
                 once.call(() -> func.call(p1));
     }
 
     public static <P1, P2>
-    JAction.A2<P1, P2>
-    wrap(final JAction.A2<P1, P2> func) {
+    JAction.T2<P1, P2>
+    wrap(final JAction.T2<P1, P2> func) {
         final Action once = action();
         return (p1, p2) ->
                 once.call(() -> func.call(p1, p2));
     }
 
     public static <P1, P2, P3>
-    JAction.A3<P1, P2, P3>
-    wrap(final JAction.A3<P1, P2, P3> func) {
+    JAction.T3<P1, P2, P3>
+    wrap(final JAction.T3<P1, P2, P3> func) {
         final Action once = action();
         return (p1, p2, p3) ->
                 once.call(() -> func.call(p1, p2, p3));
     }
 
     public static <P1, P2, P3, P4>
-    JAction.A4<P1, P2, P3, P4>
-    wrap(final JAction.A4<P1, P2, P3, P4> func) {
+    JAction.T4<P1, P2, P3, P4>
+    wrap(final JAction.T4<P1, P2, P3, P4> func) {
         final Action once = action();
         return (p1, p2, p3, p4) ->
                 once.call(() -> func.call(p1, p2, p3, p4));
     }
 
     public static <P1, P2, P3, P4, P5>
-    JAction.A5<P1, P2, P3, P4, P5>
-    wrap(final JAction.A5<P1, P2, P3, P4, P5> func) {
+    JAction.T5<P1, P2, P3, P4, P5>
+    wrap(final JAction.T5<P1, P2, P3, P4, P5> func) {
         final Action once = action();
         return (p1, p2, p3, p4, p5) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5));
     }
 
     public static <P1, P2, P3, P4, P5, P6>
-    JAction.A6<P1, P2, P3, P4, P5, P6>
-    wrap(final JAction.A6<P1, P2, P3, P4, P5, P6> func) {
+    JAction.T6<P1, P2, P3, P4, P5, P6>
+    wrap(final JAction.T6<P1, P2, P3, P4, P5, P6> func) {
         final Action once = action();
         return (p1, p2, p3, p4, p5, p6) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7>
-    JAction.A7<P1, P2, P3, P4, P5, P6, P7>
-    wrap(final JAction.A7<P1, P2, P3, P4, P5, P6, P7> func) {
+    JAction.T7<P1, P2, P3, P4, P5, P6, P7>
+    wrap(final JAction.T7<P1, P2, P3, P4, P5, P6, P7> func) {
         final Action once = action();
         return (p1, p2, p3, p4, p5, p6, p7) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8>
-    JAction.A8<P1, P2, P3, P4, P5, P6, P7, P8>
-    wrap(final JAction.A8<P1, P2, P3, P4, P5, P6, P7, P8> func) {
+    JAction.T8<P1, P2, P3, P4, P5, P6, P7, P8>
+    wrap(final JAction.T8<P1, P2, P3, P4, P5, P6, P7, P8> func) {
         final Action once = action();
         return (p1, p2, p3, p4, p5, p6, p7, p8) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7, p8));
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    JAction.A9<P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    wrap(final JAction.A9<P1, P2, P3, P4, P5, P6, P7, P8, P9> func) {
+    JAction.T9<P1, P2, P3, P4, P5, P6, P7, P8, P9>
+    wrap(final JAction.T9<P1, P2, P3, P4, P5, P6, P7, P8, P9> func) {
         final Action once = action();
         return (p1, p2, p3, p4, p5, p6, p7, p8, p9) ->
                 once.call(() -> func.call(p1, p2, p3, p4, p5, p6, p7, p8, p9));
     }
 
-    public static JAction.AN
-    wrap(final JAction.AN func) {
+    public static JAction.TN
+    wrap(final JAction.TN func) {
         final Action once = action();
         return params ->
                 once.call(() -> func.call(params));

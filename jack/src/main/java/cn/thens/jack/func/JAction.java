@@ -5,7 +5,7 @@ package cn.thens.jack.func;
  */
 @SuppressWarnings({"unused", "WeakerAccess", "unchecked"})
 public final class JAction {
-    public static void call(A0 func) {
+    public static void call(T0 func) {
         func.call();
     }
 
@@ -16,66 +16,66 @@ public final class JAction {
         return EMPTY;
     }
 
-    public interface A {
+    public interface Base {
     }
 
-    public interface A0 extends A {
+    public interface T0 extends Base {
         void call();
     }
 
-    public interface A1<P1> extends A {
+    public interface T1<P1> extends Base {
         void call(P1 p1);
     }
 
-    public interface A2<P1, P2> extends A {
+    public interface T2<P1, P2> extends Base {
         void call(P1 p1, P2 p2);
     }
 
-    public interface A3<P1, P2, P3> extends A {
+    public interface T3<P1, P2, P3> extends Base {
         void call(P1 p1, P2 p2, P3 p3);
     }
 
-    public interface A4<P1, P2, P3, P4> extends A {
+    public interface T4<P1, P2, P3, P4> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4);
     }
 
-    public interface A5<P1, P2, P3, P4, P5> extends A {
+    public interface T5<P1, P2, P3, P4, P5> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
     }
 
-    public interface A6<P1, P2, P3, P4, P5, P6> extends A {
+    public interface T6<P1, P2, P3, P4, P5, P6> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6);
     }
 
-    public interface A7<P1, P2, P3, P4, P5, P6, P7> extends A {
+    public interface T7<P1, P2, P3, P4, P5, P6, P7> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7);
     }
 
-    public interface A8<P1, P2, P3, P4, P5, P6, P7, P8> extends A {
+    public interface T8<P1, P2, P3, P4, P5, P6, P7, P8> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8);
     }
 
-    public interface A9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends A {
+    public interface T9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends Base {
         void call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
     }
 
-    public interface AN extends A {
+    public interface TN extends Base {
         void call(Object... objects);
     }
 
 
     public static final class Empty<P1, P2, P3, P4, P5, P6, P7, P8, P9> implements
-            A0,
-            A1<P1>,
-            A2<P1, P2>,
-            A3<P1, P2, P3>,
-            A4<P1, P2, P3, P4>,
-            A5<P1, P2, P3, P4, P5>,
-            A6<P1, P2, P3, P4, P5, P6>,
-            A7<P1, P2, P3, P4, P5, P6, P7>,
-            A8<P1, P2, P3, P4, P5, P6, P7, P8>,
-            A9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
-            AN {
+            T0,
+            T1<P1>,
+            T2<P1, P2>,
+            T3<P1, P2, P3>,
+            T4<P1, P2, P3, P4>,
+            T5<P1, P2, P3, P4, P5>,
+            T6<P1, P2, P3, P4, P5, P6>,
+            T7<P1, P2, P3, P4, P5, P6, P7>,
+            T8<P1, P2, P3, P4, P5, P6, P7, P8>,
+            T9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
+            TN {
 
         private Empty() {
         }

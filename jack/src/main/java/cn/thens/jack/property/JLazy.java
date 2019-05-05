@@ -7,9 +7,9 @@ import cn.thens.jack.func.JOnce;
 
 @SuppressWarnings({"unused"})
 public final class JLazy<T> implements JGetter<T> {
-    private final JFunc.F0<? extends T> creator;
+    private final JFunc.T0<? extends T> creator;
 
-    private JLazy(JFunc.F0<? extends T> creator) {
+    private JLazy(JFunc.T0<? extends T> creator) {
         this.creator = creator;
     }
 
@@ -32,7 +32,7 @@ public final class JLazy<T> implements JGetter<T> {
         });
     }
 
-    public static <T> JLazy<T> create(final JFunc.F0<? extends T> creator) {
+    public static <T> JLazy<T> create(final JFunc.T0<? extends T> creator) {
         return new JLazy<>(creator);
     }
 }

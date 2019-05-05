@@ -4,10 +4,10 @@ import java.util.List;
 
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JFunc;
-import cn.thens.jack.stream.JAny;
-import cn.thens.jack.stream.JStream;
+import cn.thens.jack.JAny;
+import cn.thens.jack.JStream;
 
-public class OneDemo {
+public class StreamDemo {
     public void test(String text) {
         JAny.of(text).elvis("0")
                 .let(Integer::parseInt)
