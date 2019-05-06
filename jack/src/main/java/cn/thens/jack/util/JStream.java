@@ -1,6 +1,5 @@
 package cn.thens.jack.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,95 +50,6 @@ public abstract class JStream<T> implements Iterable<T> {
         return EMPTY;
     }
 
-    public <C extends Collection<? super T>> C toCollection(C destination) {
-        for (T item : this) {
-            destination.add(item);
-        }
-        return destination;
-    }
-
-    public List<T> toList() {
-        return toCollection(new ArrayList<>());
-    }
-
-    public HashSet<T> toHashSet() {
-        return toCollection(new HashSet<>());
-    }
-
-    public Set<T> toSet() {
-        return toCollection(new LinkedHashSet<>());
-    }
-
-    public boolean all(JFunc.T1<T, Boolean> predicate) {
-        for (T item : this) {
-            if (!predicate.call(item)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean any() {
-        return iterator().hasNext();
-    }
-
-    public boolean any(JFunc.T1<T, Boolean> predicate) {
-        for (T item : this) {
-            if (predicate.call(item)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int count() {
-        int count = 0;
-        for (T item : this) {
-            count++;
-        }
-        return count;
-    }
-
-    public int count(JFunc.T1<T, Boolean> predicate) {
-        int count = 0;
-        for (T item : this) {
-            if (predicate.call(item)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public <R> R fold(R initial, JFunc.T2<R, T, R> operation) {
-        R accumulator = initial;
-        for (T item : this) {
-            accumulator = operation.call(accumulator, item);
-        }
-        return accumulator;
-    }
-
-    public <R> R foldIndexed(R initial, JFunc.T3<Integer, R, T, R> operation) {
-        int index = 0;
-        R accumulator = initial;
-        for (T item : this) {
-            accumulator = operation.call(index++, accumulator, item);
-        }
-        return accumulator;
-    }
-
-    public void forEach(JAction.T1<T> func) {
-        for (T item : this) {
-            func.call(item);
-        }
-    }
-
-    public void forEachIndexed(JAction.T2<Integer, T> func) {
-        int index = 0;
-        for (T item : this) {
-            func.call(index++, item);
-        }
-    }
-
     public JStream<T> onEach(JAction.T1<T> func) {
         return map(it -> {
             func.call(it);
@@ -152,147 +62,6 @@ public abstract class JStream<T> implements Iterable<T> {
             func.call(index, value);
             return value;
         });
-    }
-
-    public static <T extends Comparable<T>> JFunc.T1<JStream<T>, T> max() {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) return null;
-            T max = iterator.next();
-            while (iterator.hasNext()) {
-                T e = iterator.next();
-                if (max.compareTo(e) < 0) max = e;
-            }
-            return max;
-        };
-    }
-
-    public static <T, R extends Comparable<R>> JFunc.T1<JStream<T>, T> maxBy(JFunc.T1<T, R> selector) {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) return null;
-            T maxElem = iterator.next();
-            R maxValue = selector.call(maxElem);
-            while (iterator.hasNext()) {
-                T e = iterator.next();
-                R v = selector.call(e);
-                if (maxValue.compareTo(v) < 0) {
-                    maxElem = e;
-                    maxValue = v;
-                }
-            }
-            return maxElem;
-        };
-    }
-
-    public T maxWith(Comparator<? super T> comparator) {
-        Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
-        T max = iterator.next();
-        while (iterator.hasNext()) {
-            T e = iterator.next();
-            if (comparator.compare(max, e) < 0) max = e;
-        }
-        return max;
-    }
-
-    public static <T extends Comparable<T>> JFunc.T1<JStream<T>, T> min() {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) return null;
-            T min = iterator.next();
-            while (iterator.hasNext()) {
-                T e = iterator.next();
-                if (min.compareTo(e) > 0) min = e;
-            }
-            return min;
-        };
-    }
-
-
-    public static <T, R extends Comparable<R>> JFunc.T1<JStream<T>, T> minBy(JFunc.T1<T, R> selector) {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) return null;
-            T minElem = iterator.next();
-            R minValue = selector.call(minElem);
-            while (iterator.hasNext()) {
-                T e = iterator.next();
-                R v = selector.call(e);
-                if (minValue.compareTo(v) > 0) {
-                    minElem = e;
-                    minValue = v;
-                }
-            }
-            return minElem;
-        };
-    }
-
-    public T minWith(Comparator<? super T> comparator) {
-        Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
-        T min = iterator.next();
-        while (iterator.hasNext()) {
-            T e = iterator.next();
-            if (comparator.compare(min, e) > 0) min = e;
-        }
-        return min;
-    }
-
-    public boolean none() {
-        return !iterator().hasNext();
-    }
-
-    public boolean none(JFunc.T1<T, Boolean> predicate) {
-        for (T item : this) {
-            if (predicate.call(item)) return false;
-        }
-        return true;
-    }
-
-    public static <S, T extends S> JFunc.T1<JStream<T>, S> reduce(JFunc.T2<S, T, S> operation) {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) {
-                throw new UnsupportedOperationException("Empty sequence can't be reduced.");
-            }
-            S accumulator = iterator.next();
-            while (iterator.hasNext()) {
-                accumulator = operation.call(accumulator, iterator.next());
-            }
-            return accumulator;
-        };
-    }
-
-    public static <S, T extends S> JFunc.T1<JStream<T>, S> reduceIndexed(JFunc.T3<Integer, S, T, S> operation) {
-        return stream -> {
-            Iterator<T> iterator = stream.iterator();
-            if (!iterator.hasNext()) {
-                throw new UnsupportedOperationException("Empty sequence can't be reduced.");
-            }
-            int index = 1;
-            S accumulator = iterator.next();
-            while (iterator.hasNext()) {
-                accumulator = operation.call(index++, accumulator, iterator.next());
-            }
-            return accumulator;
-        };
-    }
-
-    public int sumBy(JFunc.T1<T, Integer> selector) {
-        int sum = 0;
-        for (T item : this) {
-            sum += selector.call(item);
-        }
-        return sum;
-    }
-
-    public double sumByDouble(JFunc.T1<T, Double> selector) {
-        double sum = 0;
-        for (T item : this) {
-            sum += selector.call(item);
-        }
-        return sum;
     }
 
     public JStream<T> requireNoNulls() {
@@ -346,48 +115,6 @@ public abstract class JStream<T> implements Iterable<T> {
                 };
             }
         };
-    }
-
-    public <A extends Appendable> A joinTo(A buffer, CharSequence separator, JFunc.T1<T, CharSequence> transform, int limit, CharSequence truncated) throws IOException {
-        int count = 0;
-        for (T element : this) {
-            if (++count > 1) buffer.append(separator);
-            if (limit < 0 || count <= limit) {
-                if (transform != null) {
-                    buffer.append(transform.call(element));
-                } else if (element instanceof CharSequence) {
-                    buffer.append((CharSequence) element);
-                } else if (element instanceof Character) {
-                    buffer.append((Character) element);
-                } else {
-                    buffer.append(element.toString());
-                }
-            } else {
-                break;
-            }
-        }
-        if (limit >= 0 && count > limit) buffer.append(truncated);
-        return buffer;
-    }
-
-    public <A extends Appendable> A joinTo(A buffer, CharSequence separator, JFunc.T1<T, CharSequence> transform, int limit) throws IOException {
-        return joinTo(buffer, separator, transform, limit, "...");
-    }
-
-    public <A extends Appendable> A joinTo(A buffer, CharSequence separator, JFunc.T1<T, CharSequence> transform) throws IOException {
-        return joinTo(buffer, separator, transform, -1);
-    }
-
-    public <A extends Appendable> A joinTo(A buffer, CharSequence separator) throws IOException {
-        return joinTo(buffer, separator, null);
-    }
-
-    public <A extends Appendable> A joinTo(A buffer) throws IOException {
-        return joinTo(buffer, ", ");
-    }
-
-    public <U> U call(JFunc.T1<JStream<T>, U> func) {
-        return func.call(this);
     }
 
     public <R> JStream<R> map(JFunc.T1<T, R> transformer) {
@@ -592,5 +319,427 @@ public abstract class JStream<T> implements Iterable<T> {
         protected void done() {
             state = State.DONE;
         }
+    }
+
+    public <U> U call(JFunc.T1<JStream<T>, U> func) {
+        return func.call(this);
+    }
+
+
+    public void forEach(JAction.T1<T> func) {
+        for (T item : this) {
+            func.call(item);
+        }
+    }
+
+    public void forEachIndexed(JAction.T2<Integer, T> func) {
+        int index = 0;
+        for (T item : this) {
+            func.call(index++, item);
+        }
+    }
+
+    public int count() {
+        int count = 0;
+        for (T item : this) {
+            count++;
+        }
+        return count;
+    }
+
+    public int count(JFunc.T1<T, Boolean> predicate) {
+        int count = 0;
+        for (T item : this) {
+            if (predicate.call(item)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int indexOf(T element) {
+        int index = 0;
+        for (T item : this) {
+            if (element == item) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    public int lastIndexOf(T element) {
+        int lastIndex = -1;
+        int index = 0;
+        for (T item : this) {
+            if (element == item) {
+                lastIndex = index;
+            }
+            index++;
+        }
+        return lastIndex;
+    }
+
+    public boolean contains(T element) {
+        return indexOf(element) >= 0;
+    }
+
+    public T elementAtOrElse(int index, JFunc.T1<Integer, T> defaultValue) {
+        if (index < 0) {
+            return defaultValue.call(index);
+        }
+        Iterator<T> iterator = iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            T element = iterator.next();
+            if (index == count++) {
+                return element;
+            }
+        }
+        return defaultValue.call(index);
+    }
+
+    public T elementAtOrNull(int index) {
+        return elementAtOrElse(index, it -> null);
+    }
+
+    public T elementAt(int index) {
+        return elementAtOrElse(index, it -> {
+            throw new IndexOutOfBoundsException("Stream doesn't contain element at index " + index);
+        });
+    }
+
+    public T firstOrElse(JFunc.T1<T, Boolean> predicate, JFunc.T0<T> defaultValue) {
+        for (T item : this) {
+            if (predicate.call(item)) return item;
+        }
+        return defaultValue.call();
+    }
+
+    public T firstOrNull(JFunc.T1<T, Boolean> predicate) {
+        return firstOrElse(predicate, () -> null);
+    }
+
+    public T first(JFunc.T1<T, Boolean> predicate) {
+        return firstOrElse(predicate, () -> {
+            throw new NoSuchElementException("Stream contains no element matching the predicate.");
+        });
+    }
+
+    public T lastOrElse(JFunc.T1<T, Boolean> predicate, JFunc.T0<T> defaultValue) {
+        T last = null;
+        boolean found = false;
+        for (T item : this) {
+            if (predicate.call(item)) {
+                found = true;
+                last = item;
+            }
+        }
+        return found ? last : defaultValue.call();
+    }
+
+    public T lastOrNull(JFunc.T1<T, Boolean> predicate) {
+        return lastOrElse(predicate, () -> null);
+    }
+
+    public T last(JFunc.T1<T, Boolean> predicate) {
+        return lastOrElse(predicate, () -> {
+            throw new NoSuchElementException("Stream contains no element matching the predicate.");
+        });
+    }
+
+    public <C extends Collection<? super T>> C toCollection(C destination) {
+        for (T item : this) {
+            destination.add(item);
+        }
+        return destination;
+    }
+
+    public List<T> toList() {
+        return toCollection(new ArrayList<>());
+    }
+
+    public HashSet<T> toHashSet() {
+        return toCollection(new HashSet<>());
+    }
+
+    public Set<T> toSet() {
+        return toCollection(new LinkedHashSet<>());
+    }
+
+    public boolean none() {
+        return !iterator().hasNext();
+    }
+
+    public boolean none(JFunc.T1<T, Boolean> predicate) {
+        for (T item : this) {
+            if (predicate.call(item)) return false;
+        }
+        return true;
+    }
+
+    public boolean all(JFunc.T1<T, Boolean> predicate) {
+        for (T item : this) {
+            if (!predicate.call(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean any() {
+        return iterator().hasNext();
+    }
+
+    public boolean any(JFunc.T1<T, Boolean> predicate) {
+        for (T item : this) {
+            if (predicate.call(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public <R> R fold(R initial, JFunc.T2<R, T, R> operation) {
+        R accumulator = initial;
+        for (T item : this) {
+            accumulator = operation.call(accumulator, item);
+        }
+        return accumulator;
+    }
+
+    public <R> R foldIndexed(R initial, JFunc.T3<Integer, R, T, R> operation) {
+        int index = 0;
+        R accumulator = initial;
+        for (T item : this) {
+            accumulator = operation.call(index++, accumulator, item);
+        }
+        return accumulator;
+    }
+
+    public static <T extends Comparable<T>> JFunc.T1<JStream<T>, T> max() {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T max = iterator.next();
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                if (max.compareTo(e) < 0) max = e;
+            }
+            return max;
+        };
+    }
+
+    public static <T, R extends Comparable<R>> JFunc.T1<JStream<T>, T> maxBy(JFunc.T1<T, R> selector) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T maxElem = iterator.next();
+            R maxValue = selector.call(maxElem);
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                R v = selector.call(e);
+                if (maxValue.compareTo(v) < 0) {
+                    maxElem = e;
+                    maxValue = v;
+                }
+            }
+            return maxElem;
+        };
+    }
+
+    public static <T> JFunc.T1<JStream<T>, T> maxWith(Comparator<? super T> comparator) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T max = iterator.next();
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                if (comparator.compare(max, e) < 0) max = e;
+            }
+            return max;
+        };
+    }
+
+    public static <T extends Comparable<T>> JFunc.T1<JStream<T>, T> min() {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T min = iterator.next();
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                if (min.compareTo(e) > 0) min = e;
+            }
+            return min;
+        };
+    }
+
+
+    public static <T, R extends Comparable<R>> JFunc.T1<JStream<T>, T>
+    minBy(JFunc.T1<T, R> selector) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T minElem = iterator.next();
+            R minValue = selector.call(minElem);
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                R v = selector.call(e);
+                if (minValue.compareTo(v) > 0) {
+                    minElem = e;
+                    minValue = v;
+                }
+            }
+            return minElem;
+        };
+    }
+
+    public static <T> JFunc.T1<JStream<T>, T> minWith(Comparator<? super T> comparator) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) return null;
+            T min = iterator.next();
+            while (iterator.hasNext()) {
+                T e = iterator.next();
+                if (comparator.compare(min, e) > 0) min = e;
+            }
+            return min;
+        };
+    }
+
+    public static <S, T extends S> JFunc.T1<JStream<T>, S> reduce(JFunc.T2<S, T, S> operation) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) {
+                throw new UnsupportedOperationException("Empty stream can't be reduced.");
+            }
+            S accumulator = iterator.next();
+            while (iterator.hasNext()) {
+                accumulator = operation.call(accumulator, iterator.next());
+            }
+            return accumulator;
+        };
+    }
+
+    public static <S, T extends S>
+    JFunc.T1<JStream<T>, S> reduceIndexed(JFunc.T3<Integer, S, T, S> operation) {
+        return stream -> {
+            Iterator<T> iterator = stream.iterator();
+            if (!iterator.hasNext()) {
+                throw new UnsupportedOperationException("Empty stream can't be reduced.");
+            }
+            int index = 1;
+            S accumulator = iterator.next();
+            while (iterator.hasNext()) {
+                accumulator = operation.call(index++, accumulator, iterator.next());
+            }
+            return accumulator;
+        };
+    }
+
+
+    public static JFunc.T1<JStream<? extends Number>, Double> average() {
+        return stream -> {
+            double sum = 0;
+            int count = 0;
+            for (Number element : stream) {
+                sum += element.doubleValue();
+                count++;
+            }
+            return count == 0 ? Double.NaN : sum / count;
+        };
+    }
+
+    public static JFunc.T1<JStream<? extends Number>, Double> sum() {
+        return stream -> {
+            double sum = 0;
+            for (Number element : stream) {
+                sum += element.doubleValue();
+            }
+            return sum;
+        };
+    }
+
+    public static <T> JFunc.T1<JStream<T>, Double> sumBy(JFunc.T1<T, Double> selector) {
+        return stream -> {
+            double sum = 0;
+            for (T item : stream) {
+                sum += selector.call(item);
+            }
+            return sum;
+        };
+    }
+
+    public static <T, A extends Appendable> JFunc.T1<JStream<T>, A> joinTo(
+            A buffer, CharSequence separator, int limit, CharSequence truncated,
+            JFunc.T1<T, CharSequence> transform) {
+        return stream -> {
+            try {
+                int count = 0;
+                for (T element : stream) {
+                    if (++count > 1) buffer.append(separator);
+                    if (limit < 0 || count <= limit) {
+                        if (transform != null) {
+                            buffer.append(transform.call(element));
+                        } else if (element instanceof CharSequence) {
+                            buffer.append((CharSequence) element);
+                        } else if (element instanceof Character) {
+                            buffer.append((Character) element);
+                        } else {
+                            buffer.append(element.toString());
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                if (limit >= 0 && count > limit) buffer.append(truncated);
+                return buffer;
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    public static <T, A extends Appendable> JFunc.T1<JStream<T>, A> joinTo(
+            A buffer, CharSequence separator, int limit, CharSequence truncated) {
+        return joinTo(buffer, separator, limit, truncated, null);
+    }
+
+    public static <T, A extends Appendable> JFunc.T1<JStream<T>, A> joinTo(
+            A buffer, CharSequence separator, int limit) {
+        return joinTo(buffer, separator, limit, "...");
+    }
+
+    public static <T, A extends Appendable> JFunc.T1<JStream<T>, A> joinTo(
+            A buffer, CharSequence separator) {
+        return joinTo(buffer, separator, -1);
+    }
+
+    public static <T, A extends Appendable>
+    JFunc.T1<JStream<T>, A> joinTo(A buffer) {
+        return joinTo(buffer, ", ");
+    }
+
+    public static <T> String joinToString(
+            CharSequence separator, int limit, CharSequence truncated,
+            JFunc.T1<T, CharSequence> transform) {
+        return joinTo(new StringBuilder(), separator, limit, truncated, transform).toString();
+    }
+
+    public static <T> String joinToString(
+            CharSequence separator, int limit, CharSequence truncated) {
+        return joinToString(separator, limit, truncated, null);
+    }
+
+    public static <T> String joinToString(CharSequence separator, int limit) {
+        return joinToString(separator, limit, "...");
+    }
+
+    public static <T> String joinToString(CharSequence separator) {
+        return joinToString(separator, -1);
+    }
+
+    public static <T> String joinToString() {
+        return joinToString(", ");
     }
 }
