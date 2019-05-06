@@ -1,4 +1,4 @@
-package cn.thens.jack;
+package cn.thens.jack.util;
 
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JFunc;

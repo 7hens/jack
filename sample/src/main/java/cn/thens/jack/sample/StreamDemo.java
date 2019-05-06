@@ -4,8 +4,8 @@ import java.util.List;
 
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JFunc;
-import cn.thens.jack.JAny;
-import cn.thens.jack.JStream;
+import cn.thens.jack.util.JAny;
+import cn.thens.jack.util.JStream;
 
 public class StreamDemo {
     public void test(String text) {

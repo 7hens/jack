@@ -1,4 +1,4 @@
-package cn.thens.jack;
+package cn.thens.jack.util;
 
 @SuppressWarnings("WeakerAccess")
 public final class JTuple {
