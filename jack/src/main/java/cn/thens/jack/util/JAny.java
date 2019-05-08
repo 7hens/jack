@@ -1,17 +1,11 @@
 package cn.thens.jack.util;
 
-import cn.thens.jack.func.JAction;
-import cn.thens.jack.func.JFunc;
+import cn.thens.jack.func.JAction1;
+import cn.thens.jack.func.JFunc1;
 import cn.thens.jack.property.JGetter;
 
-@SuppressWarnings({"WeakerAccess", "unused", "EqualsReplaceableByObjectsCall", "unchecked"})
-public final class JAny<T> implements JGetter<T> {
-    private final JGetter<T> getter;
-
-    private JAny(JGetter<T> getter) {
-        this.getter = getter;
-    }
-
+@SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
+public abstract class JAny<T> implements JGetter<T> {
     private static final JAny EMPTY = of(null);
 
     public static <T> JAny<T> empty() {
@@ -19,24 +13,24 @@ public final class JAny<T> implements JGetter<T> {
     }
 
     public static <T> JAny<T> of(JGetter<T> getter) {
-        return new JAny<>(getter);
+        return new JAny<T>() {
+            @Override
+            public T get() {
+                return getter.get();
+            }
+        };
     }
 
     public static <T> JAny<T> of(T value) {
         return of(() -> value);
     }
 
-    public static boolean equals(Object a, Object b) {
-        return a == null ? b == null : a.equals(b);
-    }
-
-    @Override
-    public T get() {
-        return getter.get();
-    }
-
     public Class<?> type() {
         return get().getClass();
+    }
+
+    public static boolean equals(Object a, Object b) {
+        return a == null ? b == null : a.equals(b);
     }
 
     @Override
@@ -116,12 +110,12 @@ public final class JAny<T> implements JGetter<T> {
         return of(value);
     }
 
-    public <U> JAny<U> let(JFunc.T1<T, U> func) {
-        return of(func.call(get()));
+    public <U> JAny<U> let(JFunc1<T, U> func) {
+        return of(func.invoke(get()));
     }
 
-    public JAny<T> also(JAction.T1<T> func) {
-        func.call(get());
+    public JAny<T> also(JAction1<T> func) {
+        func.invoke(get());
         return this;
     }
 
@@ -129,22 +123,22 @@ public final class JAny<T> implements JGetter<T> {
         return value;
     }
 
-    public JAny<T> apply(JAction.T1<JAny<T>> func) {
-        func.call(this);
+    public JAny<T> apply(JAction1<JAny<T>> func) {
+        func.invoke(this);
         return this;
     }
 
-    public <U> JAny<U> call(JFunc.T1<JAny<T>, U> func) {
-        return of(func.call(this));
+    public <U> JAny<U> call(JFunc1<JAny<T>, U> func) {
+        return of(func.invoke(this));
     }
 
-    public <U> JAny<U> safeCall(JFunc.T1<JAny<T>, U> func) {
+    public <U> JAny<U> safeCall(JFunc1<JAny<T>, U> func) {
         return isNotNull() ? call(func) : empty();
     }
 
-    public <U> JAny<U> catchError(JFunc.T1<JAny<T>, U> func) {
+    public <U> JAny<U> catchError(JFunc1<JAny<T>, U> func) {
         try {
-            return of(func.call(this));
+            return of(func.invoke(this));
         } catch (Throwable e) {
             return empty();
         }

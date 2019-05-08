@@ -5,7 +5,7 @@ import java.util.List;
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JFunc;
 import cn.thens.jack.util.JAny;
-import cn.thens.jack.util.JStream;
+import cn.thens.jack.util.JSequence;
 
 public class StreamDemo {
     public void test(String text) {
@@ -20,7 +20,7 @@ public class StreamDemo {
     }
 
     public List<Integer> stream() {
-        return JStream.of(1, 2, 3)
+        return JSequence.of(1, 2, 3)
                 .map(it -> it + 2)
                 .toList();
     }
