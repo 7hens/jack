@@ -2,7 +2,7 @@ package cn.thens.jack.util;
 
 import cn.thens.jack.func.JFunc0;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public final class JContract {
     public static void require(boolean value, JFunc0<Object> lazyMessage) {
         if (value) return;
@@ -17,16 +17,17 @@ public final class JContract {
         require(value, "Failed requirement");
     }
 
-    public static <T> void requireNotNull(T value, JFunc0<Object> lazyMessage) {
+    public static <T> T requireNotNull(T value, JFunc0<Object> lazyMessage) {
         require(value != null, lazyMessage);
+        return value;
     }
 
-    public static <T> void requireNotNull(T value, Object message) {
-        requireNotNull(value, () -> message);
+    public static <T> T requireNotNull(T value, Object message) {
+        return requireNotNull(value, () -> message);
     }
 
-    public static <T> void requireNotNull(T value) {
-        requireNotNull(value, "Required value was null");
+    public static <T> T requireNotNull(T value) {
+        return requireNotNull(value, "Required value was null");
     }
 
     public static void error(Object message) {

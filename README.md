@@ -162,6 +162,54 @@ class PropertyDemo {
 
 <!-- tabs:end -->
 
+## 空安全
+
+Jack 中的空安全使用了一个封装类 JAny 来实现。
+
+<!-- tabs:start -->
+
+### ** Jack **
+
+```java
+JAny.of(text).elvis("").get();
+
+JAny.of(text).safeCall(it -> it + "safeCall").get();
+```
+
+### ** Kotlin **
+
+```kotlin
+text ?: ""
+
+text?.let { it + "safeCall" }
+```
+
+<!-- tabs:end -->
+
+## Sequence
+
+<!-- tabs:start -->
+
+### ** Jack **
+
+```java
+JSequence.of(list)
+    .map(it -> it.toString())
+    .joinToString();
+```
+
+### ** Kotlin **
+
+```kotlin
+list.toSequence()
+    .map { it.toString() }
+    .joinToString()
+```
+
+<!-- tabs:end -->
+
 ## 最后
 
 看了看，还是 Kotlin 好用啊~
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

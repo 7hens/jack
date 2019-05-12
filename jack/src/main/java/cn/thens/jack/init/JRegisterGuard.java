@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import cn.thens.jack.func.JAction;
 import cn.thens.jack.func.JAction0;
 import cn.thens.jack.func.JAction1;
+import cn.thens.jack.util.JContract;
 
 /**
  * @author 7hens
@@ -17,6 +18,10 @@ public abstract class JRegisterGuard {
     public abstract boolean unregister();
 
     public abstract boolean isRegistered();
+
+    public void requireRegistered() {
+        JContract.require(isRegistered(), "require registered");
+    }
 
     public JRegisterGuard doOnRegister(JAction0 onRegister) {
         return doOnEach(onRegister, JAction.empty());

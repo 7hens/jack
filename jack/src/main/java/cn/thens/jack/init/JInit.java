@@ -3,6 +3,7 @@ package cn.thens.jack.init;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.property.JGetter;
+import cn.thens.jack.util.JContract;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class JInit implements JGetter<Boolean> {
@@ -14,8 +15,7 @@ public final class JInit implements JGetter<Boolean> {
     }
 
     public void check() {
-        if (peek()) return;
-        throw new RuntimeException("JInit is uninitialized");
+        JContract.require(peek(), "JInit is uninitialized");
     }
 
     public boolean peek() {
