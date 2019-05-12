@@ -8,24 +8,25 @@ import cn.thens.jack.property.JGetter;
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
 public abstract class JAny<T> implements JGetter<T> {
 
-    private static final JAny EMPTY = of(JFunc.empty());
+    private static final JAny EMPTY = new JAny() {
+        @Override
+        public Object get() {
+            return null;
+        }
+    };
 
     public static <T> JAny<T> empty() {
         return EMPTY;
     }
 
-    public static <T> JAny<T> of(JGetter<? extends T> getter) {
+    public static <T> JAny<T> of(final T value) {
+        if (value == null) return empty();
         return new JAny<T>() {
             @Override
             public T get() {
-                return getter.get();
+                return value;
             }
         };
-    }
-
-    public static <T> JAny<T> of(T value) {
-        if (value == null) return empty();
-        return of(() -> value);
     }
 
     public Class<?> type() {
@@ -74,7 +75,7 @@ public abstract class JAny<T> implements JGetter<T> {
     }
 
     public JAny<T> elvis(JGetter<? extends T> getter) {
-        return isNotNull() ? this : of(getter);
+        return isNotNull() ? this : of(getter.get());
     }
 
     public boolean is(Class<?> clazz) {
@@ -87,12 +88,12 @@ public abstract class JAny<T> implements JGetter<T> {
     }
 
     public <U> JAny<U> cast(Class<U> clazz) {
-        if (is(clazz)) return of((JGetter<U>) this);
+        if (is(clazz)) return (JAny<U>) this;
         throw new ClassCastException("expected " + clazz + ", but found " + type());
     }
 
     public <U> JAny<U> safeCast(Class<U> clazz) {
-        if (is(clazz)) return of((JGetter<U>) this);
+        if (is(clazz)) return (JAny<U>) this;
         return empty();
     }
 
@@ -111,10 +112,6 @@ public abstract class JAny<T> implements JGetter<T> {
 
     public <U> JAny<U> set(U value) {
         return of(value);
-    }
-
-    public <U> JAny<U> set(JGetter<? extends U> getter) {
-        return of(getter);
     }
 
     public <U> U with(U value) {
