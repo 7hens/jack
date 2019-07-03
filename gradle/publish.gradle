@@ -1,10 +1,10 @@
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = USER_ORG
     groupId = GROUP_ID
     artifactId = project.name
     publishVersion = VERSION
+    userOrg = USER_ORG
     desc = DESCRIPTION
     website = WEBSITE
 }
@@ -16,10 +16,6 @@ version = VERSION
 
 uploadArchives {
     repositories {
-        mavenDeployer {
-            def userHome = System.getProperty('user.home')
-            def localMavenRepo = 'file://' + new File(userHome, '.m2/repository').absolutePath
-            repository(url: uri(localMavenRepo))
-        }
+        mavenLocal()
     }
 }

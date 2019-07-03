@@ -9,6 +9,13 @@ import cn.thens.jack.util.JContract;
 public final class JInit implements JGetter<Boolean> {
     private AtomicBoolean isInitialized = new AtomicBoolean(false);
 
+    private JInit() {
+    }
+
+    public static JInit create() {
+        return new JInit();
+    }
+
     @Override
     public Boolean get() {
         return !isInitialized.compareAndSet(false, true);
