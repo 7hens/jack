@@ -33,4 +33,8 @@ public final class JContract {
     public static void error(Object message) {
         throw new IllegalStateException(message.toString());
     }
+
+    public static void error(Throwable error) {
+        throw new RuntimeException(error);
+    }
 }
