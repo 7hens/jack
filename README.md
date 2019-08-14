@@ -13,8 +13,6 @@
 implementation 'cn.thens.jack:jack-android:<last_version>'
 ```
 
-last_version: ![Download](https://api.bintray.com/packages/7hens/maven/jack-android/images/download.svg)
-
 ## View 注入
 
 使用 Jack 来注入 View 非常简单，虽然比不过 Kotlin，但会比 Butter Knife 好很多，无需手动解绑，无内存泄漏风险。
