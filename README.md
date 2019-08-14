@@ -1,17 +1,19 @@
-# Jack
-
 [![Download](https://api.bintray.com/packages/7hens/maven/jack-android/images/download.svg)](https://bintray.com/7hens/maven/jack-android/_latestVersion)
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/7hens/jack/blob/master/LICENSE)
 [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 [![github](https://img.shields.io/github/stars/7hens/jack.svg?style=social)](https://github.com/7hens/jack)
+
+# Jack
 
 一个模拟 Kotlin 的轻量级的库。[项目地址](https://github.com/7hens/jack)
 
 > 公司项目不让用 Kotlin，所以我就用 Java 写了个模拟 Kotlin 的库。哈哈~
 
 ```groovy
-implementation 'cn.thens.jack:jack-android:0.2.1'
+implementation 'cn.thens.jack:jack-android:<last_version>'
 ```
+
+last_version: ![Download](https://api.bintray.com/packages/7hens/maven/jack-android/images/download.svg)
 
 ## View 注入
 
