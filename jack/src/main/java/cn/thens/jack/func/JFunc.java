@@ -10,6 +10,14 @@ public final class JFunc {
         return func.invoke();
     }
 
+    public static <R> R call(JFunc0<R> func, R defaultValue) {
+        try {
+            return func.invoke();
+        } catch (Throwable e) {
+            return defaultValue;
+        }
+    }
+
     private static Empty EMPTY = new Empty();
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
