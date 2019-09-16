@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28
@@ -31,4 +33,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 //    implementation project(':jack-android')
     implementation 'cn.thens.jack:jack-android:0.2.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

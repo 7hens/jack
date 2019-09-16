@@ -822,6 +822,22 @@ public abstract class JSequence<T> implements Iterable<T> {
         return toCollection(new LinkedHashSet<>());
     }
 
+    public T[] toArray() {
+        int count = 0;
+        Object[] array = new Object[8];
+        for (T element : this) {
+            if (count == array.length) {
+                Object[] temp = new Object[count + (count >> 1)];
+                System.arraycopy(array, 0, temp, 0, count);
+                array = temp;
+            }
+            array[count++] = element;
+        }
+        Object[] result = new Object[count];
+        System.arraycopy(array, 0, result, 0, count);
+        return (T[]) result;
+    }
+
     public <K, V, M extends Map<? super K, ? super V>>
     M associateByTo(M destination, JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
         for (T element : this) {
