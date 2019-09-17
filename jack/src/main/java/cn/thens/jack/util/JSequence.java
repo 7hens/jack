@@ -1,6 +1,7 @@
 package cn.thens.jack.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,7 +75,9 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public JSequence<T> requireNoNulls() {
         return map(it -> {
-            if (it == null) throw new IllegalArgumentException("null element found in " + this);
+            if (it == null) {
+                throw new IllegalArgumentException("null element found in " + this);
+            }
             return it;
         });
     }
@@ -108,8 +111,12 @@ public abstract class JSequence<T> implements Iterable<T> {
             public Iterator<R> iterator() {
                 Iterator<T> firstIterator = source.iterator();
                 Iterator<T> secondIterator = source.iterator();
-                if (secondIterator.hasNext()) secondIterator.next();
-                if (!secondIterator.hasNext()) return EMPTY_ITERATOR;
+                if (secondIterator.hasNext()) {
+                    secondIterator.next();
+                }
+                if (!secondIterator.hasNext()) {
+                    return EMPTY_ITERATOR;
+                }
                 return new Iterator<R>() {
                     @Override
                     public boolean hasNext() {
@@ -189,13 +196,16 @@ public abstract class JSequence<T> implements Iterable<T> {
 
                     @Override
                     public R next() {
-                        if (!ensureItemIterator()) throw new NoSuchElementException();
+                        if (!ensureItemIterator()) {
+                            throw new NoSuchElementException();
+                        }
                         return itemIterator.next();
                     }
 
                     boolean ensureItemIterator() {
-                        if (itemIterator != null && !itemIterator.hasNext())
+                        if (itemIterator != null && !itemIterator.hasNext()) {
                             itemIterator = null;
+                        }
 
                         while (itemIterator == null) {
                             if (!iterator.hasNext()) {
@@ -221,9 +231,12 @@ public abstract class JSequence<T> implements Iterable<T> {
     }
 
     public JSequence<T> sub(int startIndex, int endIndex) {
-        JContract.require(startIndex >= 0, "startIndex should be non-negative, but is " + startIndex);
+        JContract.require(startIndex >= 0,
+                "startIndex should be non-negative, but is " + startIndex);
         JContract.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
-        JContract.require(endIndex >= startIndex, "endIndex should be not less than startIndex, but was " + endIndex + " < " + startIndex);
+        JContract.require(endIndex >= startIndex,
+                "endIndex should be not less than startIndex, but was " + endIndex + " < " +
+                        startIndex);
         JSequence<T> source = this;
         return new JSequence<T>() {
             @Override
@@ -241,7 +254,9 @@ public abstract class JSequence<T> implements Iterable<T> {
                     @Override
                     public T next() {
                         drop();
-                        if (position >= endIndex) throw new NoSuchElementException();
+                        if (position >= endIndex) {
+                            throw new NoSuchElementException();
+                        }
                         position++;
                         return iterator.next();
                     }
@@ -272,13 +287,17 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public JSequence<T> drop(int n) {
         JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
-        if (n == 0) return this;
+        if (n == 0) {
+            return this;
+        }
         return sub(n, Integer.MAX_VALUE);
     }
 
     public JSequence<T> take(int n) {
         JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
-        if (n == 0) return empty();
+        if (n == 0) {
+            return empty();
+        }
         return sub(0, n);
     }
 
@@ -289,18 +308,23 @@ public abstract class JSequence<T> implements Iterable<T> {
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
                 return new Iterator<T>() {
-                    int dropState = -1; // -1 for not dropping, 1 for nextItem, 0 for normal iteration
+                    int dropState = -1;
+                    // -1 for not dropping, 1 for nextItem, 0 for normal iteration
                     T nextItem = null;
 
                     @Override
                     public boolean hasNext() {
-                        if (dropState == -1) drop();
+                        if (dropState == -1) {
+                            drop();
+                        }
                         return dropState == 1 || iterator.hasNext();
                     }
 
                     @Override
                     public T next() {
-                        if (dropState == -1) drop();
+                        if (dropState == -1) {
+                            drop();
+                        }
 
                         if (dropState == 1) {
                             T result = nextItem;
@@ -339,17 +363,20 @@ public abstract class JSequence<T> implements Iterable<T> {
 
                     @Override
                     public boolean hasNext() {
-                        if (nextState == -1)
+                        if (nextState == -1) {
                             calcNext(); // will change nextState
+                        }
                         return nextState == 1;
                     }
 
                     @Override
                     public T next() {
-                        if (nextState == -1)
+                        if (nextState == -1) {
                             calcNext(); // will change nextState
-                        if (nextState == 0)
+                        }
+                        if (nextState == 0) {
                             throw new NoSuchElementException();
+                        }
                         T result = nextItem;
 
                         // Clean next to avoid keeping reference on yielded instance
@@ -504,7 +531,9 @@ public abstract class JSequence<T> implements Iterable<T> {
             @Override
             public Iterator<T> iterator() {
                 Set<T> other = of(elements).toSet();
-                if (other.isEmpty()) return other.iterator();
+                if (other.isEmpty()) {
+                    return other.iterator();
+                }
                 return source.filterNot(other::contains).iterator();
             }
         };
@@ -524,7 +553,9 @@ public abstract class JSequence<T> implements Iterable<T> {
 
         @Override
         public boolean hasNext() {
-            if (state == State.FAILED) throw new AssertionError();
+            if (state == State.FAILED) {
+                throw new AssertionError();
+            }
             switch (state) {
                 case DONE:
                     return false;
@@ -537,7 +568,9 @@ public abstract class JSequence<T> implements Iterable<T> {
 
         @Override
         public T next() {
-            if (!hasNext()) throw new NoSuchElementException();
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             state = State.NOT_READY;
             return nextValue;
         }
@@ -634,7 +667,8 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T get(int index) {
         return getOrElse(index, it -> {
-            throw new IndexOutOfBoundsException("Sequence doesn't contain element at index " + index);
+            throw new IndexOutOfBoundsException(
+                    "Sequence doesn't contain element at index " + index);
         });
     }
 
@@ -677,7 +711,8 @@ public abstract class JSequence<T> implements Iterable<T> {
         return firstOrElse(() -> null);
     }
 
-    public JTuple2<Integer, T> firstIndexedOrElse(JFunc1<T, Boolean> predicate, JFunc0<T> defaultValue) {
+    public JTuple2<Integer, T> firstIndexedOrElse(JFunc1<T, Boolean> predicate,
+            JFunc0<T> defaultValue) {
         int index = 0;
         for (T item : this) {
             if (predicate.invoke(item)) {
@@ -694,7 +729,8 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T first(JFunc1<T, Boolean> predicate) {
         return firstOrElse(predicate, () -> {
-            throw new NoSuchElementException("Sequence contains no element matching the predicate.");
+            throw new NoSuchElementException(
+                    "Sequence contains no element matching the predicate.");
         });
     }
 
@@ -708,8 +744,9 @@ public abstract class JSequence<T> implements Iterable<T> {
             return defaultValue.invoke();
         }
         T last = iterator.next();
-        while (iterator.hasNext())
+        while (iterator.hasNext()) {
             last = iterator.next();
+        }
         return last;
     }
 
@@ -723,7 +760,8 @@ public abstract class JSequence<T> implements Iterable<T> {
         return lastOrElse(() -> null);
     }
 
-    public JTuple2<Integer, T> lastIndexedOrElse(JFunc1<T, Boolean> predicate, JFunc0<T> defaultValue) {
+    public JTuple2<Integer, T> lastIndexedOrElse(JFunc1<T, Boolean> predicate,
+            JFunc0<T> defaultValue) {
         T last = null;
         int lastIndex = -1;
         int index = 0;
@@ -749,7 +787,8 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T last(JFunc1<T, Boolean> predicate) {
         return lastOrElse(predicate, () -> {
-            throw new NoSuchElementException("Sequence contains no element matching the predicate.");
+            throw new NoSuchElementException(
+                    "Sequence contains no element matching the predicate.");
         });
     }
 
@@ -767,9 +806,13 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T singleOrNull() {
         Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
+        if (!iterator.hasNext()) {
+            return null;
+        }
         T single = iterator.next();
-        if (iterator.hasNext()) return null;
+        if (iterator.hasNext()) {
+            return null;
+        }
         return single;
     }
 
@@ -778,14 +821,18 @@ public abstract class JSequence<T> implements Iterable<T> {
         boolean found = false;
         for (T element : this) {
             if (predicate.invoke(element)) {
-                if (found)
-                    throw new IllegalArgumentException("Sequence contains more than one matching element.");
+                if (found) {
+                    throw new IllegalArgumentException(
+                            "Sequence contains more than one matching element.");
+                }
                 single = element;
                 found = true;
             }
         }
-        if (!found)
-            throw new NoSuchElementException("Sequence contains no element matching the predicate.");
+        if (!found) {
+            throw new NoSuchElementException(
+                    "Sequence contains no element matching the predicate.");
+        }
         return single;
     }
 
@@ -794,12 +841,16 @@ public abstract class JSequence<T> implements Iterable<T> {
         boolean found = false;
         for (T element : this) {
             if (predicate.invoke(element)) {
-                if (found) return null;
+                if (found) {
+                    return null;
+                }
                 single = element;
                 found = true;
             }
         }
-        if (!found) return null;
+        if (!found) {
+            return null;
+        }
         return single;
     }
 
@@ -822,20 +873,29 @@ public abstract class JSequence<T> implements Iterable<T> {
         return toCollection(new LinkedHashSet<>());
     }
 
-    public T[] toArray() {
+    public T[] toArray(T[] target) {
         int count = 0;
-        Object[] array = new Object[8];
+        Object[] container = new Object[8];
         for (T element : this) {
-            if (count == array.length) {
-                Object[] temp = new Object[count + (count >> 1)];
-                System.arraycopy(array, 0, temp, 0, count);
-                array = temp;
+            if (count == container.length) {
+                Object[] temp = new Object[count + Math.max(count >> 2, 8)];
+                System.arraycopy(container, 0, temp, 0, count);
+                container = temp;
             }
-            array[count++] = element;
+            container[count++] = element;
         }
-        Object[] result = new Object[count];
-        System.arraycopy(array, 0, result, 0, count);
-        return (T[]) result;
+
+        if (target.length < count) {
+            return (T[]) Arrays.copyOf(container, count, target.getClass());
+        } else {
+            //noinspection SuspiciousSystemArraycopy
+            System.arraycopy(container, 0, target, 0, count);
+            if (target.length > count) {
+                target[count] = null;
+            }
+
+            return target;
+        }
     }
 
     public <K, V, M extends Map<? super K, ? super V>>
@@ -872,11 +932,13 @@ public abstract class JSequence<T> implements Iterable<T> {
         return associateTo(new LinkedHashMap<>(), transform);
     }
 
-    public <V, M extends Map<? super T, ? super V>> M associateWithTo(M destination, JFunc1<T, V> valueSelector) {
+    public <V, M extends Map<? super T, ? super V>> M associateWithTo(M destination,
+            JFunc1<T, V> valueSelector) {
         return this.associateByTo(destination, it -> it, valueSelector);
     }
 
-    public <K, M extends Map<? super K, List<T>>> M groupByTo(M destination, JFunc1<T, K> keySelector) {
+    public <K, M extends Map<? super K, List<T>>> M groupByTo(M destination,
+            JFunc1<T, K> keySelector) {
         return groupByTo(destination, keySelector, it -> it);
     }
 
@@ -884,7 +946,8 @@ public abstract class JSequence<T> implements Iterable<T> {
         return associateByTo(new LinkedHashMap<>(), it -> it, valueSelector);
     }
 
-    public <K, V, M extends Map<? super K, List<V>>> M groupByTo(M destination, JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
+    public <K, V, M extends Map<? super K, List<V>>> M groupByTo(M destination,
+            JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
         for (T element : this) {
             K key = keySelector.invoke(element);
             List<V> list = destination.get(key);
@@ -911,7 +974,9 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public boolean none(JFunc1<T, Boolean> predicate) {
         for (T item : this) {
-            if (predicate.invoke(item)) return false;
+            if (predicate.invoke(item)) {
+                return false;
+            }
         }
         return true;
     }
@@ -957,7 +1022,9 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public <R extends Comparable<R>> T maxBy(JFunc1<T, R> selector) {
         Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
+        if (!iterator.hasNext()) {
+            return null;
+        }
         T maxElem = iterator.next();
         R maxValue = selector.invoke(maxElem);
         while (iterator.hasNext()) {
@@ -973,18 +1040,24 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T maxWith(Comparator<? super T> comparator) {
         Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
+        if (!iterator.hasNext()) {
+            return null;
+        }
         T max = iterator.next();
         while (iterator.hasNext()) {
             T e = iterator.next();
-            if (comparator.compare(max, e) < 0) max = e;
+            if (comparator.compare(max, e) < 0) {
+                max = e;
+            }
         }
         return max;
     }
 
     public <R extends Comparable<R>> T minBy(JFunc1<T, R> selector) {
         Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
+        if (!iterator.hasNext()) {
+            return null;
+        }
         T minElem = iterator.next();
         R minValue = selector.invoke(minElem);
         while (iterator.hasNext()) {
@@ -1000,11 +1073,15 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public T minWith(Comparator<? super T> comparator) {
         Iterator<T> iterator = iterator();
-        if (!iterator.hasNext()) return null;
+        if (!iterator.hasNext()) {
+            return null;
+        }
         T min = iterator.next();
         while (iterator.hasNext()) {
             T e = iterator.next();
-            if (comparator.compare(min, e) > 0) min = e;
+            if (comparator.compare(min, e) > 0) {
+                min = e;
+            }
         }
         return min;
     }
@@ -1058,7 +1135,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         try {
             int count = 0;
             for (T element : this) {
-                if (++count > 1) buffer.append(separator);
+                if (++count > 1) {
+                    buffer.append(separator);
+                }
                 if (limit < 0 || count <= limit) {
                     if (transform != null) {
                         buffer.append(transform.invoke(element));
@@ -1073,14 +1152,17 @@ public abstract class JSequence<T> implements Iterable<T> {
                     break;
                 }
             }
-            if (limit >= 0 && count > limit) buffer.append(truncated);
+            if (limit >= 0 && count > limit) {
+                buffer.append(truncated);
+            }
             return buffer;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    public <A extends Appendable> A joinTo(A buffer, CharSequence separator, int limit, CharSequence truncated) {
+    public <A extends Appendable> A joinTo(A buffer, CharSequence separator, int limit,
+            CharSequence truncated) {
         return joinTo(buffer, separator, limit, truncated, null);
     }
 
