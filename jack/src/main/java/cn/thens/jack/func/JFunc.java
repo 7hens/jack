@@ -10,11 +10,11 @@ public final class JFunc {
         return func.invoke();
     }
 
-    public static <R> R call(JFunc0<R> func, R defaultValue) {
+    public static <R> R call(JFunc0<R> func, R fallback) {
         try {
             return func.invoke();
         } catch (Throwable e) {
-            return defaultValue;
+            return fallback;
         }
     }
 
