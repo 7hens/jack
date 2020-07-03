@@ -1,5 +1,9 @@
 apply plugin: 'java'
-apply from: '../gradle/publish.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+
+group = "com.github.7hens.jack"
+version = "-SNAPSHOT"
 
 //compileOptions {
 //    sourceCompatibility = '1.8'
@@ -7,5 +11,5 @@ apply from: '../gradle/publish.gradle'
 //}
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
 }

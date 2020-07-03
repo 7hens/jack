@@ -1,5 +1,9 @@
 apply plugin: 'com.android.library'
-apply from: '../gradle/publish.gradle'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+
+group = "com.github.7hens.jack"
+version = "-SNAPSHOT"
 
 android {
     compileSdkVersion 28
@@ -28,7 +32,7 @@ android {
 dependencies {
     api project(':jack')
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

@@ -5,8 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
-import cn.thens.jack.property.JGetter;
+import cn.thens.jack.IntentKey;
 import cn.thens.jack.JLazyView;
+import cn.thens.jack.Wrapper;
+import cn.thens.jack.property.JGetter;
 
 public class MainActivity extends AppCompatActivity {
     // 创建注入工具，支持 Activity、Fragment、View、Dialog 等
@@ -22,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         vText.get().setText("hello");
         vButton.get().setEnabled(false);
+        String title = Wrapper.of(getIntent()).get(TITLE);
     }
 
+    public static IntentKey<String> TITLE = IntentKey.string("title");
 }
