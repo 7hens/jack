@@ -119,12 +119,12 @@ public abstract class JAny<T> implements Getter<T> {
     }
 
     public JAny<T> also(Action1<T> func) {
-        func.run(get());
+        Functions.of(func).run(get());
         return this;
     }
 
     public JAny<T> apply(Action1<JAny<T>> func) {
-        func.run(this);
+        Functions.of(func).run(this);
         return this;
     }
 

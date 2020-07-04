@@ -3,74 +3,45 @@ package cn.thens.jack.property;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Functions;
-import cn.thens.jack.util.ThrowableWrapper;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
-public abstract class Property<T> implements Setter<T> {
-    public static <T> Property<T> of(final Action1<T> setter, final Func0<T> getter) {
+@SuppressWarnings({"unused"})
+public class Property<T> implements Setter<T> {
+
+    @Override
+    public void set(T t) {
+    }
+
+    @Override
+    public T get() {
+        return null;
+    }
+
+    private static <T> Property<T>
+    of(final Func0<? extends T> getter, final Action1<? super T> setter) {
+        Func0.X<? extends T> get = Functions.of(getter);
+        Action1.X<? super T> set = Functions.of(setter);
         return new Property<T>() {
             @Override
             public void set(T t) {
-                try {
-                    setter.run(t);
-                } catch (Throwable throwable) {
-                    throw new ThrowableWrapper(throwable);
-                }
+                set.run(t);
             }
 
             @Override
             public T get() {
-                return Functions.of(getter).invoke();
+                return get.invoke();
             }
         };
     }
 
-    public Property<T> get(final Func0<T> getter) {
-        Property<T > self = this;
-        return () -> Functions.of(getter).invoke();
+    public final Property<T> get(final Func0<T> getter) {
+        return of(getter, this::set);
     }
 
-    public Getter<T> get(T value) {
-        return () -> value;
+    public final Property<T> get(T value) {
+        return get(() -> value);
     }
 
-    public Setter<T> set(final Action1<T> setter, final Func0<T> getter) {
-        return new Setter<T>() {
-            @Override
-            public void set(T t) {
-                setter.run(t);
-            }
-
-            @Override
-            public T get() {
-                return getter.invoke();
-            }
-        };
-    }
-
-    public Setter<T> set(final Action1<T> setter, final T value) {
-        return set(setter, () -> value);
-    }
-
-    public SetterSupplier<T> set(final Action1<T> setter) {
-        return new SetterSupplier<>(this, setter);
-    }
-
-    public static class SetterSupplier<T> {
-        private final Action1<T> setter;
-        private final Property<T> jProperty;
-
-        SetterSupplier(Property<T> jProperty, Action1<T> setter) {
-            this.jProperty = jProperty;
-            this.setter = setter;
-        }
-
-        public Setter<T> get(Func0<T> getter) {
-            return jProperty.set(setter, getter);
-        }
-
-        public Setter<T> get(T value) {
-            return jProperty.set(setter, value);
-        }
+    public final Property<T> set(final Action1<? super T> setter) {
+        return of(this::get, setter);
     }
 }
