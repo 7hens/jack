@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import cn.thens.jack.func.JAction1;
-import cn.thens.jack.func.JAction2;
-import cn.thens.jack.func.JFunc0;
-import cn.thens.jack.func.JFunc1;
-import cn.thens.jack.func.JFunc2;
-import cn.thens.jack.func.JFunc3;
-import cn.thens.jack.tuple.JTuple;
-import cn.thens.jack.tuple.JTuple2;
+import cn.thens.jack.func.Action1;
+import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Func0;
+import cn.thens.jack.func.Func1;
+import cn.thens.jack.func.Func2;
+import cn.thens.jack.func.Func3;
+import cn.thens.jack.tuple.Tuple2;
+import cn.thens.jack.tuple.Tuples;
 
 @SuppressWarnings({"WeakerAccess", "NullableProblems", "unused", "unchecked"})
 public abstract class JSequence<T> implements Iterable<T> {
@@ -59,16 +59,16 @@ public abstract class JSequence<T> implements Iterable<T> {
         return EMPTY;
     }
 
-    public JSequence<T> onEach(JAction1<T> func) {
+    public JSequence<T> onEach(Action1<? super T> func) {
         return map(it -> {
-            func.invoke(it);
+            func.run(it);
             return it;
         });
     }
 
-    public JSequence<T> onEachIndexed(JAction2<Integer, T> func) {
+    public JSequence<T> onEachIndexed(Action2<? super Integer, ? super T> func) {
         return mapIndexed((index, value) -> {
-            func.invoke(index, value);
+            func.run(index, value);
             return value;
         });
     }
@@ -82,7 +82,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         });
     }
 
-    public <R, V> JSequence<V> zip(JSequence<R> other, JFunc2<T, R, V> transform) {
+    public <R, V> JSequence<V> zip(JSequence<R> other, Func2<T, R, V> transform) {
         JSequence<T> source = this;
         return new JSequence<V>() {
             @Override
@@ -97,14 +97,18 @@ public abstract class JSequence<T> implements Iterable<T> {
 
                     @Override
                     public V next() {
-                        return transform.invoke(sourceIterator.next(), otherIterator.next());
+                        try {
+                            return transform.invoke(sourceIterator.next(), otherIterator.next());
+                        } catch (Throwable e) {
+                            throw new ThrowableWrapper(e);
+                        }
                     }
                 };
             }
         };
     }
 
-    public <R> JSequence<R> zipWithNext(JFunc2<T, T, R> transform) {
+    public <R> JSequence<R> zipWithNext(Func2<T, T, R> transform) {
         JSequence<T> source = this;
         return new JSequence<R>() {
             @Override
@@ -132,7 +136,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R> JSequence<R> map(JFunc1<T, R> transformer) {
+    public <R> JSequence<R> map(Func1<T, R> transformer) {
         JSequence<T> source = this;
         return new JSequence<R>() {
             @Override
@@ -153,13 +157,13 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<JTuple2<Integer, T>> withIndex() {
+    public JSequence<Tuple2<Integer, T>> withIndex() {
         JSequence<T> source = this;
-        return new JSequence<JTuple2<Integer, T>>() {
+        return new JSequence<Tuple2<Integer, T>>() {
             @Override
-            public Iterator<JTuple2<Integer, T>> iterator() {
+            public Iterator<Tuple2<Integer, T>> iterator() {
                 Iterator<T> iterator = source.iterator();
-                return new Iterator<JTuple2<Integer, T>>() {
+                return new Iterator<Tuple2<Integer, T>>() {
                     int index = 0;
 
                     @Override
@@ -168,19 +172,19 @@ public abstract class JSequence<T> implements Iterable<T> {
                     }
 
                     @Override
-                    public JTuple2<Integer, T> next() {
-                        return JTuple.of(index++, iterator.next());
+                    public Tuple2<Integer, T> next() {
+                        return Tuples.of(index++, iterator.next());
                     }
                 };
             }
         };
     }
 
-    public <R> JSequence<R> mapIndexed(JFunc2<Integer, T, R> transformer) {
+    public <R> JSequence<R> mapIndexed(Func2<Integer, T, R> transformer) {
         return withIndex().map(it -> transformer.invoke(it.v1(), it.v2()));
     }
 
-    public <R> JSequence<R> flatten(JFunc1<T, ? extends Iterator<R>> transformer) {
+    public <R> JSequence<R> flatten(Func1<T, ? extends Iterator<R>> transformer) {
         JSequence<T> source = this;
         return new JSequence<R>() {
             @Override
@@ -226,7 +230,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R> JSequence<R> flatMap(JFunc1<T, ? extends Iterable<R>> transformer) {
+    public <R> JSequence<R> flatMap(Func1<T, ? extends Iterable<R>> transformer) {
         return flatten(it -> transformer.invoke(it).iterator());
     }
 
@@ -272,7 +276,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JTuple2<List<T>, List<T>> partition(JFunc1<T, Boolean> predicate) {
+    public Tuple2<List<T>, List<T>> partition(Func1<T, Boolean> predicate) {
         List<T> first = new ArrayList<>();
         List<T> second = new ArrayList<>();
         for (T element : this) {
@@ -282,7 +286,7 @@ public abstract class JSequence<T> implements Iterable<T> {
                 second.add(element);
             }
         }
-        return JTuple.of(first, second);
+        return Tuples.of(first, second);
     }
 
     public JSequence<T> drop(int n) {
@@ -301,7 +305,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return sub(0, n);
     }
 
-    public JSequence<T> dropWhile(JFunc1<T, Boolean> predicate) {
+    public JSequence<T> dropWhile(Func1<T, Boolean> predicate) {
         JSequence<T> source = this;
         return new JSequence<T>() {
             @Override
@@ -351,7 +355,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> takeWhile(JFunc1<T, Boolean> predicate) {
+    public JSequence<T> takeWhile(Func1<T, Boolean> predicate) {
         JSequence<T> source = this;
         return new JSequence<T>() {
             @Override
@@ -401,7 +405,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> filter(JFunc1<T, Boolean> predicate) {
+    public JSequence<T> filter(Func1<T, Boolean> predicate) {
         JSequence<T> source = this;
         return new JSequence<T>() {
             @Override
@@ -449,13 +453,13 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> filterIndexed(JFunc2<Integer, T, Boolean> predicate) {
+    public JSequence<T> filterIndexed(Func2<Integer, T, Boolean> predicate) {
         return withIndex()
                 .filter(it -> predicate.invoke(it.v1(), it.v2()))
-                .map(JTuple2::v2);
+                .map(Tuple2::v2);
     }
 
-    public JSequence<T> filterNot(JFunc1<T, Boolean> predicate) {
+    public JSequence<T> filterNot(Func1<T, Boolean> predicate) {
         return filter(it -> !predicate.invoke(it));
     }
 
@@ -480,15 +484,15 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R extends Comparable<R>> JSequence<T> sortedBy(JFunc1<T, R> selector) {
+    public <R extends Comparable<R>> JSequence<T> sortedBy(Func1<T, R> selector) {
         return sortedWith(JComparator.by(selector));
     }
 
-    public <R extends Comparable<R>> JSequence<T> sortedByDescending(JFunc1<T, R> selector) {
+    public <R extends Comparable<R>> JSequence<T> sortedByDescending(Func1<T, R> selector) {
         return sortedWith((JComparator.by(selector).reversed()));
     }
 
-    public <K> JSequence<T> distinctBy(JFunc1<T, K> keySelector) {
+    public <K> JSequence<T> distinctBy(Func1<T, K> keySelector) {
         JSequence<T> source = this;
         return new JSequence<T>() {
             @Override
@@ -599,24 +603,26 @@ public abstract class JSequence<T> implements Iterable<T> {
         });
     }
 
-    public JSequence<T> ifEmpty(JFunc0<JSequence<T>> defaultValue) {
-        return isEmpty() ? defaultValue.invoke() : this;
+    public JSequence<T> ifEmpty(Func0<? extends JSequence<T>> defaultValue) {
+        return isEmpty() ? Func0.X.of(defaultValue).invoke() : this;
     }
 
-    public <U> U call(JFunc1<JSequence<T>, U> func) {
-        return func.invoke(this);
+    public <U> U call(Func1<JSequence<T>, U> func) {
+        return Func1.X.of(func).invoke(this);
     }
 
-    public void forEach(JAction1<T> func) {
+    public void forEach(Action1<? super T> func) {
+        Action1.X<? super T> action = Action1.X.of(func);
         for (T item : this) {
-            func.invoke(item);
+            action.run(item);
         }
     }
 
-    public void forEachIndexed(JAction2<Integer, T> func) {
+    public void forEachIndexed(Action2<? super Integer, ? super T> func) {
         int index = 0;
+        Action2.X<? super Integer, ? super T> action = Action2.X.of(func);
         for (T item : this) {
-            func.invoke(index++, item);
+            action.run(index++, item);
         }
     }
 
@@ -636,7 +642,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return count;
     }
 
-    public int count(JFunc1<T, Boolean> predicate) {
+    public int count(Func1<T, Boolean> predicate) {
         int count = 0;
         for (T item : this) {
             if (predicate.invoke(item)) {
@@ -646,7 +652,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return count;
     }
 
-    public T getOrElse(int index, JFunc1<Integer, T> defaultValue) {
+    public T getOrElse(int index, Func1<Integer, T> defaultValue) {
         if (index < 0) {
             return defaultValue.invoke(index);
         }
@@ -676,11 +682,11 @@ public abstract class JSequence<T> implements Iterable<T> {
         return firstIndexedOrElse(it -> it.equals(element), () -> null).v1();
     }
 
-    public int indexOf(JFunc1<T, Boolean> predicate) {
+    public int indexOf(Func1<T, Boolean> predicate) {
         return firstIndexOf(predicate);
     }
 
-    public int firstIndexOf(JFunc1<T, Boolean> predicate) {
+    public int firstIndexOf(Func1<T, Boolean> predicate) {
         return firstIndexedOrElse(predicate, () -> null).v1();
     }
 
@@ -688,7 +694,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return lastIndexedOrElse(it -> it.equals(element), () -> null).v1();
     }
 
-    public int lastIndexOf(JFunc1<T, Boolean> predicate) {
+    public int lastIndexOf(Func1<T, Boolean> predicate) {
         return lastIndexedOrElse(predicate, () -> null).v1();
     }
 
@@ -696,7 +702,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return indexOf(element) >= 0;
     }
 
-    public T firstOrElse(JFunc0<T> defaultValue) {
+    public T firstOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
         return iterator.hasNext() ? iterator.next() : defaultValue.invoke();
     }
@@ -711,34 +717,34 @@ public abstract class JSequence<T> implements Iterable<T> {
         return firstOrElse(() -> null);
     }
 
-    public JTuple2<Integer, T> firstIndexedOrElse(JFunc1<T, Boolean> predicate,
-            JFunc0<T> defaultValue) {
+    public Tuple2<Integer, T> firstIndexedOrElse(Func1<T, Boolean> predicate,
+                                                 Func0<T> defaultValue) {
         int index = 0;
         for (T item : this) {
             if (predicate.invoke(item)) {
-                return JTuple.of(index, item);
+                return Tuples.of(index, item);
             }
             index++;
         }
-        return JTuple.of(-1, defaultValue.invoke());
+        return Tuples.of(-1, defaultValue.invoke());
     }
 
-    public T firstOrElse(JFunc1<T, Boolean> predicate, JFunc0<T> defaultValue) {
+    public T firstOrElse(Func1<T, Boolean> predicate, Func0<T> defaultValue) {
         return firstIndexedOrElse(predicate, defaultValue).v2();
     }
 
-    public T first(JFunc1<T, Boolean> predicate) {
+    public T first(Func1<T, Boolean> predicate) {
         return firstOrElse(predicate, () -> {
             throw new NoSuchElementException(
                     "Sequence contains no element matching the predicate.");
         });
     }
 
-    public T firstOrNull(JFunc1<T, Boolean> predicate) {
+    public T firstOrNull(Func1<T, Boolean> predicate) {
         return firstOrElse(predicate, () -> null);
     }
 
-    public T lastOrElse(JFunc0<T> defaultValue) {
+    public T lastOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
             return defaultValue.invoke();
@@ -760,8 +766,8 @@ public abstract class JSequence<T> implements Iterable<T> {
         return lastOrElse(() -> null);
     }
 
-    public JTuple2<Integer, T> lastIndexedOrElse(JFunc1<T, Boolean> predicate,
-            JFunc0<T> defaultValue) {
+    public Tuple2<Integer, T> lastIndexedOrElse(Func1<T, Boolean> predicate,
+                                                Func0<T> defaultValue) {
         T last = null;
         int lastIndex = -1;
         int index = 0;
@@ -774,18 +780,18 @@ public abstract class JSequence<T> implements Iterable<T> {
             }
             index++;
         }
-        return JTuple.of(lastIndex, found ? last : defaultValue.invoke());
+        return Tuples.of(lastIndex, found ? last : defaultValue.invoke());
     }
 
-    public T lastOrElse(JFunc1<T, Boolean> predicate, JFunc0<T> defaultValue) {
+    public T lastOrElse(Func1<T, Boolean> predicate, Func0<T> defaultValue) {
         return lastIndexedOrElse(predicate, defaultValue).v2();
     }
 
-    public T lastOrNull(JFunc1<T, Boolean> predicate) {
+    public T lastOrNull(Func1<T, Boolean> predicate) {
         return lastOrElse(predicate, () -> null);
     }
 
-    public T last(JFunc1<T, Boolean> predicate) {
+    public T last(Func1<T, Boolean> predicate) {
         return lastOrElse(predicate, () -> {
             throw new NoSuchElementException(
                     "Sequence contains no element matching the predicate.");
@@ -816,7 +822,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return single;
     }
 
-    public T single(JFunc1<T, Boolean> predicate) {
+    public T single(Func1<T, Boolean> predicate) {
         T single = null;
         boolean found = false;
         for (T element : this) {
@@ -836,7 +842,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return single;
     }
 
-    public T singleOrNull(JFunc1<T, Boolean> predicate) {
+    public T singleOrNull(Func1<T, Boolean> predicate) {
         T single = null;
         boolean found = false;
         for (T element : this) {
@@ -899,7 +905,7 @@ public abstract class JSequence<T> implements Iterable<T> {
     }
 
     public <K, V, M extends Map<? super K, ? super V>>
-    M associateByTo(M destination, JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
+    M associateByTo(M destination, Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         for (T element : this) {
             destination.put(keySelector.invoke(element), valueTransform.invoke(element));
         }
@@ -907,47 +913,47 @@ public abstract class JSequence<T> implements Iterable<T> {
     }
 
     public <K, V, M extends Map<? super K, ? super T>>
-    M associateByTo(M destination, JFunc1<T, K> keySelector) {
+    M associateByTo(M destination, Func1<T, K> keySelector) {
         return associateByTo(destination, keySelector, it -> it);
     }
 
-    public <K, V> Map<K, V> associateBy(JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
+    public <K, V> Map<K, V> associateBy(Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         return associateByTo(new LinkedHashMap<>(), keySelector, valueTransform);
     }
 
-    public <K> Map<K, T> associateBy(JFunc1<T, K> keySelector) {
+    public <K> Map<K, T> associateBy(Func1<T, K> keySelector) {
         return associateBy(keySelector, it -> it);
     }
 
     public <K, V, M extends Map<? super K, ? super V>>
-    M associateTo(M destination, JFunc1<T, JTuple2<K, V>> transform) {
+    M associateTo(M destination, Func1<T, Tuple2<K, V>> transform) {
         for (T element : this) {
-            JTuple2<K, V> pair = transform.invoke(element);
+            Tuple2<K, V> pair = transform.invoke(element);
             destination.put(pair.v1(), pair.v2());
         }
         return destination;
     }
 
-    public <K, V> Map<K, V> associate(JFunc1<T, JTuple2<K, V>> transform) {
+    public <K, V> Map<K, V> associate(Func1<T, Tuple2<K, V>> transform) {
         return associateTo(new LinkedHashMap<>(), transform);
     }
 
     public <V, M extends Map<? super T, ? super V>> M associateWithTo(M destination,
-            JFunc1<T, V> valueSelector) {
+                                                                      Func1<T, V> valueSelector) {
         return this.associateByTo(destination, it -> it, valueSelector);
     }
 
     public <K, M extends Map<? super K, List<T>>> M groupByTo(M destination,
-            JFunc1<T, K> keySelector) {
+                                                              Func1<T, K> keySelector) {
         return groupByTo(destination, keySelector, it -> it);
     }
 
-    public <V> Map<T, V> associateWith(JFunc1<T, V> valueSelector) {
+    public <V> Map<T, V> associateWith(Func1<T, V> valueSelector) {
         return associateByTo(new LinkedHashMap<>(), it -> it, valueSelector);
     }
 
     public <K, V, M extends Map<? super K, List<V>>> M groupByTo(M destination,
-            JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
+                                                                 Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         for (T element : this) {
             K key = keySelector.invoke(element);
             List<V> list = destination.get(key);
@@ -960,11 +966,11 @@ public abstract class JSequence<T> implements Iterable<T> {
         return destination;
     }
 
-    public <K, V> Map<K, List<V>> groupBy(JFunc1<T, K> keySelector, JFunc1<T, V> valueTransform) {
+    public <K, V> Map<K, List<V>> groupBy(Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         return groupByTo(new LinkedHashMap<>(), keySelector, valueTransform);
     }
 
-    public <K> Map<K, List<T>> groupBy(JFunc1<T, K> keySelector) {
+    public <K> Map<K, List<T>> groupBy(Func1<T, K> keySelector) {
         return groupByTo(new LinkedHashMap<>(), keySelector, it -> it);
     }
 
@@ -972,7 +978,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return !iterator().hasNext();
     }
 
-    public boolean none(JFunc1<T, Boolean> predicate) {
+    public boolean none(Func1<T, Boolean> predicate) {
         for (T item : this) {
             if (predicate.invoke(item)) {
                 return false;
@@ -981,7 +987,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return true;
     }
 
-    public boolean all(JFunc1<T, Boolean> predicate) {
+    public boolean all(Func1<T, Boolean> predicate) {
         for (T item : this) {
             if (!predicate.invoke(item)) {
                 return false;
@@ -994,7 +1000,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return iterator().hasNext();
     }
 
-    public boolean any(JFunc1<T, Boolean> predicate) {
+    public boolean any(Func1<T, Boolean> predicate) {
         for (T item : this) {
             if (predicate.invoke(item)) {
                 return true;
@@ -1003,7 +1009,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return false;
     }
 
-    public <R> R fold(R initial, JFunc2<R, T, R> operation) {
+    public <R> R fold(R initial, Func2<R, T, R> operation) {
         R accumulator = initial;
         for (T item : this) {
             accumulator = operation.invoke(accumulator, item);
@@ -1011,7 +1017,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return accumulator;
     }
 
-    public <R> R foldIndexed(R initial, JFunc3<Integer, R, T, R> operation) {
+    public <R> R foldIndexed(R initial, Func3<Integer, R, T, R> operation) {
         int index = 0;
         R accumulator = initial;
         for (T item : this) {
@@ -1020,7 +1026,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return accumulator;
     }
 
-    public <R extends Comparable<R>> T maxBy(JFunc1<T, R> selector) {
+    public <R extends Comparable<R>> T maxBy(Func1<T, R> selector) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
             return null;
@@ -1053,7 +1059,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return max;
     }
 
-    public <R extends Comparable<R>> T minBy(JFunc1<T, R> selector) {
+    public <R extends Comparable<R>> T minBy(Func1<T, R> selector) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
             return null;
@@ -1086,7 +1092,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return min;
     }
 
-    public T reduce(JFunc2<T, T, ? extends T> operation) {
+    public T reduce(Func2<T, T, ? extends T> operation) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
             throw new UnsupportedOperationException("Empty sequence can't be reduced.");
@@ -1098,7 +1104,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return accumulator;
     }
 
-    public T reduceIndexed(JFunc3<Integer, T, T, ? extends T> operation) {
+    public T reduceIndexed(Func3<Integer, T, T, ? extends T> operation) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
             throw new UnsupportedOperationException("Empty sequence can't be reduced.");
@@ -1111,7 +1117,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return accumulator;
     }
 
-    public double averageBy(JFunc1<T, ? extends Number> selector) {
+    public double averageBy(Func1<T, ? extends Number> selector) {
         double sum = 0;
         int count = 0;
         for (T element : this) {
@@ -1121,7 +1127,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return count == 0 ? Double.NaN : sum / count;
     }
 
-    public double sumBy(JFunc1<T, ? extends Number> selector) {
+    public double sumBy(Func1<T, ? extends Number> selector) {
         double sum = 0;
         for (T item : this) {
             sum += selector.invoke(item).doubleValue();
@@ -1131,7 +1137,7 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public <A extends Appendable> A joinTo(
             A buffer, CharSequence separator, int limit, CharSequence truncated,
-            JFunc1<T, CharSequence> transform) {
+            Func1<T, CharSequence> transform) {
         try {
             int count = 0;
             for (T element : this) {
@@ -1162,7 +1168,7 @@ public abstract class JSequence<T> implements Iterable<T> {
     }
 
     public <A extends Appendable> A joinTo(A buffer, CharSequence separator, int limit,
-            CharSequence truncated) {
+                                           CharSequence truncated) {
         return joinTo(buffer, separator, limit, truncated, null);
     }
 
@@ -1180,7 +1186,7 @@ public abstract class JSequence<T> implements Iterable<T> {
 
     public String joinToString(
             CharSequence separator, int limit, CharSequence truncated,
-            JFunc1<T, CharSequence> transform) {
+            Func1<T, CharSequence> transform) {
         return joinTo(new StringBuilder(), separator, limit, truncated, transform).toString();
     }
 

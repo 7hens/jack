@@ -2,7 +2,7 @@ package cn.thens.jack.util;
 
 import java.util.Comparator;
 
-import cn.thens.jack.func.JFunc1;
+import cn.thens.jack.func.Func1;
 
 @SuppressWarnings({"WeakerAccess"})
 public abstract class JComparator<T> implements Comparator<T> {
@@ -23,7 +23,7 @@ public abstract class JComparator<T> implements Comparator<T> {
         };
     }
 
-    public static <T> JComparator<T> by(JFunc1<T, ? extends Comparable<?>> selector) {
+    public static <T> JComparator<T> by(Func1<T, ? extends Comparable<?>> selector) {
         return new JComparator<T>() {
             @Override
             public int compare(T a, T b) {
@@ -32,7 +32,7 @@ public abstract class JComparator<T> implements Comparator<T> {
         };
     }
 
-    public static <T, K> JComparator<T> by(Comparator<? super K> comparator, JFunc1<T, ? extends K> selector) {
+    public static <T, K> JComparator<T> by(Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
         return new JComparator<T>() {
             @Override
             public int compare(T a, T b) {

@@ -1,11 +1,11 @@
 package cn.thens.jack.sample;
 
-import cn.thens.jack.property.JGetter;
-import cn.thens.jack.property.JLazy;
+import cn.thens.jack.property.Getter;
+import cn.thens.jack.property.Lazy;
 
 public class LazyDemo {
     // 类似于 Kotlin 的 private val name by lazy { "Jack" }
-    private JGetter<String> name = JLazy.create(() -> "Jack");
+    private Getter<String> name = Lazy.of(() -> "Jack");
 
     public String getName() {
         return name.get();

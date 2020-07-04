@@ -2,8 +2,7 @@ package cn.thens.jack.sample;
 
 import java.util.List;
 
-import cn.thens.jack.func.JAction;
-import cn.thens.jack.func.JFunc;
+import cn.thens.jack.func.Functions;
 import cn.thens.jack.util.JAny;
 import cn.thens.jack.util.JSequence;
 
@@ -14,8 +13,8 @@ public class StreamDemo {
                 .catchError(it -> (long) it)
                 .safeCall(it -> it + "safeCall")
                 .get();
-        int i = JFunc.call(() -> 12);
-        JAction.call(() -> System.out.println("hello, world"));
+        int i = Functions.call(() -> 12);
+        Functions.call(() -> System.out.println("hello, world"));
     }
 
     public List<Integer> stream() {

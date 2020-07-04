@@ -1,19 +1,19 @@
 package cn.thens.jack.sample;
 
-import cn.thens.jack.property.JGetter;
-import cn.thens.jack.property.JProperty;
-import cn.thens.jack.property.JSetter;
+import cn.thens.jack.property.Getter;
+import cn.thens.jack.property.Property;
+import cn.thens.jack.property.Setter;
 
 public class PropertyDemo {
     private String contentInternal;
 
     // 只读属性
-    private JGetter<String> title = new JProperty<String>()
+    private Getter<String> title = new Property<String>()
             .get(() -> "hello world");
 
 
     // 可读写属性
-    private JSetter<String> content = new JProperty<String>()
+    private Setter<String> content = new Property<String>()
             .set(it -> contentInternal = it)
             .get(() -> contentInternal);
 

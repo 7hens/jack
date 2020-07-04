@@ -1,12 +1,12 @@
 package cn.thens.jack.util;
 
-import cn.thens.jack.func.JAction1;
-import cn.thens.jack.func.JFunc;
-import cn.thens.jack.func.JFunc1;
-import cn.thens.jack.property.JGetter;
+import cn.thens.jack.func.Action1;
+import cn.thens.jack.func.Func1;
+import cn.thens.jack.func.Functions;
+import cn.thens.jack.property.Getter;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
-public abstract class JAny<T> implements JGetter<T> {
+public abstract class JAny<T> implements Getter<T> {
 
     private static final JAny EMPTY = new JAny() {
         @Override
@@ -74,7 +74,7 @@ public abstract class JAny<T> implements JGetter<T> {
         return elvis(of(newValue));
     }
 
-    public JAny<T> elvis(JGetter<? extends T> getter) {
+    public JAny<T> elvis(Getter<? extends T> getter) {
         return isNotNull() ? this : of(getter.get());
     }
 
@@ -118,25 +118,25 @@ public abstract class JAny<T> implements JGetter<T> {
         return value;
     }
 
-    public JAny<T> also(JAction1<T> func) {
-        func.invoke(get());
+    public JAny<T> also(Action1<T> func) {
+        func.run(get());
         return this;
     }
 
-    public JAny<T> apply(JAction1<JAny<T>> func) {
-        func.invoke(this);
+    public JAny<T> apply(Action1<JAny<T>> func) {
+        func.run(this);
         return this;
     }
 
-    public <U> JAny<U> call(JFunc1<T, ? extends U> func) {
+    public <U> JAny<U> call(Func1<T, ? extends U> func) {
         return of(func.invoke(get()));
     }
 
-    public <U> JAny<U> safeCall(JFunc1<T, ? extends U> func) {
+    public <U> JAny<U> safeCall(Func1<T, ? extends U> func) {
         return isNotNull() ? call(func) : empty();
     }
 
-    public <U> JAny<U> catchError(JFunc1<T, ? extends U> func, JFunc1<Throwable, ? extends U> defaultValue) {
+    public <U> JAny<U> catchError(Func1<T, ? extends U> func, Func1<Throwable, ? extends U> defaultValue) {
         try {
             return call(func);
         } catch (Throwable e) {
@@ -144,7 +144,7 @@ public abstract class JAny<T> implements JGetter<T> {
         }
     }
 
-    public <U> JAny<U> catchError(JFunc1<T, U> func) {
-        return catchError(func, JFunc.empty());
+    public <U> JAny<U> catchError(Func1<T, U> func) {
+        return catchError(func, Functions.empty());
     }
 }

@@ -8,7 +8,7 @@ import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.thens.jack.func.JFunc1;
+import cn.thens.jack.func.Func1;
 
 public class JTupleGenerator {
     @Test
@@ -86,7 +86,7 @@ public class JTupleGenerator {
         clipboard.setContents(new StringSelection(obj.toString()), null);
     }
 
-    private String joinToString(int count, String separator, JFunc1<Integer, String> transformer) {
+    private String joinToString(int count, String separator, Func1<Integer, String> transformer) {
         List<String> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             list.add(transformer.invoke(i));

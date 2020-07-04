@@ -8,15 +8,15 @@ import android.widget.TextView;
 import cn.thens.jack.IntentKey;
 import cn.thens.jack.JLazyView;
 import cn.thens.jack.Wrapper;
-import cn.thens.jack.property.JGetter;
+import cn.thens.jack.property.Getter;
 
 public class MainActivity extends AppCompatActivity {
     // 创建注入工具，支持 Activity、Fragment、View、Dialog 等
     private JLazyView lazyView = JLazyView.create(this);
 
     // 绑定 id
-    private JGetter<TextView> vText = lazyView.bind(R.id.vText);
-    private JGetter<Button> vButton = lazyView.bind(R.id.vButton);
+    private Getter<TextView> vText = lazyView.bind(R.id.vText);
+    private Getter<Button> vButton = lazyView.bind(R.id.vButton);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
