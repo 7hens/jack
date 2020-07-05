@@ -1,4 +1,4 @@
-package cn.thens.jack.property;
+package cn.thens.jack.ref;
 
 @SuppressWarnings({"unused"})
 public interface Setter<T> extends Getter<T> {

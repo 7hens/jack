@@ -8,7 +8,7 @@ import android.widget.TextView;
 import cn.thens.jack.IntentKey;
 import cn.thens.jack.JLazyView;
 import cn.thens.jack.Wrapper;
-import cn.thens.jack.property.Getter;
+import cn.thens.jack.ref.Getter;
 
 public class MainActivity extends AppCompatActivity {
     // 创建注入工具，支持 Activity、Fragment、View、Dialog 等

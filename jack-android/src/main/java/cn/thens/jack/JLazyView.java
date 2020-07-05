@@ -8,8 +8,8 @@ import android.view.Window;
 
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.property.Getter;
-import cn.thens.jack.property.Lazy;
+import cn.thens.jack.ref.Getter;
+import cn.thens.jack.ref.Lazy;
 
 /**
  * @author 7hens

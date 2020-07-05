@@ -1,8 +1,8 @@
 package cn.thens.jack.sample;
 
-import cn.thens.jack.property.Getter;
-import cn.thens.jack.property.Property;
-import cn.thens.jack.property.Setter;
+import cn.thens.jack.ref.Getter;
+import cn.thens.jack.ref.Property;
+import cn.thens.jack.ref.Setter;
 
 public class PropertyDemo {
     private String contentInternal;

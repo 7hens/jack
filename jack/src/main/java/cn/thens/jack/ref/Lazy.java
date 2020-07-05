@@ -1,4 +1,4 @@
-package cn.thens.jack.property;
+package cn.thens.jack.ref;
 
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Once;
