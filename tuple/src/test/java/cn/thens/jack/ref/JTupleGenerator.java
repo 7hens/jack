@@ -1,4 +1,4 @@
-package cn.thens.jack.compile;
+package cn.thens.jack.ref;
 
 import org.junit.Test;
 

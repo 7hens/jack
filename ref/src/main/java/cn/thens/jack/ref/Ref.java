@@ -1,11 +1,15 @@
 package cn.thens.jack.ref;
 
 import cn.thens.jack.func.Action1;
+import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Once;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
-public abstract class Ref<T> implements Getter<T>, IRef<T> {
+public abstract class Ref<T> implements IRef<T> {
+    abstract T get();
+
     @Override
     public Ref<T> asRef() {
         return this;
@@ -48,11 +52,11 @@ public abstract class Ref<T> implements Getter<T>, IRef<T> {
     }
 
     public Ref<T> elvis(T newValue) {
-        return elvis(of(newValue));
+        return elvisRef(of(newValue));
     }
 
-    public Ref<T> elvis(Getter<? extends T> getter) {
-        return isNotNull() ? this : of(getter.get());
+    public Ref<T> elvisRef(IRef<T> ref) {
+        return isNotNull() ? this : ref.asRef();
     }
 
     public boolean is(Class<?> clazz) {
@@ -109,6 +113,21 @@ public abstract class Ref<T> implements Getter<T>, IRef<T> {
         return isNotNull() ? run(action) : empty();
     }
 
+    public MutableRef<T> mutable() {
+        return this instanceof MutableRef ? (MutableRef<T>) this : new MutableRef<>(this);
+    }
+
+    public MutableRef<T> mutable(Action1<? super T> action) {
+        Action1.X<? super T> actionX = Functions.of(action);
+        return new MutableRef<T>(this) {
+            @Override
+            public MutableRef<T> set(Ref<T> ref) {
+                actionX.run(ref.get());
+                return super.set(ref);
+            }
+        };
+    }
+
     public <V> boolean contains(RefKey<T, V> key) {
         return key.exists(get());
     }
@@ -134,6 +153,11 @@ public abstract class Ref<T> implements Getter<T>, IRef<T> {
         return defaultValue;
     }
 
+    public <V> Ref<T> putIfAbsent(MutableRefKey<T, V> key, V value) {
+        if (!contains(key)) put(key, value);
+        return this;
+    }
+
     private static final Ref EMPTY = new Ref() {
         @Override
         public Object get() {
@@ -151,6 +175,26 @@ public abstract class Ref<T> implements Getter<T>, IRef<T> {
             @Override
             public T get() {
                 return value;
+            }
+        };
+    }
+
+    public static <T> Ref<T> from(Func0<? extends T> func) {
+        final Func0.X<? extends T> funcX = Functions.of(func);
+        return new Ref<T>() {
+            @Override
+            public T get() {
+                return funcX.invoke();
+            }
+        };
+    }
+
+    public static <T> Ref<T> lazy(Func0<? extends T> func) {
+        Once<T> once = Once.create();
+        return new Ref<T>() {
+            @Override
+            public T get() {
+                return once.call(func);
             }
         };
     }
