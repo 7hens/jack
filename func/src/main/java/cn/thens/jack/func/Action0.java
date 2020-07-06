@@ -11,7 +11,7 @@ public interface Action0 {
 
         public X once() {
             final Once<Void> once = Once.create();
-            return of(() -> once.call(this));
+            return of(() -> once.run(this));
         }
 
         public <R> Func0.X<R> func(R result) {

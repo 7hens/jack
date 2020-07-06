@@ -101,7 +101,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public <U> Ref<U> apply(Func1<? super T, ? extends U> func) {
-        return from(() -> Functions.of(func).invoke(get()));
+        return get(() -> Functions.of(func).invoke(get()));
     }
 
     public <U> Ref<U> safeApply(Func1<? super T, ? extends U> func) {
@@ -109,7 +109,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> run(Action1<? super T> action) {
-        return from(() -> {
+        return get(() -> {
             T value = get();
             Functions.of(action).run(value);
             return value;
@@ -124,7 +124,12 @@ public abstract class Ref<T> implements IRef<T> {
         return this instanceof MutableRef ? (MutableRef<T>) this : new MutableRef<>(this);
     }
 
-    public MutableRef<T> mutable(Action1<? super T> action) {
+    public Ref<T> lazy() {
+        Once<T> once = Once.create();
+        return get(() -> once.call(this::get));
+    }
+
+    public MutableRef<T> set(Action1<? super T> action) {
         Action1.X<? super T> actionX = Functions.of(action);
         return new MutableRef<T>(this) {
             @Override
@@ -186,22 +191,12 @@ public abstract class Ref<T> implements IRef<T> {
         };
     }
 
-    public static <T> Ref<T> from(Func0<? extends T> func) {
+    public static <T> Ref<T> get(Func0<? extends T> func) {
         final Func0.X<? extends T> funcX = Functions.of(func);
         return new Ref<T>() {
             @Override
             public T get() {
                 return funcX.invoke();
-            }
-        };
-    }
-
-    public static <T> Ref<T> lazy(Func0<? extends T> func) {
-        Once<T> once = Once.create();
-        return new Ref<T>() {
-            @Override
-            public T get() {
-                return once.call(func);
             }
         };
     }

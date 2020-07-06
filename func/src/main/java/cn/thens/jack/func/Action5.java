@@ -18,7 +18,7 @@ public interface Action5<P1, P2, P3, P4, P5> {
         public X<P1, P2, P3, P4, P5> once() {
             final Once<Void> once = Once.create();
             return of((p1, p2, p3, p4, p5) ->
-                    once.call(() -> run(p1, p2, p3, p4, p5)));
+                    once.run(() -> run(p1, p2, p3, p4, p5)));
         }
 
         public <R> Func5.X<P1, P2, P3, P4, P5, R> func(R result) {

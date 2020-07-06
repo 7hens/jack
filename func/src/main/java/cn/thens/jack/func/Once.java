@@ -34,7 +34,7 @@ public final class Once<R> {
         return result;
     }
 
-    public void call(Action0 action) {
+    public void run(Action0 action) {
         call(() -> {
             action.run();
             return null;

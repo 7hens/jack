@@ -32,7 +32,7 @@ public class RefTest {
     public void property() {
         TestX.Logger logger = TestX.logger();
         AtomicReference<String> hello = new AtomicReference<>("hello");
-        MutableRef<String> ref = Ref.from(hello::get).mutable(hello::set);
+        MutableRef<String> ref = Ref.get(hello::get).set(hello::set);
         Assert.assertEquals("hello", ref.get());
         ref.set("world");
         Assert.assertEquals("world", hello.get());
