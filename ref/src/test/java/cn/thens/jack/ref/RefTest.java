@@ -10,6 +10,12 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class RefTest {
     @Test
+    public void elvis() {
+        Assert.assertEquals("hello", Ref.<String>empty().elvis("hello"));
+        Assert.assertEquals("hello", Ref.of("hello").elvis("world"));
+    }
+
+    @Test
     public void mutable() {
         TestX.Logger logger = TestX.logger();
         MutableRef<Integer> ref = Ref.of(123)

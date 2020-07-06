@@ -51,8 +51,8 @@ public abstract class Ref<T> implements IRef<T> {
         return get() == null;
     }
 
-    public Ref<T> elvis(T newValue) {
-        return elvisRef(of(newValue));
+    public T elvis(T newValue) {
+        return elvisRef(of(newValue)).get();
     }
 
     public Ref<T> elvisRef(IRef<T> ref) {
@@ -96,8 +96,12 @@ public abstract class Ref<T> implements IRef<T> {
         return false;
     }
 
+    public <U> U to(Func1<? super Ref<T>, ? extends U> func) {
+        return Functions.of(func).invoke(this);
+    }
+
     public <U> Ref<U> apply(Func1<? super T, ? extends U> func) {
-        return of(Functions.of(func).invoke(get()));
+        return from(() -> Functions.of(func).invoke(get()));
     }
 
     public <U> Ref<U> safeApply(Func1<? super T, ? extends U> func) {
@@ -105,8 +109,11 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> run(Action1<? super T> action) {
-        Functions.of(action).run(get());
-        return this;
+        return from(() -> {
+            T value = get();
+            Functions.of(action).run(value);
+            return value;
+        });
     }
 
     public Ref<T> safeRun(Action1<? super T> action) {
