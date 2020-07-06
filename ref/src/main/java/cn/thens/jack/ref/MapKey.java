@@ -6,7 +6,7 @@ import java.util.Map;
  * @author 7hens
  */
 public abstract class MapKey<K, V> extends MutableRefKey<Map<K, V>, V> {
-    public static <K, V> MapKey<K, V> create(K key) {
+    public static <K, V> MapKey<K, V> of(K key) {
         return new MapKey<K, V>() {
             @Override
             protected void set(Map<K, V> target, V value) {

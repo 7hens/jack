@@ -5,6 +5,7 @@ import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Functions;
 import cn.thens.jack.func.Once;
+import cn.thens.jack.func.Predicate;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
 public abstract class Ref<T> implements IRef<T> {
@@ -15,14 +16,20 @@ public abstract class Ref<T> implements IRef<T> {
         return this;
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object that) {
         if (this == that) return true;
-        Object thatValue = that;
-        if (that instanceof Ref) {
-            thatValue = ((Ref) that).get();
+        Object a = valueOf(get());
+        Object b = valueOf(that);
+        return a == null ? b == null : a.equals(b);
+    }
+
+    private static Object valueOf(Object value) {
+        if (value instanceof Ref) {
+            return valueOf(((Ref) value).get());
         }
-        return equals(get(), thatValue);
+        return value;
     }
 
     @Override
@@ -39,10 +46,6 @@ public abstract class Ref<T> implements IRef<T> {
         return get().getClass();
     }
 
-    private static boolean equals(Object a, Object b) {
-        return a == null ? b == null : a.equals(b);
-    }
-
     public boolean isNotNull() {
         return get() != null;
     }
@@ -57,6 +60,19 @@ public abstract class Ref<T> implements IRef<T> {
 
     public Ref<T> elvisRef(IRef<T> ref) {
         return isNotNull() ? this : ref.asRef();
+    }
+
+    public Ref<T> requireEquals(T value) {
+        return require(ref -> ref.equals(value));
+    }
+
+    public Ref<T> requireNotNull() {
+        return require(Ref::isNotNull);
+    }
+
+    public Ref<T> require(Predicate<? super Ref<? extends T>> predicate) {
+        if (Predicate.X.of(predicate).test(this)) return this;
+        throw new IllegalArgumentException("Failed requirement");
     }
 
     public boolean is(Class<?> clazz) {
