@@ -1,7 +1,5 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 public interface Action1<P1> {
     void run(P1 p1) throws Throwable;
 
@@ -9,7 +7,7 @@ public interface Action1<P1> {
             implements Action1<P1> {
         public abstract void run(P1 p1);
 
-        X() {
+        private X() {
         }
 
         public Action0.X curry(P1 p1) {
@@ -20,7 +18,7 @@ public interface Action1<P1> {
         public X<P1> once() {
             final Once<Void> once = Once.create();
             return of((p1) ->
-                    once.call(() -> run(p1)));
+                    once.run(() -> run(p1)));
         }
 
         public <R> Func1.X<P1, R> func(R result) {
@@ -32,7 +30,7 @@ public interface Action1<P1> {
 
         public static <P1>
         X<P1>
-        of(Action1<P1> action) {
+        of(Action1<? super P1> action) {
             return new X<P1>() {
                 @Override
                 public void run(P1 p1) {

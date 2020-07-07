@@ -1,7 +1,5 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 public interface Action3<P1, P2, P3> {
     void run(P1 p1, P2 p2, P3 p3) throws Throwable;
 
@@ -20,7 +18,7 @@ public interface Action3<P1, P2, P3> {
         public X<P1, P2, P3> once() {
             final Once<Void> once = Once.create();
             return of((p1, p2, p3) ->
-                    once.call(() -> run(p1, p2, p3)));
+                    once.run(() -> run(p1, p2, p3)));
         }
 
         public <R> Func3.X<P1, P2, P3, R> func(R result) {
@@ -32,7 +30,7 @@ public interface Action3<P1, P2, P3> {
 
         public static <P1, P2, P3>
         X<P1, P2, P3>
-        of(Action3<P1, P2, P3> action) {
+        of(Action3<? super P1, ? super P2, ? super P3> action) {
             return new X<P1, P2, P3>() {
                 @Override
                 public void run(P1 p1, P2 p2, P3 p3) {
@@ -43,19 +41,6 @@ public interface Action3<P1, P2, P3> {
                     }
                 }
             };
-        }
-
-        private static final X EMPTY = new X() {
-            @Override
-            public void run(Object p1, Object p2, Object p3) {
-            }
-        };
-
-        @SuppressWarnings("unchecked")
-        public static <P1, P2, P3>
-        X<P1, P2, P3>
-        empty() {
-            return EMPTY;
         }
     }
 }

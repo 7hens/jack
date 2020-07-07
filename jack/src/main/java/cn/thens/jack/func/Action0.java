@@ -1,19 +1,17 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 public interface Action0 {
     void run() throws Throwable;
 
     abstract class X implements Action0 {
         public abstract void run();
 
-        X() {
+        private X() {
         }
 
         public X once() {
             final Once<Void> once = Once.create();
-            return of(() -> once.call(this));
+            return of(() -> once.run(this));
         }
 
         public <R> Func0.X<R> func(R result) {

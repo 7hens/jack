@@ -2,8 +2,6 @@ package cn.thens.jack.func;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class Once<R> {
     public static final int INITIALIZED = 0;
@@ -36,7 +34,7 @@ public final class Once<R> {
         return result;
     }
 
-    public void call(Action0 action) {
+    public void run(Action0 action) {
         call(() -> {
             action.run();
             return null;

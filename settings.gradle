@@ -2,7 +2,4 @@ rootProject.name = 'Jack'
 
 include ':sample'
 include ':jack'
-include ':func'
-include ':ref'
-include ':tuple'
 include ':jack-android'

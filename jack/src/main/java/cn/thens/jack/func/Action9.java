@@ -1,7 +1,5 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 public interface Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> {
     void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) throws Throwable;
 
@@ -9,7 +7,7 @@ public interface Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> {
             implements Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> {
         public abstract void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9);
 
-        X() {
+        private X() {
         }
 
         public Action8.X<P2, P3, P4, P5, P6, P7, P8, P9> curry(P1 p1) {
@@ -20,7 +18,7 @@ public interface Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> {
         public X<P1, P2, P3, P4, P5, P6, P7, P8, P9> once() {
             final Once<Void> once = Once.create();
             return of((p1, p2, p3, p4, p5, p6, p7, p8, p9) ->
-                    once.call(() -> run(p1, p2, p3, p4, p5, p6, p7, p8, p9)));
+                    once.run(() -> run(p1, p2, p3, p4, p5, p6, p7, p8, p9)));
         }
 
         public <R> Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func(R result) {
@@ -32,7 +30,7 @@ public interface Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> {
 
         public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
         X<P1, P2, P3, P4, P5, P6, P7, P8, P9>
-        of(Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> action) {
+        of(Action9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9> action) {
             return new X<P1, P2, P3, P4, P5, P6, P7, P8, P9>() {
                 @Override
                 public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {

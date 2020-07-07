@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import java.io.Serializable;
 
-import cn.thens.jack.util.JAny;
+import cn.thens.jack.ref.Ref;
 
 /**
  * @author 7hens
@@ -35,7 +35,7 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
 
             @Override
             protected String get(Intent intent, String defaultValue) {
-                return JAny.of(intent.getStringExtra(key)).elvis(defaultValue).get();
+                return Ref.of(intent.getStringExtra(key)).elvis(defaultValue);
             }
         };
     }

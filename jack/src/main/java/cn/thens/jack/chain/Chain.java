@@ -1,4 +1,4 @@
-package cn.thens.jack.util;
+package cn.thens.jack.chain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,58 +22,30 @@ import cn.thens.jack.func.Func3;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
+import cn.thens.jack.util.JComparator;
+import cn.thens.jack.util.JContract;
+import cn.thens.jack.util.ThrowableWrapper;
 
-@SuppressWarnings({"WeakerAccess", "NullableProblems", "unused", "unchecked"})
-public abstract class JSequence<T> implements Iterable<T> {
-    public static <T> JSequence<T> of(Iterable<T> iterable) {
-        return new JSequence<T>() {
-            @Override
-            public Iterator<T> iterator() {
-                return iterable.iterator();
-            }
-        };
+/**
+ * @author 7hens
+ */
+@SuppressWarnings("WeakerAccess")
+public abstract class Chain<T> implements Iterable<T> {
+
+    public static <T> Chain<T> of(Iterable<T> iterable) {
+        return ChainCreate.from(iterable);
     }
 
     @SafeVarargs
-    public static <T> JSequence<T> of(T... elements) {
-        List<T> list = new ArrayList<>(elements.length);
-        Collections.addAll(list, elements);
-        return of(list);
+    public static <T> Chain<T> of(T... elements) {
+        return ChainCreate.from(elements);
     }
 
-    private static Iterator EMPTY_ITERATOR = new Iterator() {
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public Object next() {
-            throw new NoSuchElementException();
-        }
-    };
-
-    private static JSequence EMPTY = of(EMPTY_ITERATOR);
-
-    public static <T> JSequence<T> empty() {
-        return EMPTY;
+    public static <T> Chain<T> empty() {
+        return ChainCreate.empty();
     }
 
-    public JSequence<T> onEach(Action1<? super T> func) {
-        return map(it -> {
-            func.run(it);
-            return it;
-        });
-    }
-
-    public JSequence<T> onEachIndexed(Action2<? super Integer, ? super T> func) {
-        return mapIndexed((index, value) -> {
-            func.run(index, value);
-            return value;
-        });
-    }
-
-    public JSequence<T> requireNoNulls() {
+    public Chain<T> requireNoNulls() {
         return map(it -> {
             if (it == null) {
                 throw new IllegalArgumentException("null element found in " + this);
@@ -82,9 +54,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         });
     }
 
-    public <R, V> JSequence<V> zip(JSequence<R> other, Func2<T, R, V> transform) {
-        JSequence<T> source = this;
-        return new JSequence<V>() {
+    public <R, V> Chain<V> zip(Chain<R> other, Func2<T, R, V> transform) {
+        Chain<T> source = this;
+        return new Chain<V>() {
             @Override
             public Iterator<V> iterator() {
                 Iterator<T> sourceIterator = source.iterator();
@@ -108,9 +80,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R> JSequence<R> zipWithNext(Func2<T, T, R> transform) {
-        JSequence<T> source = this;
-        return new JSequence<R>() {
+    public <R> Chain<R> zipWithNext(Func2<T, T, R> transform) {
+        Chain<T> source = this;
+        return new Chain<R>() {
             @Override
             public Iterator<R> iterator() {
                 Iterator<T> firstIterator = source.iterator();
@@ -136,57 +108,29 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R> JSequence<R> map(Func1<T, R> transformer) {
-        JSequence<T> source = this;
-        return new JSequence<R>() {
-            @Override
-            public Iterator<R> iterator() {
-                Iterator<T> iterator = source.iterator();
-                return new Iterator<R>() {
-                    @Override
-                    public boolean hasNext() {
-                        return iterator.hasNext();
-                    }
-
-                    @Override
-                    public R next() {
-                        return transformer.invoke(iterator.next());
-                    }
-                };
-            }
-        };
+    public <R> Chain<R> map(Func1<? super T, ? extends R> transformer) {
+        return ChainMap.map(this, transformer);
     }
 
-    public JSequence<Tuple2<Integer, T>> withIndex() {
-        JSequence<T> source = this;
-        return new JSequence<Tuple2<Integer, T>>() {
-            @Override
-            public Iterator<Tuple2<Integer, T>> iterator() {
-                Iterator<T> iterator = source.iterator();
-                return new Iterator<Tuple2<Integer, T>>() {
-                    int index = 0;
-
-                    @Override
-                    public boolean hasNext() {
-                        return iterator.hasNext();
-                    }
-
-                    @Override
-                    public Tuple2<Integer, T> next() {
-                        return Tuples.of(index++, iterator.next());
-                    }
-                };
-            }
-        };
+    public <R> Chain<R> mapIndexed(Func2<Integer, T, R> mapper) {
+        return ChainMap.mapIndexed(this, mapper);
     }
 
-    public <R> JSequence<R> mapIndexed(Func2<Integer, T, R> transformer) {
-        return withIndex().map(it -> transformer.invoke(it.v1(), it.v2()));
+    public Chain<Tuple2<Integer, T>> withIndex() {
+        return ChainMap.withIndex(this);
     }
 
-    public <R> JSequence<R> flatten(Func1<T, ? extends Iterator<R>> transformer) {
-        JSequence<T> source = this;
-        return new JSequence<R>() {
+    public Chain<T> onEach(Action1<? super T> action) {
+        return ChainMap.onEach(this, action);
+    }
+
+    public Chain<T> onEachIndexed(Action2<? super Integer, ? super T> action) {
+        return ChainMap.onEachIndexed(this, action);
+    }
+
+    public <R> Chain<R> flatten(Func1<T, ? extends Iterator<R>> transformer) {
+        Chain<T> source = this;
+        return new Chain<R>() {
             @Override
             public Iterator<R> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -230,19 +174,19 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R> JSequence<R> flatMap(Func1<T, ? extends Iterable<R>> transformer) {
+    public <R> Chain<R> flatMap(Func1<T, ? extends Iterable<R>> transformer) {
         return flatten(it -> transformer.invoke(it).iterator());
     }
 
-    public JSequence<T> sub(int startIndex, int endIndex) {
+    public Chain<T> sub(int startIndex, int endIndex) {
         JContract.require(startIndex >= 0,
                 "startIndex should be non-negative, but is " + startIndex);
         JContract.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
         JContract.require(endIndex >= startIndex,
                 "endIndex should be not less than startIndex, but was " + endIndex + " < " +
                         startIndex);
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -289,7 +233,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return Tuples.of(first, second);
     }
 
-    public JSequence<T> drop(int n) {
+    public Chain<T> drop(int n) {
         JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
         if (n == 0) {
             return this;
@@ -297,7 +241,7 @@ public abstract class JSequence<T> implements Iterable<T> {
         return sub(n, Integer.MAX_VALUE);
     }
 
-    public JSequence<T> take(int n) {
+    public Chain<T> take(int n) {
         JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
         if (n == 0) {
             return empty();
@@ -305,9 +249,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         return sub(0, n);
     }
 
-    public JSequence<T> dropWhile(Func1<T, Boolean> predicate) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public Chain<T> dropWhile(Func1<T, Boolean> predicate) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -355,9 +299,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> takeWhile(Func1<T, Boolean> predicate) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public Chain<T> takeWhile(Func1<T, Boolean> predicate) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -405,9 +349,9 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> filter(Func1<T, Boolean> predicate) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public Chain<T> filter(Func1<T, Boolean> predicate) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 return new Iterator<T>() {
@@ -453,28 +397,28 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> filterIndexed(Func2<Integer, T, Boolean> predicate) {
+    public Chain<T> filterIndexed(Func2<Integer, T, Boolean> predicate) {
         return withIndex()
                 .filter(it -> predicate.invoke(it.v1(), it.v2()))
                 .map(Tuple2::v2);
     }
 
-    public JSequence<T> filterNot(Func1<T, Boolean> predicate) {
+    public Chain<T> filterNot(Func1<T, Boolean> predicate) {
         return filter(it -> !predicate.invoke(it));
     }
 
-    public <R> JSequence<R> filterIsInstance(Class<R> clazz) {
-        return (JSequence<R>) filter(it -> Ref.of(it).is(clazz));
+    public <R> Chain<R> filterIsInstance(Class<R> clazz) {
+        return (Chain<R>) filter(it -> Ref.of(it).is(clazz));
     }
 
-    public JSequence<T> filterNotNull() {
+    public Chain<T> filterNotNull() {
         //noinspection Convert2MethodRef
         return filterNot(it -> it == null);
     }
 
-    public JSequence<T> sortedWith(Comparator<? super T> comparator) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public Chain<T> sortedWith(Comparator<? super T> comparator) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 List<T> sortedList = source.toList();
@@ -484,22 +428,22 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public <R extends Comparable<R>> JSequence<T> sortedBy(Func1<T, R> selector) {
+    public <R extends Comparable<R>> Chain<T> sortedBy(Func1<T, R> selector) {
         return sortedWith(Comparator.X.by(selector));
     }
 
-    public <R extends Comparable<R>> JSequence<T> sortedByDescending(Func1<T, R> selector) {
+    public <R extends Comparable<R>> Chain<T> sortedByDescending(Func1<T, R> selector) {
         return sortedWith((JComparator.by(selector).reversed()));
     }
 
-    public <K> JSequence<T> distinctBy(Func1<T, K> keySelector) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public <K> Chain<T> distinctBy(Func1<T, K> keySelector) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
                 HashSet<K> observed = new HashSet<>();
-                return new AbstractIterator<T>() {
+                return new Chain.AbstractIterator<T>() {
                     @Override
                     protected void computeNext() {
                         while (iterator.hasNext()) {
@@ -517,21 +461,21 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence<T> distinct() {
+    public Chain<T> distinct() {
         return distinctBy(it -> it);
     }
 
-    public JSequence<T> add(Iterable<T> elements) {
+    public Chain<T> add(Iterable<T> elements) {
         return of(this, of(elements)).flatten(Iterable::iterator);
     }
 
-    public JSequence<T> add(T... elements) {
+    public Chain<T> add(T... elements) {
         return add(of(elements));
     }
 
-    public JSequence<T> remove(Iterable<T> elements) {
-        JSequence<T> source = this;
-        return new JSequence<T>() {
+    public Chain<T> remove(Iterable<T> elements) {
+        Chain<T> source = this;
+        return new Chain<T>() {
             @Override
             public Iterator<T> iterator() {
                 Set<T> other = of(elements).toSet();
@@ -543,21 +487,21 @@ public abstract class JSequence<T> implements Iterable<T> {
         };
     }
 
-    public JSequence remove(T... element) {
+    public Chain remove(T... element) {
         return remove(of(element));
     }
 
     private static abstract class AbstractIterator<T> implements Iterator<T> {
         private enum State {READY, NOT_READY, DONE, FAILED}
 
-        private State state = State.NOT_READY;
+        private Chain.AbstractIterator.State state = Chain.AbstractIterator.State.NOT_READY;
         private T nextValue;
 
         protected abstract void computeNext();
 
         @Override
         public boolean hasNext() {
-            if (state == State.FAILED) {
+            if (state == Chain.AbstractIterator.State.FAILED) {
                 throw new AssertionError();
             }
             switch (state) {
@@ -575,39 +519,39 @@ public abstract class JSequence<T> implements Iterable<T> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            state = State.NOT_READY;
+            state = Chain.AbstractIterator.State.NOT_READY;
             return nextValue;
         }
 
         private boolean tryToComputeNext() {
-            state = State.FAILED;
+            state = Chain.AbstractIterator.State.FAILED;
             computeNext();
-            return state == State.READY;
+            return state == Chain.AbstractIterator.State.READY;
         }
 
         protected void setNext(T value) {
             nextValue = value;
-            state = State.READY;
+            state = Chain.AbstractIterator.State.READY;
         }
 
         protected void done() {
-            state = State.DONE;
+            state = Chain.AbstractIterator.State.DONE;
         }
     }
 
-    public <U> JSequence<U> cast(Class<U> clazz) {
-        return (JSequence<U>) onEach(item -> {
+    public <U> Chain<U> cast(Class<U> clazz) {
+        return (Chain<U>) onEach(item -> {
             if (Ref.of(item).isNot(clazz)) {
                 throw new ClassCastException();
             }
         });
     }
 
-    public JSequence<T> ifEmpty(Func0<? extends JSequence<T>> defaultValue) {
+    public Chain<T> ifEmpty(Func0<? extends Chain<T>> defaultValue) {
         return isEmpty() ? Func0.X.of(defaultValue).invoke() : this;
     }
 
-    public <U> U call(Func1<JSequence<T>, U> func) {
+    public <U> U call(Func1<Chain<T>, U> func) {
         return Func1.X.of(func).invoke(this);
     }
 

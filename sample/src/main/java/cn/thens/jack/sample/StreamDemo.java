@@ -3,18 +3,18 @@ package cn.thens.jack.sample;
 import java.util.List;
 
 import cn.thens.jack.func.Functions;
-import cn.thens.jack.util.JAny;
+import cn.thens.jack.ref.Ref;
 import cn.thens.jack.util.JSequence;
 
 public class StreamDemo {
     public void test(String text) {
-        JAny.of(text).elvis("0")
-                .call(Integer::parseInt)
-                .catchError(it -> (long) it)
-                .safeCall(it -> it + "safeCall")
+        Ref.of(text).elvisRef("0")
+                .safeApply(Integer::parseInt)
+                .safeApply(it -> (long) it)
+                .safeApply(it -> it + "safeCall")
                 .get();
-        int i = Functions.call(() -> 12);
-        Functions.call(() -> System.out.println("hello, world"));
+        int i = Functions.of(() -> 12).invoke();
+        Functions.of(() -> System.out.println("hello, world")).run();
     }
 
     public List<Integer> stream() {

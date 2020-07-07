@@ -1,7 +1,5 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 public interface Func1<P1, R> {
     R invoke(P1 p1) throws Throwable;
 
@@ -25,7 +23,7 @@ public interface Func1<P1, R> {
             return Action1.X.of(this::invoke);
         }
 
-        public static <P1, R> X<P1, R> of(Func1<P1, R> func) {
+        public static <P1, R> X<P1, R> of(Func1<? super P1, ? extends R> func) {
             return new X<P1, R>() {
                 @Override
                 public R invoke(P1 p1) {

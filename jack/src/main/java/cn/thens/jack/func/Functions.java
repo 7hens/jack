@@ -1,7 +1,5 @@
 package cn.thens.jack.func;
 
-import cn.thens.jack.util.ThrowableWrapper;
-
 @SuppressWarnings("unchecked")
 public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Action0,
@@ -41,106 +39,106 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         return Action0.X.of(action);
     }
 
-    public static <P1> Action1.X<P1> of(Action1<P1> action) {
+    public static <P1> Action1.X<P1> of(Action1<? super P1> action) {
         return Action1.X.of(action);
     }
 
-    public static <P1, P2> Action2.X<P1, P2> of(Action2<P1, P2> action) {
+    public static <P1, P2> Action2.X<P1, P2> of(Action2<? super P1, ? super P2> action) {
         return Action2.X.of(action);
     }
 
     public static <P1, P2, P3>
     Action3.X<P1, P2, P3>
-    of(Action3<P1, P2, P3> action) {
+    of(Action3<? super P1, ? super P2, ? super P3> action) {
         return Action3.X.of(action);
     }
 
     public static <P1, P2, P3, P4>
     Action4.X<P1, P2, P3, P4>
-    of(Action4<P1, P2, P3, P4> action) {
+    of(Action4<? super P1, ? super P2, ? super P3, ? super P4> action) {
         return Action4.X.of(action);
     }
 
     public static <P1, P2, P3, P4, P5>
     Action5.X<P1, P2, P3, P4, P5>
-    of(Action5<P1, P2, P3, P4, P5> action) {
+    of(Action5<? super P1, ? super P2, ? super P3, ? super P4, ? super P5> action) {
         return Action5.X.of(action);
     }
 
     public static <P1, P2, P3, P4, P5, P6>
     Action6.X<P1, P2, P3, P4, P5, P6>
-    of(Action6<P1, P2, P3, P4, P5, P6> action) {
+    of(Action6<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6> action) {
         return Action6.X.of(action);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7>
     Action7.X<P1, P2, P3, P4, P5, P6, P7>
-    of(Action7<P1, P2, P3, P4, P5, P6, P7> action) {
+    of(Action7<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7> action) {
         return Action7.X.of(action);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8>
     Action8.X<P1, P2, P3, P4, P5, P6, P7, P8>
-    of(Action8<P1, P2, P3, P4, P5, P6, P7, P8> action) {
+    of(Action8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8> action) {
         return Action8.X.of(action);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
     Action9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    of(Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9> action) {
+    of(Action9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9> action) {
         return Action9.X.of(action);
     }
 
     public static <R> Func0.X<R>
-    of(Func0<R> func) {
+    of(Func0<? extends R> func) {
         return Func0.X.of(func);
     }
 
     public static <P1, R> Func1.X<P1, R>
-    of(Func1<P1, R> func) {
+    of(Func1<? super P1, ? extends R> func) {
         return Func1.X.of(func);
     }
 
     public static <P1, P2, R> Func2.X<P1, P2, R>
-    of(Func2<P1, P2, R> func) {
+    of(Func2<? super P1, ? super P2, ? extends R> func) {
         return Func2.X.of(func);
     }
 
     public static <P1, P2, P3, R> Func3.X<P1, P2, P3, R>
-    of(Func3<P1, P2, P3, R> func) {
+    of(Func3<? super P1, ? super P2, ? super P3, ? extends R> func) {
         return Func3.X.of(func);
     }
 
     public static <P1, P2, P3, P4, R> Func4.X<P1, P2, P3, P4, R>
-    of(Func4<P1, P2, P3, P4, R> func) {
+    of(Func4<? super P1, ? super P2, ? super P3, ? super P4, ? extends R> func) {
         return Func4.X.of(func);
     }
 
     public static <P1, P2, P3, P4, P5, R> Func5.X<P1, P2, P3, P4, P5, R>
-    of(Func5<P1, P2, P3, P4, P5, R> func) {
+    of(Func5<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? extends R> func) {
         return Func5.X.of(func);
     }
 
     public static <P1, P2, P3, P4, P5, P6, R> Func6.X<P1, P2, P3, P4, P5, P6, R>
-    of(Func6<P1, P2, P3, P4, P5, P6, R> func) {
+    of(Func6<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? extends R> func) {
         return Func6.X.of(func);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, R>
     Func7.X<P1, P2, P3, P4, P5, P6, P7, R>
-    of(Func7<P1, P2, P3, P4, P5, P6, P7, R> func) {
+    of(Func7<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? extends R> func) {
         return Func7.X.of(func);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, R>
     Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>
-    of(Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> func) {
+    of(Func8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? extends R> func) {
         return Func8.X.of(func);
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
     Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    of(Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
+    of(Func9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9,? extends  R> func) {
         return Func9.X.of(func);
     }
 
