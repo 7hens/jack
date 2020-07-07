@@ -20,93 +20,20 @@ import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
+import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.ThrowableWrapper;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
-import cn.thens.jack.util.JComparator;
 import cn.thens.jack.util.JContract;
-import cn.thens.jack.util.ThrowableWrapper;
 
 /**
  * @author 7hens
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class Chain<T> implements Iterable<T> {
-
-    public static <T> Chain<T> of(Iterable<T> iterable) {
-        return ChainCreate.from(iterable);
-    }
-
-    @SafeVarargs
-    public static <T> Chain<T> of(T... elements) {
-        return ChainCreate.from(elements);
-    }
-
-    public static <T> Chain<T> empty() {
-        return ChainCreate.empty();
-    }
-
-    public Chain<T> requireNoNulls() {
-        return map(it -> {
-            if (it == null) {
-                throw new IllegalArgumentException("null element found in " + this);
-            }
-            return it;
-        });
-    }
-
-    public <R, V> Chain<V> zip(Chain<R> other, Func2<T, R, V> transform) {
-        Chain<T> source = this;
-        return new Chain<V>() {
-            @Override
-            public Iterator<V> iterator() {
-                Iterator<T> sourceIterator = source.iterator();
-                Iterator<R> otherIterator = other.iterator();
-                return new Iterator<V>() {
-                    @Override
-                    public boolean hasNext() {
-                        return sourceIterator.hasNext() && otherIterator.hasNext();
-                    }
-
-                    @Override
-                    public V next() {
-                        try {
-                            return transform.invoke(sourceIterator.next(), otherIterator.next());
-                        } catch (Throwable e) {
-                            throw new ThrowableWrapper(e);
-                        }
-                    }
-                };
-            }
-        };
-    }
-
-    public <R> Chain<R> zipWithNext(Func2<T, T, R> transform) {
-        Chain<T> source = this;
-        return new Chain<R>() {
-            @Override
-            public Iterator<R> iterator() {
-                Iterator<T> firstIterator = source.iterator();
-                Iterator<T> secondIterator = source.iterator();
-                if (secondIterator.hasNext()) {
-                    secondIterator.next();
-                }
-                if (!secondIterator.hasNext()) {
-                    return EMPTY_ITERATOR;
-                }
-                return new Iterator<R>() {
-                    @Override
-                    public boolean hasNext() {
-                        return secondIterator.hasNext();
-                    }
-
-                    @Override
-                    public R next() {
-                        return transform.invoke(firstIterator.next(), secondIterator.next());
-                    }
-                };
-            }
-        };
+    public <R> R to(Func1<? super Chain<T>, ? extends R> converter) {
+        return Functions.of(converter).invoke(this);
     }
 
     public <R> Chain<R> map(Func1<? super T, ? extends R> transformer) {
@@ -129,46 +56,34 @@ public abstract class Chain<T> implements Iterable<T> {
         return ChainMap.onEachIndexed(this, action);
     }
 
-    public <R> Chain<R> flatten(Func1<T, ? extends Iterator<R>> transformer) {
-        Chain<T> source = this;
-        return new Chain<R>() {
-            @Override
-            public Iterator<R> iterator() {
-                Iterator<T> iterator = source.iterator();
-                return new Iterator<R>() {
-                    Iterator<R> itemIterator = null;
+    public Chain<T> requireNoNulls() {
+        return ChainMap.requireNoNulls(this);
+    }
 
+    public <U> Chain<U> cast(Class<U> clazz) {
+        return ChainMap.cast(this, clazz);
+    }
+
+    public <R, V> Chain<V> zip(Chain<R> other, Func2<T, R, V> transform) {
+        Chain<T> source = this;
+        return new Chain<V>() {
+            @Override
+            public Iterator<V> iterator() {
+                Iterator<T> sourceIterator = source.iterator();
+                Iterator<R> otherIterator = other.iterator();
+                return new Iterator<V>() {
                     @Override
                     public boolean hasNext() {
-                        return ensureItemIterator();
+                        return sourceIterator.hasNext() && otherIterator.hasNext();
                     }
 
                     @Override
-                    public R next() {
-                        if (!ensureItemIterator()) {
-                            throw new NoSuchElementException();
+                    public V next() {
+                        try {
+                            return transform.invoke(sourceIterator.next(), otherIterator.next());
+                        } catch (Throwable e) {
+                            throw ThrowableWrapper.of(e);
                         }
-                        return itemIterator.next();
-                    }
-
-                    boolean ensureItemIterator() {
-                        if (itemIterator != null && !itemIterator.hasNext()) {
-                            itemIterator = null;
-                        }
-
-                        while (itemIterator == null) {
-                            if (!iterator.hasNext()) {
-                                return false;
-                            } else {
-                                T element = iterator.next();
-                                Iterator<R> nextItemIterator = transformer.invoke(element);
-                                if (nextItemIterator.hasNext()) {
-                                    itemIterator = nextItemIterator;
-                                    return true;
-                                }
-                            }
-                        }
-                        return true;
                     }
                 };
             }
@@ -434,7 +349,7 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public <R extends Comparable<R>> Chain<T> sortedByDescending(Func1<T, R> selector) {
-        return sortedWith((JComparator.by(selector).reversed()));
+        return sortedWith((Comparator.X.by(selector).reversed()));
     }
 
     public <K> Chain<T> distinctBy(Func1<T, K> keySelector) {
@@ -538,14 +453,6 @@ public abstract class Chain<T> implements Iterable<T> {
         protected void done() {
             state = Chain.AbstractIterator.State.DONE;
         }
-    }
-
-    public <U> Chain<U> cast(Class<U> clazz) {
-        return (Chain<U>) onEach(item -> {
-            if (Ref.of(item).isNot(clazz)) {
-                throw new ClassCastException();
-            }
-        });
     }
 
     public Chain<T> ifEmpty(Func0<? extends Chain<T>> defaultValue) {
@@ -1080,6 +987,80 @@ public abstract class Chain<T> implements Iterable<T> {
         return sum;
     }
 
+    public <R> Chain<R> zipWithNext(Func2<T, T, R> transform) {
+        Chain<T> source = this;
+        return new Chain<R>() {
+            @Override
+            public Iterator<R> iterator() {
+                Iterator<T> firstIterator = source.iterator();
+                Iterator<T> secondIterator = source.iterator();
+                if (secondIterator.hasNext()) {
+                    secondIterator.next();
+                }
+                if (!secondIterator.hasNext()) {
+                    return EMPTY_ITERATOR;
+                }
+                return new Iterator<R>() {
+                    @Override
+                    public boolean hasNext() {
+                        return secondIterator.hasNext();
+                    }
+
+                    @Override
+                    public R next() {
+                        return transform.invoke(firstIterator.next(), secondIterator.next());
+                    }
+                };
+            }
+        };
+    }
+
+    public <R> Chain<R> flatten(Func1<T, ? extends Iterator<R>> transformer) {
+        Chain<T> source = this;
+        return new Chain<R>() {
+            @Override
+            public Iterator<R> iterator() {
+                Iterator<T> iterator = source.iterator();
+                return new Iterator<R>() {
+                    Iterator<R> itemIterator = null;
+
+                    @Override
+                    public boolean hasNext() {
+                        return ensureItemIterator();
+                    }
+
+                    @Override
+                    public R next() {
+                        if (!ensureItemIterator()) {
+                            throw new NoSuchElementException();
+                        }
+                        return itemIterator.next();
+                    }
+
+                    boolean ensureItemIterator() {
+                        if (itemIterator != null && !itemIterator.hasNext()) {
+                            itemIterator = null;
+                        }
+
+                        while (itemIterator == null) {
+                            if (!iterator.hasNext()) {
+                                return false;
+                            } else {
+                                T element = iterator.next();
+                                Iterator<R> nextItemIterator = transformer.invoke(element);
+                                if (nextItemIterator.hasNext()) {
+                                    itemIterator = nextItemIterator;
+                                    return true;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                };
+            }
+        };
+    }
+
     public <A extends Appendable> A joinTo(
             A buffer, CharSequence separator, int limit, CharSequence truncated,
             Func1<T, CharSequence> transform) {
@@ -1149,5 +1130,18 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public String joinToString() {
         return joinToString(", ");
+    }
+
+    public static <T> Chain<T> of(Iterable<T> iterable) {
+        return ChainCreate.from(iterable);
+    }
+
+    @SafeVarargs
+    public static <T> Chain<T> of(T... elements) {
+        return ChainCreate.from(elements);
+    }
+
+    public static <T> Chain<T> empty() {
+        return ChainCreate.empty();
     }
 }

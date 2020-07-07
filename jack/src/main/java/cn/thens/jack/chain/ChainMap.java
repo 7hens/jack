@@ -8,6 +8,7 @@ import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Functions;
+import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
 
@@ -65,5 +66,18 @@ public class ChainMap<T, R> extends Chain<R> {
             action.run(index, item);
             return item;
         });
+    }
+
+    static <T> Chain<T> requireNoNulls(Chain<T> upChain) {
+        return map(upChain, item -> {
+            if (item == null) {
+                throw new IllegalArgumentException("null element found in " + upChain);
+            }
+            return item;
+        });
+    }
+
+    static <T, U> Chain<U> cast(Chain<T> upChain, Class<U> clazz) {
+        return map(upChain, item -> Ref.of(item).cast(clazz).get());
     }
 }

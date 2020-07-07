@@ -15,10 +15,12 @@ import java.util.Set;
 
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Comparator;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
+import cn.thens.jack.func.ThrowableWrapper;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
@@ -100,7 +102,7 @@ public abstract class JSequence<T> implements Iterable<T> {
                         try {
                             return transform.invoke(sourceIterator.next(), otherIterator.next());
                         } catch (Throwable e) {
-                            throw new ThrowableWrapper(e);
+                            throw ThrowableWrapper.of(e);
                         }
                     }
                 };
@@ -489,7 +491,7 @@ public abstract class JSequence<T> implements Iterable<T> {
     }
 
     public <R extends Comparable<R>> JSequence<T> sortedByDescending(Func1<T, R> selector) {
-        return sortedWith((JComparator.by(selector).reversed()));
+        return sortedWith((Comparator.X.by(selector).reversed()));
     }
 
     public <K> JSequence<T> distinctBy(Func1<T, K> keySelector) {
