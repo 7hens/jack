@@ -15,6 +15,7 @@ import java.util.Set;
 
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Comparator;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
