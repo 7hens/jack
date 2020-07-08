@@ -23,7 +23,7 @@ import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
 import cn.thens.jack.func.Functions;
-import cn.thens.jack.func.ThrowableWrapper;
+import cn.thens.jack.func.Predicate;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
@@ -68,31 +68,8 @@ public abstract class Chain<T> implements Iterable<T> {
         return ChainMap.cast(this, clazz);
     }
 
-    public <R, V> Chain<V> zip(Chain<R> other, Func2<T, R, V> transform) {
-        Chain<T> source = this;
-        return new Chain<V>() {
-            @NotNull
-            @Override
-            public Iterator<V> iterator() {
-                Iterator<T> sourceIterator = source.iterator();
-                Iterator<R> otherIterator = other.iterator();
-                return new Iterator<V>() {
-                    @Override
-                    public boolean hasNext() {
-                        return sourceIterator.hasNext() && otherIterator.hasNext();
-                    }
-
-                    @Override
-                    public V next() {
-                        try {
-                            return transform.invoke(sourceIterator.next(), otherIterator.next());
-                        } catch (Throwable e) {
-                            throw ThrowableWrapper.of(e);
-                        }
-                    }
-                };
-            }
-        };
+    public <U, R> Chain<R> zip(Chain<U> other, Func2<T, U, R> zipper) {
+        return new ChainZip<>(this, other, zipper);
     }
 
     public <R> Chain<R> flatMap(Func1<T, ? extends Iterable<R>> transformer) {
@@ -153,14 +130,6 @@ public abstract class Chain<T> implements Iterable<T> {
             }
         }
         return Tuples.of(first, second);
-    }
-
-    public Chain<T> drop(int n) {
-        Ref.require(n >= 0, "Requested element count " + n + " is less than zero");
-        if (n == 0) {
-            return this;
-        }
-        return sub(n, Integer.MAX_VALUE);
     }
 
     public Chain<T> take(int n) {
@@ -273,72 +242,26 @@ public abstract class Chain<T> implements Iterable<T> {
         };
     }
 
-    public Chain<T> filter(Func1<T, Boolean> predicate) {
-        Chain<T> source = this;
-        return new Chain<T>() {
-            @NotNull
-            @Override
-            public Iterator<T> iterator() {
-                return new Iterator<T>() {
-                    Iterator<T> iterator = source.iterator();
-                    int nextState = -1; // -1 for unknown, 0 for done, 1 for continue
-                    T nextItem = null;
-
-                    void calcNext() {
-                        while (iterator.hasNext()) {
-                            T item = iterator.next();
-                            if (predicate.invoke(item)) {
-                                nextItem = item;
-                                nextState = 1;
-                                return;
-                            }
-                        }
-                        nextState = 0;
-                    }
-
-                    @Override
-                    public boolean hasNext() {
-                        if (nextState == -1) {
-                            calcNext();
-                        }
-                        return nextState == 1;
-                    }
-
-                    @Override
-                    public T next() {
-                        if (nextState == -1) {
-                            calcNext();
-                        }
-                        if (nextState == 0) {
-                            throw new NoSuchElementException();
-                        }
-                        T result = nextItem;
-                        nextItem = null;
-                        nextState = -1;
-                        return result;
-                    }
-                };
-            }
-        };
+    public Chain<T> filter(Predicate<T> predicate) {
+        return ChainFilter.filter(this, predicate);
     }
 
-    public Chain<T> filterIndexed(Func2<Integer, T, Boolean> predicate) {
-        return withIndex()
-                .filter(it -> predicate.invoke(it.v1(), it.v2()))
-                .map(Tuple2::v2);
-    }
-
-    public Chain<T> filterNot(Func1<T, Boolean> predicate) {
-        return filter(it -> !predicate.invoke(it));
+    public Chain<T> filterNot(Predicate<T> predicate) {
+        return filter(Predicate.X.of(predicate).not());
     }
 
     public <R> Chain<R> filterIsInstance(Class<R> clazz) {
-        return (Chain<R>) filter(it -> Ref.of(it).is(clazz));
+        return filter(it -> Ref.of(it).is(clazz)).cast(clazz);
     }
 
     public Chain<T> filterNotNull() {
         //noinspection Convert2MethodRef
-        return filterNot(it -> it == null);
+        return filter(it -> it != null);
+    }
+
+    public Chain<T> skip(int n) {
+        Ref.require(n >= 0, "Requested element count " + n + " is less than zero");
+        return filter(Predicate.X.skip(n));
     }
 
     public Chain<T> sortedWith(Comparator<? super T> comparator) {
