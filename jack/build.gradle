@@ -1,15 +1,14 @@
-apply plugin: 'java'
+apply plugin: "java-library"
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'maven-publish'
 
 group = "com.github.7hens.jack"
 version = "-SNAPSHOT"
 
-//compileOptions {
-//    sourceCompatibility = '1.8'
-//    targetCompatibility = '1.8'
-//}
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 dependencies {
     testImplementation 'junit:junit:4.13'
+    compileOnly 'org.jetbrains:annotations:19.0.0'
 }

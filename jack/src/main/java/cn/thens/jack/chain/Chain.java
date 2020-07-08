@@ -1,5 +1,7 @@
 package cn.thens.jack.chain;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,13 +27,15 @@ import cn.thens.jack.func.ThrowableWrapper;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
-import cn.thens.jack.util.JContract;
 
 /**
  * @author 7hens
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class Chain<T> implements Iterable<T> {
+    @NotNull
+    public abstract Iterator<T> iterator();
+
     public <R> R to(Func1<? super Chain<T>, ? extends R> converter) {
         return Functions.of(converter).invoke(this);
     }
@@ -67,6 +71,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <R, V> Chain<V> zip(Chain<R> other, Func2<T, R, V> transform) {
         Chain<T> source = this;
         return new Chain<V>() {
+            @NotNull
             @Override
             public Iterator<V> iterator() {
                 Iterator<T> sourceIterator = source.iterator();
@@ -95,14 +100,15 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public Chain<T> sub(int startIndex, int endIndex) {
-        JContract.require(startIndex >= 0,
+        Ref.require(startIndex >= 0,
                 "startIndex should be non-negative, but is " + startIndex);
-        JContract.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
-        JContract.require(endIndex >= startIndex,
+        Ref.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
+        Ref.require(endIndex >= startIndex,
                 "endIndex should be not less than startIndex, but was " + endIndex + " < " +
                         startIndex);
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -150,7 +156,7 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public Chain<T> drop(int n) {
-        JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
+        Ref.require(n >= 0, "Requested element count " + n + " is less than zero");
         if (n == 0) {
             return this;
         }
@@ -158,7 +164,7 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public Chain<T> take(int n) {
-        JContract.require(n >= 0, "Requested element count " + n + " is less than zero");
+        Ref.require(n >= 0, "Requested element count " + n + " is less than zero");
         if (n == 0) {
             return empty();
         }
@@ -168,6 +174,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public Chain<T> dropWhile(Func1<T, Boolean> predicate) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -218,6 +225,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public Chain<T> takeWhile(Func1<T, Boolean> predicate) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -268,6 +276,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public Chain<T> filter(Func1<T, Boolean> predicate) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 return new Iterator<T>() {
@@ -335,6 +344,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public Chain<T> sortedWith(Comparator<? super T> comparator) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 List<T> sortedList = source.toList();
@@ -355,6 +365,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <K> Chain<T> distinctBy(Func1<T, K> keySelector) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
@@ -392,6 +403,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public Chain<T> remove(Iterable<T> elements) {
         Chain<T> source = this;
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 Set<T> other = of(elements).toSet();
@@ -990,6 +1002,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <R> Chain<R> zipWithNext(Func2<T, T, R> transform) {
         Chain<T> source = this;
         return new Chain<R>() {
+            @NotNull
             @Override
             public Iterator<R> iterator() {
                 Iterator<T> firstIterator = source.iterator();
@@ -1019,6 +1032,7 @@ public abstract class Chain<T> implements Iterable<T> {
         Chain<T> source = this;
         return new Chain<R>() {
             @Override
+            @NotNull
             public Iterator<R> iterator() {
                 Iterator<T> iterator = source.iterator();
                 return new Iterator<R>() {

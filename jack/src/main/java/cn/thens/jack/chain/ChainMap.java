@@ -1,5 +1,7 @@
 package cn.thens.jack.chain;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,6 +27,7 @@ public class ChainMap<T, R> extends Chain<R> {
         this.mapper = Functions.of(mapper);
     }
 
+    @NotNull
     @Override
     public Iterator<R> iterator() {
         Iterator<T> iterator = upChain.iterator();

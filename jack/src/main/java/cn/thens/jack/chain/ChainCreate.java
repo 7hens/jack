@@ -1,5 +1,7 @@
 package cn.thens.jack.chain;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import java.util.NoSuchElementException;
 class ChainCreate {
     static <T> Chain<T> from(final Iterable<T> iterable) {
         return new Chain<T>() {
+            @NotNull
             @Override
             public Iterator<T> iterator() {
                 return iterable.iterator();
@@ -39,6 +42,7 @@ class ChainCreate {
     };
 
     private static Chain EMPTY = new Chain() {
+        @NotNull
         @Override
         public Iterator iterator() {
             return EMPTY_ITERATOR;

@@ -1,11 +1,16 @@
 package cn.thens.jack.ref;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Functions;
 import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.func.ThrowableWrapper;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
 public abstract class Ref<T> implements IRef<T> {
@@ -39,7 +44,7 @@ public abstract class Ref<T> implements IRef<T> {
 
     @Override
     public String toString() {
-        return isNull() ? "null" : get().toString();
+        return messageOf(get());
     }
 
     public Class<?> type() {
@@ -67,16 +72,18 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> requireEquals(T value) {
-        return require(ref -> ref.equals(value));
+        require(equals(value));
+        return this;
     }
 
     public Ref<T> requireNotNull() {
-        return require(Ref::isNotNull);
+        require(isNotNull(), new NullPointerException());
+        return this;
     }
 
     public Ref<T> require(Predicate<? super Ref<? extends T>> predicate) {
-        if (Predicate.X.of(predicate).test(this)) return this;
-        throw new IllegalArgumentException("Failed requirement");
+        require(Predicate.X.of(predicate).test(this));
+        return this;
     }
 
     public boolean is(Class<?> clazz) {
@@ -219,5 +226,46 @@ public abstract class Ref<T> implements IRef<T> {
                 return funcX.invoke();
             }
         };
+    }
+
+    public static void require(boolean value, Object message) {
+        if (value) return;
+        if (message instanceof RuntimeException) {
+            throw (RuntimeException) message;
+        }
+        if (message instanceof Throwable) {
+            throw ThrowableWrapper.of((Throwable) message);
+        }
+        throw new IllegalArgumentException(messageOf(message));
+    }
+
+    public static void require(boolean value) {
+        require(value, "Failed requirement");
+    }
+
+    private static String messageOf(Object obj) {
+        if (obj == null) return "null";
+        if (obj instanceof String) return (String) obj;
+        if (obj instanceof Func0) return messageOf(Functions.of((Func0) obj).invoke());
+        if (obj instanceof Throwable) return messageOf((Throwable) obj);
+        if (!obj.getClass().isArray()) return obj.toString();
+        if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);
+        if (obj instanceof byte[]) return Arrays.toString((byte[]) obj);
+        if (obj instanceof char[]) return Arrays.toString((char[]) obj);
+        if (obj instanceof short[]) return Arrays.toString((short[]) obj);
+        if (obj instanceof int[]) return Arrays.toString((int[]) obj);
+        if (obj instanceof long[]) return Arrays.toString((long[]) obj);
+        if (obj instanceof float[]) return Arrays.toString((float[]) obj);
+        if (obj instanceof double[]) return Arrays.toString((double[]) obj);
+        if (obj instanceof Object[]) return Arrays.deepToString((Object[]) obj);
+        return obj.toString();
+    }
+
+    private static String messageOf(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw, false);
+        throwable.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
     }
 }
