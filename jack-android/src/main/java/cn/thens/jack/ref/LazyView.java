@@ -2,9 +2,10 @@ package cn.thens.jack.ref;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.view.View;
 import android.view.Window;
+
+import androidx.fragment.app.Fragment;
 
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;

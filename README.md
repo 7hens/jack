@@ -206,6 +206,51 @@ list.toSequence()
 
 <!-- tabs:end -->
 
+## Flow
+
+```java
+Flow.just(1, 2, 3, 4, 5)
+        .take(3)
+        .mapToFlow(it -> Flow.just(it + 10, it + 20))
+        .delayErrors()
+        .flatMerge()
+        .onCollect(new CollectorHelper<Integer>() {
+            @Override
+            protected void onEach(Integer s) {
+                System.out.println(s);
+            }
+
+            @Override
+            protected void onComplete() {
+            }
+        })
+        .flowOn(Schedulers.io())
+        .autoCancel(AndroidFlow.lifecycle(activity))
+        .collect();
+```
+
+**Supported Operators**
+
+| Category     | Operators                                                                       |
+| ------------ | ------------------------------------------------------------------------------- |
+| Create       | create / just / defer / empty / never / error / from / range / timer / interval |
+| Convert      | transform / to / polyTo                                                         |
+| Scheduler    | flowOn                                                                          |
+| Collect      | onCollect / toCollection / toList                                               |
+| Map          | map / mapToFlow / flatMap                                                       |
+| Throttle     | throttleFirst / throttleLast                                                    |
+| Filter       | filter / distinct / distinctUntilChanged / ignoreElements / skip                |
+| Take         | take / takeLast / takeWhile / takeUntil                                         |
+| Element      | first / elementAt / last                                                        |
+| Repeat       | repeat                                                                          |
+| Fold         | reduce                                                                          |
+| Timeout      | timeout / autoCancel                                                            |
+| Delay        | delay / delayStart                                                              |
+| Catch        | catchError / retry                                                              |
+| Window       | window / buffer                                                                 |
+| Backpressure | onBackpressure                                                                  |
+| Poly         | polyWith / delayErrors / flatConcat / flatMerge / flatSwitch / flatZip          |
+
 ## 最后
 
 看了看，还是 Kotlin 好用啊~
