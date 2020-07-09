@@ -228,6 +228,10 @@ public abstract class Ref<T> implements IRef<T> {
         };
     }
 
+    public static <T> Ref<T> lazy(Func0<? extends T> func) {
+        return Ref.<T>get(func).lazy();
+    }
+
     public static void require(boolean value, Object message) {
         if (value) return;
         if (message instanceof RuntimeException) {

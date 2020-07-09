@@ -35,5 +35,12 @@ public interface Func1<P1, R> {
                 }
             };
         }
+
+        private static final Func1.X SELF = of(it -> it);
+
+        @SuppressWarnings("unchecked")
+        public static <P1> X<P1, P1> self() {
+            return SELF;
+        }
     }
 }

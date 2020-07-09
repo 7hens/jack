@@ -293,7 +293,7 @@ public abstract class Chain<T> implements Iterable<T> {
             public Iterator<T> iterator() {
                 Iterator<T> iterator = source.iterator();
                 HashSet<K> observed = new HashSet<>();
-                return new Chain.AbstractIterator<T>() {
+                return new AbstractIterator<T>() {
                     @Override
                     protected void computeNext() {
                         while (iterator.hasNext()) {
@@ -340,54 +340,6 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public Chain remove(T... element) {
         return remove(of(element));
-    }
-
-    private static abstract class AbstractIterator<T> implements Iterator<T> {
-        private enum State {READY, NOT_READY, DONE, FAILED}
-
-        private Chain.AbstractIterator.State state = Chain.AbstractIterator.State.NOT_READY;
-        private T nextValue;
-
-        protected abstract void computeNext();
-
-        @Override
-        public boolean hasNext() {
-            if (state == Chain.AbstractIterator.State.FAILED) {
-                throw new AssertionError();
-            }
-            switch (state) {
-                case DONE:
-                    return false;
-                case READY:
-                    return true;
-                default:
-                    return tryToComputeNext();
-            }
-        }
-
-        @Override
-        public T next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            state = Chain.AbstractIterator.State.NOT_READY;
-            return nextValue;
-        }
-
-        private boolean tryToComputeNext() {
-            state = Chain.AbstractIterator.State.FAILED;
-            computeNext();
-            return state == Chain.AbstractIterator.State.READY;
-        }
-
-        protected void setNext(T value) {
-            nextValue = value;
-            state = Chain.AbstractIterator.State.READY;
-        }
-
-        protected void done() {
-            state = Chain.AbstractIterator.State.DONE;
-        }
     }
 
     public Chain<T> ifEmpty(Func0<? extends Chain<T>> defaultValue) {
