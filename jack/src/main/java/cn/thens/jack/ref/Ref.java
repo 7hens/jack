@@ -65,7 +65,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> elvisRef(IRef<T> ref) {
-        return isNotNull() ? this : ref.asRef();
+        return call(it -> it != null ? it : ref.asRef().get());
     }
 
     public Ref<T> elvisRef(T newValue) {
@@ -227,6 +227,10 @@ public abstract class Ref<T> implements IRef<T> {
                 return funcX.call();
             }
         };
+    }
+
+    public static <T> Ref<T> defer(IRef<T> ref) {
+        return get(() -> ref.asRef().get());
     }
 
     public static <T> Ref<T> lazy(Func0<? extends T> func) {
