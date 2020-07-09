@@ -1,12 +1,12 @@
 package cn.thens.jack.ref;
 
-public abstract class MutableRefKey<T, V> extends RefKey<T, V> {
+public abstract class MutRefKey<T, V> extends RefKey<T, V> {
     protected abstract void set(T target, V value);
 
     @Override
-    public MutableRefKey<T, V> defaultValue(V defaultValue) {
-        MutableRefKey<T, V> source = this;
-        return new MutableRefKey<T, V>() {
+    public MutRefKey<T, V> defaultValue(V defaultValue) {
+        MutRefKey<T, V> source = this;
+        return new MutRefKey<T, V>() {
             @Override
             protected void set(T target, V value) {
                 source.set(target, value);

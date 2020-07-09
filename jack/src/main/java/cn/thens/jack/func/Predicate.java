@@ -1,6 +1,9 @@
 package cn.thens.jack.func;
 
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import cn.thens.jack.ref.Ref;
 
 /**
  * @author 7hens
@@ -8,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public interface Predicate<T> {
     boolean test(T t) throws Throwable;
 
+    @SuppressWarnings("rawtypes")
     abstract class X<T> implements Predicate<T> {
         @Override
         public abstract boolean test(T t);
@@ -69,12 +73,8 @@ public interface Predicate<T> {
             };
         }
 
-        public static <T> X<T> of(Func0<? extends Boolean> func) {
-            return of(it -> func.call());
-        }
-
         public static <T> X<T> eq(T value) {
-            return of(it -> equals(it, value));
+            return of(it -> Ref.of(it).equals(value));
         }
 
         public static <T> X<T> take(int count) {
@@ -87,9 +87,34 @@ public interface Predicate<T> {
             return of(it -> restCount.decrementAndGet() < 0);
         }
 
-        private static boolean equals(Object a, Object b) {
-            //noinspection EqualsReplaceableByObjectsCall
-            return a != null ? a.equals(b) : b == null;
+        public static <T, K> X<T> distinctBy(Func1<? super T, ? extends K> keySelector) {
+            final HashSet<K> observed = new HashSet<>();
+            return of(it -> {
+                K key = keySelector.call(it);
+                return observed.add(key);
+            });
+        }
+
+        public static <T> X<T> distinct() {
+            return distinctBy(Funcs.self());
+        }
+
+        public static <T, K> X<T> distinctUntilChangedBy(Func1<? super T, ? extends K> keySelector) {
+            return of(new Predicate<T>() {
+                K lastKey = null;
+
+                @Override
+                public boolean test(T t) throws Throwable {
+                    K key = keySelector.call(t);
+                    K prevKey = lastKey;
+                    lastKey = key;
+                    return Ref.of(key).equals(prevKey);
+                }
+            });
+        }
+
+        public static <T> X<T> distinctUntilChanged() {
+            return distinctUntilChangedBy(Funcs.self());
         }
     }
 }

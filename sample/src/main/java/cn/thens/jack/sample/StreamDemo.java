@@ -1,5 +1,6 @@
 package cn.thens.jack.sample;
 
+import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.ref.Ref;
 
@@ -11,6 +12,6 @@ public class StreamDemo {
                 .safeCall(it -> it + "safeCall")
                 .get();
         int i = Funcs.of(() -> 12).call();
-        Funcs.of(() -> System.out.println("hello, world")).run();
+        Actions.of(() -> System.out.println("hello, world")).run();
     }
 }

@@ -1,4 +1,4 @@
-package cn.thens.jack;
+package cn.thens.jack.ref;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author 7hens
  */
 @SuppressWarnings({"unused"})
-public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
+public abstract class BundleKey<V> extends MutRefKey<Bundle, V> {
 
     public static BundleKey<String> string(String key) {
         return new BundleKey<String>() {
@@ -21,6 +21,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             @Override
             protected String get(Bundle bundle, String defaultValue) {
                 return bundle.getString(key, defaultValue);
+            }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
             }
         };
     }
@@ -36,6 +41,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             protected String[] get(Bundle bundle, String[] defaultValue) {
                 String[] value = bundle.getStringArray(key);
                 return value != null ? value : defaultValue;
+            }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
             }
         };
     }
@@ -56,6 +66,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             protected Integer getDefaultValue() {
                 return 0;
             }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
+            }
         };
     }
 
@@ -74,6 +89,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             @Override
             protected Long getDefaultValue() {
                 return 0L;
+            }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
             }
         };
     }
@@ -94,6 +114,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             protected Float getDefaultValue() {
                 return 0F;
             }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
+            }
         };
     }
 
@@ -112,6 +137,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             @Override
             protected Double getDefaultValue() {
                 return 0.0;
+            }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
             }
         };
     }
@@ -132,6 +162,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             protected Boolean getDefaultValue() {
                 return false;
             }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
+            }
         };
     }
 
@@ -147,6 +182,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
                 Parcelable value = bundle.getParcelable(key);
                 return value != null ? value : defaultValue;
             }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
+            }
         };
     }
 
@@ -161,6 +201,11 @@ public abstract class BundleKey<V> extends Wrapper.Key<Bundle, V> {
             protected Serializable get(Bundle bundle, Serializable defaultValue) {
                 Serializable value = bundle.getSerializable(key);
                 return value != null ? value : defaultValue;
+            }
+
+            @Override
+            protected boolean exists(Bundle target) {
+                return target.containsKey(key);
             }
         };
     }

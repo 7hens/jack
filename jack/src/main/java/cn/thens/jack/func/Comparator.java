@@ -54,5 +54,14 @@ public interface Comparator<T> {
         public static <T, K> X<T> by(java.util.Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
             return of((a, b) -> comparator.compare(selector.call(a), selector.call(b)));
         }
+
+        public static <T extends Comparable<T>> X<T> self() {
+            return of((a, b) -> {
+                if (a == b) return 0;
+                if (a == null) return -1;
+                if (b == null) return 1;
+                return a.compareTo(b);
+            });
+        }
     }
 }

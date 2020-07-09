@@ -1,21 +1,19 @@
 package cn.thens.jack.sample;
 
-import cn.thens.jack.ref.Getter;
-import cn.thens.jack.ref.Property;
-import cn.thens.jack.ref.Setter;
+import cn.thens.jack.ref.MutRef;
+import cn.thens.jack.ref.Ref;
 
 public class PropertyDemo {
     private String contentInternal;
 
     // 只读属性
-    private Getter<String> title = new Property<String>()
-            .get(() -> "hello world");
+    private Ref<String> title = Ref.get(() -> "hello world");
 
 
     // 可读写属性
-    private Setter<String> content = new Property<String>()
-            .set(it -> contentInternal = it)
-            .get(() -> contentInternal);
+    private MutRef<String> content = Ref
+            .get(() -> contentInternal)
+            .set(it -> contentInternal = it);
 
     public String getTitle() {
         return title.get();

@@ -3,6 +3,8 @@ package cn.thens.jack.chain;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import cn.thens.jack.func.ThrowableWrapper;
+
 /**
  * @author 7hens
  */
@@ -12,20 +14,24 @@ abstract class AbstractIterator<T> implements Iterator<T> {
     private State state = State.NOT_READY;
     private T nextValue;
 
-    protected abstract void computeNext();
+    protected abstract void computeNext() throws Throwable;
 
     @Override
     public boolean hasNext() {
         if (state == State.FAILED) {
             throw new AssertionError();
         }
-        switch (state) {
-            case DONE:
-                return false;
-            case READY:
-                return true;
-            default:
-                return tryToComputeNext();
+        try {
+            switch (state) {
+                case DONE:
+                    return false;
+                case READY:
+                    return true;
+                default:
+                    return tryToComputeNext();
+            }
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
         }
     }
 
@@ -38,7 +44,7 @@ abstract class AbstractIterator<T> implements Iterator<T> {
         return nextValue;
     }
 
-    private boolean tryToComputeNext() {
+    private boolean tryToComputeNext() throws Throwable {
         state = State.FAILED;
         computeNext();
         return state == State.READY;

@@ -24,11 +24,11 @@ implementation 'cn.thens.jack:jack-android:<last_version>'
 ```java
 public class MainActivity extends AppCompatActivity {
     // 创建注入工具，支持 Activity、Fragment、View、Dialog 等
-    private JLazyView lazyView = JLazyView.create(this);
+    private LazyView lazyView = LazyView.create(this);
     
     // 绑定 id
-    private JGetter<TextView> vText = lazyView.bind(R.id.vText);
-    private JGetter<Button> vButton = lazyView.bind(R.id.vButton);
+    private Ref<TextView> vText = lazyView.bind(R.id.vText);
+    private Ref<Button> vButton = lazyView.bind(R.id.vButton);
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 ```java
 public class LazyDemo {
     // 类似于 Kotlin 的 private val name by lazy { "Jack" }
-    private JGetter<String> name = JLazy.create(() -> "Jack");
+    private Ref<String> name = Ref.lazy(() -> "Jack");
     
     public String getName() {
         return name.get();
@@ -121,13 +121,12 @@ public class PropertyDemo {
     private String contentInternal;
 
     // 可读写属性
-    private JSetter<String> content = new JProperty<String>()
-            .set(it -> contentInternal = it)
-            .get(() -> contentInternal);
+    private MutRef<String> content = Ref
+            .get(() -> contentInternal)
+            .set(it -> contentInternal = it);
     
     // 只读属性
-    private JGetter<String> title = new JProperty<String>()
-            .get(() -> "hello world");
+    private Ref<String> title = Ref.get(() -> "hello world");
 
     public String getContent() {
         return content.get();
@@ -164,16 +163,16 @@ class PropertyDemo {
 
 ## 空安全
 
-Jack 中的空安全使用了一个封装类 JAny 来实现。
+Jack 中的空安全使用了一个封装类 Ref 来实现。
 
 <!-- tabs:start -->
 
 ### ** Jack **
 
 ```java
-JAny.of(text).elvis("").get();
+Ref.of(text).elvis("");
 
-JAny.of(text).safeCall(it -> it + "safeCall").get();
+Ref.of(text).safeCall(it -> it + "safeCall").get();
 ```
 
 ### ** Kotlin **
@@ -193,7 +192,7 @@ text?.let { it + "safeCall" }
 ### ** Jack **
 
 ```java
-JSequence.of(list)
+Chain.of(list)
     .map(it -> it.toString())
     .joinToString();
 ```

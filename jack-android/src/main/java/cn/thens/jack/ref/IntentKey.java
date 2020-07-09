@@ -1,16 +1,14 @@
-package cn.thens.jack;
+package cn.thens.jack.ref;
 
 import android.content.Intent;
 import android.os.Parcelable;
 
 import java.io.Serializable;
 
-import cn.thens.jack.ref.Ref;
-
 /**
  * @author 7hens
  */
-public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
+public abstract class IntentKey<V> extends MutRefKey<Intent, V> {
     public static IntentKey<String> action() {
         return new IntentKey<String>() {
             @Override
@@ -22,6 +20,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected String get(Intent target, String defaultValue) {
                 String result = target.getAction();
                 return result != null ? result : defaultValue;
+            }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.getAction() != null;
             }
         };
     }
@@ -37,6 +40,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected String get(Intent intent, String defaultValue) {
                 return Ref.of(intent.getStringExtra(key)).elvis(defaultValue);
             }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
+            }
         };
     }
 
@@ -51,6 +59,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected String[] get(Intent intent, String[] defaultValue) {
                 String[] value = intent.getStringArrayExtra(key);
                 return value != null ? value : defaultValue;
+            }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
             }
         };
     }
@@ -71,6 +84,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected Integer getDefaultValue() {
                 return 0;
             }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
+            }
         };
     }
 
@@ -89,6 +107,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             @Override
             protected Long getDefaultValue() {
                 return 0L;
+            }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
             }
         };
     }
@@ -109,6 +132,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected Float getDefaultValue() {
                 return 0F;
             }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
+            }
         };
     }
 
@@ -127,6 +155,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             @Override
             protected Double getDefaultValue() {
                 return 0.0;
+            }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
             }
         };
     }
@@ -147,6 +180,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected Boolean getDefaultValue() {
                 return false;
             }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
+            }
         };
     }
 
@@ -162,6 +200,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
                 Parcelable value = intent.getParcelableExtra(key);
                 return value != null ? value : defaultValue;
             }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
+            }
         };
     }
 
@@ -176,6 +219,11 @@ public abstract class IntentKey<V> extends Wrapper.Key<Intent, V> {
             protected Serializable get(Intent intent, Serializable defaultValue) {
                 Serializable value = intent.getSerializableExtra(key);
                 return value != null ? value : defaultValue;
+            }
+
+            @Override
+            protected boolean exists(Intent target) {
+                return target.hasExtra(key);
             }
         };
     }

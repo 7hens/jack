@@ -6,10 +6,10 @@ import cn.thens.jack.func.Actions;
 /**
  * @author 7hens
  */
-public class MutableRef<T> extends Ref<T> {
+public class MutRef<T> extends Ref<T> {
     private Ref<T> ref;
 
-    MutableRef(Ref<T> ref) {
+    MutRef(Ref<T> ref) {
         this.ref = ref;
     }
 
@@ -23,20 +23,20 @@ public class MutableRef<T> extends Ref<T> {
         return ref.get();
     }
 
-    public final MutableRef<T> set(T newValue) {
+    public final MutRef<T> set(T newValue) {
         return set(Ref.of(newValue));
     }
 
-    public MutableRef<T> set(Ref<T> ref) {
+    public MutRef<T> set(Ref<T> ref) {
         this.ref = ref;
         return this;
     }
 
-    public MutableRef<T> observe(Action2<? super T, ? super T> action) {
+    public MutRef<T> observe(Action2<? super T, ? super T> action) {
         Action2.X<? super T, ? super T> actionX = Actions.of(action);
-        return new MutableRef<T>(this) {
+        return new MutRef<T>(this) {
             @Override
-            public MutableRef<T> set(Ref<T> ref) {
+            public MutRef<T> set(Ref<T> ref) {
                 actionX.run(ref.get(), super.get());
                 return super.set(ref);
             }

@@ -12,9 +12,9 @@ public abstract class RefKey<T, V> {
         return null;
     }
 
-    public MutableRefKey<T, V> toMutableKey(Action2<? super T, ? super V> setter) {
+    public MutRefKey<T, V> toMutableKey(Action2<? super T, ? super V> setter) {
         RefKey<T, V> self = this;
-        return new MutableRefKey<T, V>() {
+        return new MutRefKey<T, V>() {
             @Override
             protected void set(T target, V value) {
                 Actions.of(setter).run(target, value);

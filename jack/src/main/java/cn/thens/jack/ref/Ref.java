@@ -33,7 +33,7 @@ public abstract class Ref<T> implements IRef<T> {
 
     private static Object valueOf(Object value) {
         if (value instanceof Ref) {
-            return valueOf(((Ref) value).get());
+            return valueOf(((Ref<?>) value).get());
         }
         return value;
     }
@@ -148,8 +148,8 @@ public abstract class Ref<T> implements IRef<T> {
         return isNotNull() ? run(action) : empty();
     }
 
-    public MutableRef<T> mutable() {
-        return this instanceof MutableRef ? (MutableRef<T>) this : new MutableRef<>(this);
+    public MutRef<T> mutable() {
+        return this instanceof MutRef ? (MutRef<T>) this : new MutRef<>(this);
     }
 
     public Ref<T> lazy() {
@@ -157,11 +157,11 @@ public abstract class Ref<T> implements IRef<T> {
         return get(() -> once.call(this::get));
     }
 
-    public MutableRef<T> set(Action1<? super T> action) {
+    public MutRef<T> set(Action1<? super T> action) {
         Action1.X<? super T> actionX = Actions.of(action);
-        return new MutableRef<T>(this) {
+        return new MutRef<T>(this) {
             @Override
-            public MutableRef<T> set(Ref<T> ref) {
+            public MutRef<T> set(Ref<T> ref) {
                 actionX.run(ref.get());
                 return super.set(ref);
             }
@@ -172,7 +172,7 @@ public abstract class Ref<T> implements IRef<T> {
         return key.exists(get());
     }
 
-    public <V> Ref<T> put(MutableRefKey<T, V> key, V value) {
+    public <V> Ref<T> put(MutRefKey<T, V> key, V value) {
         key.set(get(), value);
         return this;
     }
@@ -185,7 +185,7 @@ public abstract class Ref<T> implements IRef<T> {
         return get(key, key.getDefaultValue());
     }
 
-    public <V> V getOrPut(MutableRefKey<T, V> key, V defaultValue) {
+    public <V> V getOrPut(MutRefKey<T, V> key, V defaultValue) {
         if (contains(key)) {
             return get(key);
         }
@@ -193,12 +193,13 @@ public abstract class Ref<T> implements IRef<T> {
         return defaultValue;
     }
 
-    public <V> Ref<T> putIfAbsent(MutableRefKey<T, V> key, V value) {
+    public <V> Ref<T> putIfAbsent(MutRefKey<T, V> key, V value) {
         if (!contains(key)) put(key, value);
         return this;
     }
 
-    private static final Ref EMPTY = new Ref() {
+    @SuppressWarnings("rawtypes")
+    private static final Ref EMPTY = new Ref<Object>() {
         @Override
         public Object get() {
             return null;
@@ -255,7 +256,7 @@ public abstract class Ref<T> implements IRef<T> {
     private static String messageOf(Object obj) {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
-        if (obj instanceof Func0) return messageOf(Funcs.of((Func0) obj).call());
+        if (obj instanceof Func0) return messageOf(Funcs.of((Func0<?>) obj).call());
         if (obj instanceof Throwable) return messageOf((Throwable) obj);
         if (!obj.getClass().isArray()) return obj.toString();
         if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);
