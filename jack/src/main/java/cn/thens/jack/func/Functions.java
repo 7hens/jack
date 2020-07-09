@@ -23,7 +23,7 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Func8<P1, P2, P3, P4, P5, P6, P7, P8, R>,
         Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> {
 
-    private static Functions EMPTY = new Functions(null);
+    private static Functions EMPTY = new Functions();
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
     Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
@@ -32,7 +32,26 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
     Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> always(R result) {
-        return result != null ? new Functions<>(result) : empty();
+        if (result == null) return empty();
+        return from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> result);
+    }
+
+    private static Functions SELF = from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> p1);
+
+    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
+    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, P1> self() {
+        return SELF;
+    }
+
+    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
+    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> from(Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
+        Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> funcX = of(func);
+        return new Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>() {
+            @Override
+            public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+                return funcX.invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            }
+        };
     }
 
     public static Action0.X of(Action0 action) {
@@ -138,103 +157,107 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
     Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    of(Func9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9,? extends  R> func) {
+    of(Func9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9, ? extends R> func) {
         return Func9.X.of(func);
-    }
-
-    private final R result;
-
-    private Functions(R result) {
-        this.result = result;
     }
 
     @Override
     public void run() {
+        invoke();
     }
 
     @Override
     public void run(P1 p1) {
+        invoke(p1);
     }
 
     @Override
     public void run(P1 p1, P2 p2) {
+        invoke(p1, p2);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3) {
+        invoke(p1, p2, p3);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4) {
+        invoke(p1, p2, p3, p4);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+        invoke(p1, p2, p3, p4, p5);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
+        invoke(p1, p2, p3, p4, p5, p6);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
+        invoke(p1, p2, p3, p4, p5, p6, p7);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+        invoke(p1, p2, p3, p4, p5, p6, p7, p8);
     }
 
     @Override
     public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+        invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
     }
 
     @Override
     public R invoke() {
-        return result;
+        return invoke(null);
     }
 
     @Override
     public R invoke(P1 p1) {
-        return result;
+        return invoke(p1, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2) {
-        return result;
+        return invoke(p1, p2, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3) {
-        return result;
+        return invoke(p1, p2, p3, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4) {
-        return result;
+        return invoke(p1, p2, p3, p4, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        return result;
+        return invoke(p1, p2, p3, p4, p5, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        return result;
+        return invoke(p1, p2, p3, p4, p5, p6, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        return result;
+        return invoke(p1, p2, p3, p4, p5, p6, p7, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-        return result;
+        return invoke(p1, p2, p3, p4, p5, p6, p7, p8, null);
     }
 
     @Override
     public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
-        return result;
+        return null;
     }
 }
