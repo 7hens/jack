@@ -4,7 +4,7 @@ import java.nio.BufferOverflowException;
 import java.util.LinkedList;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class Backpressure<T> {
@@ -35,7 +35,7 @@ public abstract class Backpressure<T> {
     }
 
     public final Backpressure<T> or(Backpressure<T> backpressure) {
-        return or(Functions.always(backpressure));
+        return or(Funcs.always(backpressure));
     }
 
     public final Backpressure<T> dropAll() {

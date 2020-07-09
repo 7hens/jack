@@ -22,7 +22,7 @@ import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
@@ -37,7 +37,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public abstract Iterator<T> iterator();
 
     public <R> R to(Func1<? super Chain<T>, ? extends R> converter) {
-        return Functions.of(converter).invoke(this);
+        return Funcs.of(converter).invoke(this);
     }
 
     public <R> Chain<R> map(Func1<? super T, ? extends R> transformer) {

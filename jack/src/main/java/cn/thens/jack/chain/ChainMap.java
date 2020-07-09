@@ -9,7 +9,7 @@ import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
@@ -23,7 +23,7 @@ class ChainMap<T, R> extends Chain<R> {
 
     private ChainMap(Chain<T> up, Func1<? super T, ? extends R> mapper) {
         this.up = up;
-        this.mapper = Functions.of(mapper);
+        this.mapper = Funcs.of(mapper);
     }
 
     @NotNull

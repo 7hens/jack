@@ -10,7 +10,7 @@ public interface Func1<P1, R> {
         }
 
         public Func0.X<R> curry(P1 p1) {
-            return Functions.of(() ->
+            return Funcs.of(() ->
                     invoke(p1));
         }
 

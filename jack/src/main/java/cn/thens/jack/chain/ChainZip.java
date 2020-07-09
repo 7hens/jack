@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 import cn.thens.jack.func.Func2;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 
 class ChainZip<T, U, R> extends Chain<R> {
     private final Chain<T> first;
@@ -15,7 +15,7 @@ class ChainZip<T, U, R> extends Chain<R> {
     ChainZip(Chain<T> first, Chain<U> second, Func2<? super T, ? super U, ? extends R> zipper) {
         this.first = first;
         this.second = second;
-        this.zipper = Functions.of(zipper);
+        this.zipper = Funcs.of(zipper);
     }
 
     @Override

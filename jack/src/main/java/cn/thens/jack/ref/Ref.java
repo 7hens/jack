@@ -5,9 +5,10 @@ import java.io.StringWriter;
 import java.util.Arrays;
 
 import cn.thens.jack.func.Action1;
+import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.func.ThrowableWrapper;
@@ -124,11 +125,11 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public <U> U to(Func1<? super Ref<T>, ? extends U> func) {
-        return Functions.of(func).invoke(this);
+        return Funcs.of(func).invoke(this);
     }
 
     public <U> Ref<U> apply(Func1<? super T, ? extends U> func) {
-        return get(() -> Functions.of(func).invoke(get()));
+        return get(() -> Funcs.of(func).invoke(get()));
     }
 
     public <U> Ref<U> safeApply(Func1<? super T, ? extends U> func) {
@@ -138,7 +139,7 @@ public abstract class Ref<T> implements IRef<T> {
     public Ref<T> run(Action1<? super T> action) {
         return get(() -> {
             T value = get();
-            Functions.of(action).run(value);
+            Actions.of(action).run(value);
             return value;
         });
     }
@@ -157,7 +158,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public MutableRef<T> set(Action1<? super T> action) {
-        Action1.X<? super T> actionX = Functions.of(action);
+        Action1.X<? super T> actionX = Actions.of(action);
         return new MutableRef<T>(this) {
             @Override
             public MutableRef<T> set(Ref<T> ref) {
@@ -219,7 +220,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public static <T> Ref<T> get(Func0<? extends T> func) {
-        final Func0.X<? extends T> funcX = Functions.of(func);
+        final Func0.X<? extends T> funcX = Funcs.of(func);
         return new Ref<T>() {
             @Override
             public T get() {
@@ -250,7 +251,7 @@ public abstract class Ref<T> implements IRef<T> {
     private static String messageOf(Object obj) {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
-        if (obj instanceof Func0) return messageOf(Functions.of((Func0) obj).invoke());
+        if (obj instanceof Func0) return messageOf(Funcs.of((Func0) obj).invoke());
         if (obj instanceof Throwable) return messageOf((Throwable) obj);
         if (!obj.getClass().isArray()) return obj.toString();
         if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);

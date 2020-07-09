@@ -5,7 +5,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.CompositeCancellable;
 
@@ -58,6 +58,6 @@ class FlowThrottleFirst<T> implements FlowOperator<T, T> {
     }
 
     static <T> FlowOperator<T, T> throttleFirst(Flowable<?> flow) {
-        return new FlowThrottleFirst<>(Functions.always(flow));
+        return new FlowThrottleFirst<>(Funcs.always(flow));
     }
 }

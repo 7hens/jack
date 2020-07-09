@@ -1,7 +1,7 @@
 package cn.thens.jack.ref;
 
 import cn.thens.jack.func.Action2;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Actions;
 
 /**
  * @author 7hens
@@ -33,7 +33,7 @@ public class MutableRef<T> extends Ref<T> {
     }
 
     public MutableRef<T> observe(Action2<? super T, ? super T> action) {
-        Action2.X<? super T, ? super T> actionX = Functions.of(action);
+        Action2.X<? super T, ? super T> actionX = Actions.of(action);
         return new MutableRef<T>(this) {
             @Override
             public MutableRef<T> set(Ref<T> ref) {

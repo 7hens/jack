@@ -1,17 +1,7 @@
 package cn.thens.jack.func;
 
 @SuppressWarnings("unchecked")
-public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
-        Action0,
-        Action1<P1>,
-        Action2<P1, P2>,
-        Action3<P1, P2, P3>,
-        Action4<P1, P2, P3, P4>,
-        Action5<P1, P2, P3, P4, P5>,
-        Action6<P1, P2, P3, P4, P5, P6>,
-        Action7<P1, P2, P3, P4, P5, P6, P7>,
-        Action8<P1, P2, P3, P4, P5, P6, P7, P8>,
-        Action9<P1, P2, P3, P4, P5, P6, P7, P8, P9>,
+public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Func0<R>,
         Func1<P1, R>,
         Func2<P1, P2, R>,
@@ -23,30 +13,30 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Func8<P1, P2, P3, P4, P5, P6, P7, P8, R>,
         Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> {
 
-    private static Functions EMPTY = new Functions();
+    private static Funcs EMPTY = new Funcs();
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
+    Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> empty() {
         return EMPTY;
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> always(R result) {
+    Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> always(R result) {
         if (result == null) return empty();
         return from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> result);
     }
 
-    private static Functions SELF = from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> p1);
+    private static Funcs SELF = from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> p1);
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, P1> self() {
+    Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, P1> self() {
         return SELF;
     }
 
     public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
-    Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> from(Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
+    Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> from(Func9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> func) {
         Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> funcX = of(func);
-        return new Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>() {
+        return new Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>() {
             @Override
             public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
                 return funcX.invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
@@ -54,58 +44,11 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         };
     }
 
-    public static Action0.X of(Action0 action) {
-        return Action0.X.of(action);
-    }
-
-    public static <P1> Action1.X<P1> of(Action1<? super P1> action) {
-        return Action1.X.of(action);
-    }
-
-    public static <P1, P2> Action2.X<P1, P2> of(Action2<? super P1, ? super P2> action) {
-        return Action2.X.of(action);
-    }
-
-    public static <P1, P2, P3>
-    Action3.X<P1, P2, P3>
-    of(Action3<? super P1, ? super P2, ? super P3> action) {
-        return Action3.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4>
-    Action4.X<P1, P2, P3, P4>
-    of(Action4<? super P1, ? super P2, ? super P3, ? super P4> action) {
-        return Action4.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4, P5>
-    Action5.X<P1, P2, P3, P4, P5>
-    of(Action5<? super P1, ? super P2, ? super P3, ? super P4, ? super P5> action) {
-        return Action5.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4, P5, P6>
-    Action6.X<P1, P2, P3, P4, P5, P6>
-    of(Action6<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6> action) {
-        return Action6.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4, P5, P6, P7>
-    Action7.X<P1, P2, P3, P4, P5, P6, P7>
-    of(Action7<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7> action) {
-        return Action7.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4, P5, P6, P7, P8>
-    Action8.X<P1, P2, P3, P4, P5, P6, P7, P8>
-    of(Action8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8> action) {
-        return Action8.X.of(action);
-    }
-
-    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    Action9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9>
-    of(Action9<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? super P9> action) {
-        return Action9.X.of(action);
+    public static <P1, P2, P3, P4, P5, P6, P7, P8, P9, R>
+    Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> error(Throwable error) {
+        return from((p1, p2, p3, p4, p5, p6, p7, p8, p9) -> {
+            throw error;
+        });
     }
 
     public static <R> Func0.X<R>
@@ -161,54 +104,40 @@ public class Functions<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         return Func9.X.of(func);
     }
 
-    @Override
-    public void run() {
-        invoke();
+    public Func1.X<P1, R> x1() {
+        return Func1.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1) {
-        invoke(p1);
+    public Func2.X<P1, P2, R> x2() {
+        return Func2.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2) {
-        invoke(p1, p2);
+    public Func3.X<P1, P2, P3, R> x3() {
+        return Func3.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3) {
-        invoke(p1, p2, p3);
+    public Func4.X<P1, P2, P3, P4, R> x4() {
+        return Func4.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4) {
-        invoke(p1, p2, p3, p4);
+    public Func5.X<P1, P2, P3, P4, P5, R> x5() {
+        return Func5.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        invoke(p1, p2, p3, p4, p5);
+    public Func6.X<P1, P2, P3, P4, P5, P6, R> x6() {
+        return Func6.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        invoke(p1, p2, p3, p4, p5, p6);
+    public Func7.X<P1, P2, P3, P4, P5, P6, P7, R> x7() {
+        return Func7.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        invoke(p1, p2, p3, p4, p5, p6, p7);
+    public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R> x8() {
+        return Func8.X.of(this);
     }
 
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-        invoke(p1, p2, p3, p4, p5, p6, p7, p8);
-    }
-
-    @Override
-    public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
-        invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+    public Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> x9() {
+        return Func9.X.of(this);
     }
 
     @Override

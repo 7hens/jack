@@ -4,7 +4,7 @@ package cn.thens.jack.flow;
 import java.util.concurrent.CancellationException;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.CompositeCancellable;
 
@@ -54,6 +54,6 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
     }
 
     static <T> FlowOperator<T, T> throttleLast(Flowable<?> flow) {
-        return new FlowThrottleLast<T>(Functions.always(flow));
+        return new FlowThrottleLast<T>(Funcs.always(flow));
     }
 }

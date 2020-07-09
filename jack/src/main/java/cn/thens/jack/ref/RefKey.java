@@ -1,7 +1,7 @@
 package cn.thens.jack.ref;
 
 import cn.thens.jack.func.Action2;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Actions;
 
 public abstract class RefKey<T, V> {
     protected abstract V get(T target, V defaultValue);
@@ -17,7 +17,7 @@ public abstract class RefKey<T, V> {
         return new MutableRefKey<T, V>() {
             @Override
             protected void set(T target, V value) {
-                Functions.of(setter).run(target, value);
+                Actions.of(setter).run(target, value);
             }
 
             @Override

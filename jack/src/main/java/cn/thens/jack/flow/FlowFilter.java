@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
 
 /**
@@ -72,7 +72,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
     }
 
     static <T> FlowFilter<T> distinct() {
-        return distinct(Functions.self());
+        return distinct(Funcs.self());
     }
 
     static <T, K> FlowFilter<T> distinctUntilChanged(final Func1<? super T, ? extends K> keySelector) {
@@ -98,7 +98,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
     }
 
     static <T> FlowFilter<T> distinctUntilChanged() {
-        return distinctUntilChanged(Functions.self());
+        return distinctUntilChanged(Funcs.self());
     }
 
     static <T> FlowFilter<T> skip(int count) {

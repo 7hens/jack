@@ -2,7 +2,7 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Functions;
+import cn.thens.jack.func.Funcs;
 
 /**
  * @author 7hens
@@ -48,6 +48,6 @@ class FlowDelay<T> extends AbstractFlow<T> {
     }
 
     public static <T> FlowDelay<T> delay(Flow<T> upFlow, Flowable<?> delayFlow) {
-        return new FlowDelay<>(upFlow, Functions.always(delayFlow));
+        return new FlowDelay<>(upFlow, Funcs.always(delayFlow));
     }
 }
