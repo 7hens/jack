@@ -30,7 +30,7 @@ public interface Func1<P1, R> {
                     try {
                         return func.invoke(p1);
                     } catch (Throwable e) {
-                        throw new ThrowableWrapper(e);
+                        throw ThrowableWrapper.of(e);
                     }
                 }
             };

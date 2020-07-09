@@ -25,7 +25,7 @@ public interface Func0<R> {
                     try {
                         return func.invoke();
                     } catch (Throwable e) {
-                        throw new ThrowableWrapper(e);
+                        throw ThrowableWrapper.of(e);
                     }
                 }
             };

@@ -34,7 +34,7 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
                     try {
                         return func.invoke(p1, p2, p3, p4, p5, p6, p7, p8);
                     } catch (Throwable e) {
-                        throw new ThrowableWrapper(e);
+                        throw ThrowableWrapper.of(e);
                     }
                 }
             };

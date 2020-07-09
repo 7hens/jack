@@ -37,7 +37,7 @@ public interface Action1<P1> {
                     try {
                         action.run(p1);
                     } catch (Throwable e) {
-                        throw new ThrowableWrapper(e);
+                        throw ThrowableWrapper.of(e);
                     }
                 }
             };
