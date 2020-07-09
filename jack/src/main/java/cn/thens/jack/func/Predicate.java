@@ -70,7 +70,7 @@ public interface Predicate<T> {
         }
 
         public static <T> X<T> of(Func0<? extends Boolean> func) {
-            return of(it -> func.invoke());
+            return of(it -> func.call());
         }
 
         public static <T> X<T> eq(T value) {

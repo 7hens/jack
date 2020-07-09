@@ -44,7 +44,7 @@ public abstract class Flow<T> implements Flowable<T> {
 
     public <R> R to(Func1<? super Flow<T>, ? extends R> converter) {
         try {
-            return converter.invoke(this);
+            return converter.call(this);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

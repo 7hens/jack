@@ -6,11 +6,11 @@ import cn.thens.jack.ref.Ref;
 public class StreamDemo {
     public void test(String text) {
         Ref.of(text).elvisRef("0")
-                .safeApply(Integer::parseInt)
-                .safeApply(it -> (long) it)
-                .safeApply(it -> it + "safeCall")
+                .safeCall(Integer::parseInt)
+                .safeCall(it -> (long) it)
+                .safeCall(it -> it + "safeCall")
                 .get();
-        int i = Funcs.of(() -> 12).invoke();
+        int i = Funcs.of(() -> 12).call();
         Funcs.of(() -> System.out.println("hello, world")).run();
     }
 }

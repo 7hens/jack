@@ -24,7 +24,7 @@ class FlowDelay<T> extends AbstractFlow<T> {
                 @Override
                 public void onCollect(Reply<? extends T> reply) {
                     try {
-                        delayFunc.invoke(reply).asFlow()
+                        delayFunc.call(reply).asFlow()
                                 .collect(emitter, new CollectorHelper() {
                                     @Override
                                     protected void onTerminate(Throwable error) throws Throwable {

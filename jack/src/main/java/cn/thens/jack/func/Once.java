@@ -22,7 +22,7 @@ public final class Once<R> {
         if (state.get() == ENDED) return result;
         if (state.compareAndSet(INITIALIZED, STARTED)) {
             try {
-                result = func.invoke();
+                result = func.call();
             } catch (Throwable e) {
                 throw ThrowableWrapper.of(e);
             } finally {

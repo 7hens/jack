@@ -55,7 +55,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
 
             @Override
             public boolean test(T data) throws Throwable {
-                K key = keySelector.invoke(data);
+                K key = keySelector.call(data);
                 if (collectedKeys.contains(key)) {
                     return false;
                 }
@@ -81,7 +81,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
 
             @Override
             public boolean test(T data) throws Throwable {
-                K key = keySelector.invoke(data);
+                K key = keySelector.call(data);
                 if (key.equals(lastKey)) {
                     return false;
                 }

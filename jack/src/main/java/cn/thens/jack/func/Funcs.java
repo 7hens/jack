@@ -38,8 +38,8 @@ public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Func9.X<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> funcX = of(func);
         return new Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>() {
             @Override
-            public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
-                return funcX.invoke(p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+                return funcX.call(p1, p2, p3, p4, p5, p6, p7, p8, p9);
             }
         };
     }
@@ -141,52 +141,52 @@ public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
     }
 
     @Override
-    public R invoke() {
-        return invoke(null);
+    public R call() {
+        return call(null);
     }
 
     @Override
-    public R invoke(P1 p1) {
-        return invoke(p1, null);
+    public R call(P1 p1) {
+        return call(p1, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2) {
-        return invoke(p1, p2, null);
+    public R call(P1 p1, P2 p2) {
+        return call(p1, p2, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3) {
-        return invoke(p1, p2, p3, null);
+    public R call(P1 p1, P2 p2, P3 p3) {
+        return call(p1, p2, p3, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4) {
-        return invoke(p1, p2, p3, p4, null);
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4) {
+        return call(p1, p2, p3, p4, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        return invoke(p1, p2, p3, p4, p5, null);
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+        return call(p1, p2, p3, p4, p5, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        return invoke(p1, p2, p3, p4, p5, p6, null);
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
+        return call(p1, p2, p3, p4, p5, p6, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        return invoke(p1, p2, p3, p4, p5, p6, p7, null);
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
+        return call(p1, p2, p3, p4, p5, p6, p7, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-        return invoke(p1, p2, p3, p4, p5, p6, p7, p8, null);
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+        return call(p1, p2, p3, p4, p5, p6, p7, p8, null);
     }
 
     @Override
-    public R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
+    public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9) {
         return null;
     }
 }

@@ -38,7 +38,7 @@ class ChainMap<T, R> extends Chain<R> {
 
             @Override
             public R next() {
-                return mapper.invoke(iterator.next());
+                return mapper.call(iterator.next());
             }
         };
     }
@@ -49,7 +49,7 @@ class ChainMap<T, R> extends Chain<R> {
 
     static <T, R> Chain<R> mapIndexed(Chain<T> up, Func2<? super Integer, ? super T, ? extends R> mapper) {
         AtomicInteger index = new AtomicInteger(0);
-        return map(up, item -> mapper.invoke(index.getAndIncrement(), item));
+        return map(up, item -> mapper.call(index.getAndIncrement(), item));
     }
 
     static <T> Chain<Tuple2<Integer, T>> withIndex(Chain<T> up) {

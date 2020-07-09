@@ -23,7 +23,7 @@ class FlowMap<T, R> implements FlowOperator<T, R> {
                     return;
                 }
                 try {
-                    emitter.data(mapper.invoke(reply.data()));
+                    emitter.data(mapper.call(reply.data()));
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

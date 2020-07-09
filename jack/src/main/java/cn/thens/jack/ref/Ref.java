@@ -125,15 +125,15 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public <U> U to(Func1<? super Ref<T>, ? extends U> func) {
-        return Funcs.of(func).invoke(this);
+        return Funcs.of(func).call(this);
     }
 
-    public <U> Ref<U> apply(Func1<? super T, ? extends U> func) {
-        return get(() -> Funcs.of(func).invoke(get()));
+    public <U> Ref<U> call(Func1<? super T, ? extends U> func) {
+        return get(() -> Funcs.of(func).call(get()));
     }
 
-    public <U> Ref<U> safeApply(Func1<? super T, ? extends U> func) {
-        return isNotNull() ? apply(func) : empty();
+    public <U> Ref<U> safeCall(Func1<? super T, ? extends U> func) {
+        return isNotNull() ? call(func) : empty();
     }
 
     public Ref<T> run(Action1<? super T> action) {
@@ -224,7 +224,7 @@ public abstract class Ref<T> implements IRef<T> {
         return new Ref<T>() {
             @Override
             public T get() {
-                return funcX.invoke();
+                return funcX.call();
             }
         };
     }
@@ -251,7 +251,7 @@ public abstract class Ref<T> implements IRef<T> {
     private static String messageOf(Object obj) {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
-        if (obj instanceof Func0) return messageOf(Funcs.of((Func0) obj).invoke());
+        if (obj instanceof Func0) return messageOf(Funcs.of((Func0) obj).call());
         if (obj instanceof Throwable) return messageOf((Throwable) obj);
         if (!obj.getClass().isArray()) return obj.toString();
         if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);

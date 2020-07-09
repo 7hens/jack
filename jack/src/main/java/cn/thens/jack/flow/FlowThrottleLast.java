@@ -31,7 +31,7 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
                 }
                 try {
                     lastFlow.cancel();
-                    lastFlow = flowFactory.invoke(reply.data())
+                    lastFlow = flowFactory.call(reply.data())
                             .asFlow()
                             .collect(emitter, new CollectorHelper() {
                                 @Override

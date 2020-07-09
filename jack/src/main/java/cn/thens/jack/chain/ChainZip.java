@@ -30,7 +30,7 @@ class ChainZip<T, U, R> extends Chain<R> {
 
             @Override
             public R next() {
-                return zipper.invoke(firstIterator.next(), secondIterator.next());
+                return zipper.call(firstIterator.next(), secondIterator.next());
             }
         };
     }

@@ -28,7 +28,7 @@ public abstract class Backpressure<T> {
                 try {
                     self.apply(buffer);
                 } catch (Throwable e) {
-                    catchError.invoke(e).apply(buffer);
+                    catchError.call(e).apply(buffer);
                 }
             }
         };

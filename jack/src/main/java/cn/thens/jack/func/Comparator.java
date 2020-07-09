@@ -48,11 +48,11 @@ public interface Comparator<T> {
         }
 
         public static <T> X<T> by(Func1<? super T, ? extends Comparable<?>> selector) {
-            return of((a, b) -> compareValues(selector.invoke(a), selector.invoke(b)));
+            return of((a, b) -> compareValues(selector.call(a), selector.call(b)));
         }
 
         public static <T, K> X<T> by(java.util.Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
-            return of((a, b) -> comparator.compare(selector.invoke(a), selector.invoke(b)));
+            return of((a, b) -> comparator.compare(selector.call(a), selector.call(b)));
         }
     }
 }

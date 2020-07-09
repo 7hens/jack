@@ -37,7 +37,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public abstract Iterator<T> iterator();
 
     public <R> R to(Func1<? super Chain<T>, ? extends R> converter) {
-        return Funcs.of(converter).invoke(this);
+        return Funcs.of(converter).call(this);
     }
 
     public <R> Chain<R> map(Func1<? super T, ? extends R> transformer) {
@@ -73,7 +73,7 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public <R> Chain<R> flatMap(Func1<T, ? extends Iterable<R>> transformer) {
-        return flatten(it -> transformer.invoke(it).iterator());
+        return flatten(it -> transformer.call(it).iterator());
     }
 
     public Chain<T> sub(int startIndex, int endIndex) {
@@ -123,7 +123,7 @@ public abstract class Chain<T> implements Iterable<T> {
         List<T> first = new ArrayList<>();
         List<T> second = new ArrayList<>();
         for (T element : this) {
-            if (predicate.invoke(element)) {
+            if (predicate.call(element)) {
                 first.add(element);
             } else {
                 second.add(element);
@@ -178,7 +178,7 @@ public abstract class Chain<T> implements Iterable<T> {
                     void drop() {
                         while (iterator.hasNext()) {
                             T item = iterator.next();
-                            if (!predicate.invoke(item)) {
+                            if (!predicate.call(item)) {
                                 nextItem = item;
                                 dropState = 1;
                                 return;
@@ -229,7 +229,7 @@ public abstract class Chain<T> implements Iterable<T> {
                     void calcNext() {
                         if (iterator.hasNext()) {
                             T item = iterator.next();
-                            if (predicate.invoke(item)) {
+                            if (predicate.call(item)) {
                                 nextState = 1;
                                 nextItem = item;
                                 return;
@@ -298,7 +298,7 @@ public abstract class Chain<T> implements Iterable<T> {
                     protected void computeNext() {
                         while (iterator.hasNext()) {
                             T next = iterator.next();
-                            K key = keySelector.invoke(next);
+                            K key = keySelector.call(next);
                             if (observed.add(key)) {
                                 setNext(next);
                                 return;
@@ -343,11 +343,11 @@ public abstract class Chain<T> implements Iterable<T> {
     }
 
     public Chain<T> ifEmpty(Func0<? extends Chain<T>> defaultValue) {
-        return isEmpty() ? Func0.X.of(defaultValue).invoke() : this;
+        return isEmpty() ? Func0.X.of(defaultValue).call() : this;
     }
 
     public <U> U call(Func1<Chain<T>, U> func) {
-        return Func1.X.of(func).invoke(this);
+        return Func1.X.of(func).call(this);
     }
 
     public void forEach(Action1<? super T> func) {
@@ -384,7 +384,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public int count(Func1<T, Boolean> predicate) {
         int count = 0;
         for (T item : this) {
-            if (predicate.invoke(item)) {
+            if (predicate.call(item)) {
                 count++;
             }
         }
@@ -393,7 +393,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public T getOrElse(int index, Func1<Integer, T> defaultValue) {
         if (index < 0) {
-            return defaultValue.invoke(index);
+            return defaultValue.call(index);
         }
         Iterator<T> iterator = iterator();
         int count = 0;
@@ -403,7 +403,7 @@ public abstract class Chain<T> implements Iterable<T> {
                 return element;
             }
         }
-        return defaultValue.invoke(index);
+        return defaultValue.call(index);
     }
 
     public T getOrNull(int index) {
@@ -443,7 +443,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public T firstOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
-        return iterator.hasNext() ? iterator.next() : defaultValue.invoke();
+        return iterator.hasNext() ? iterator.next() : defaultValue.call();
     }
 
     public T first() {
@@ -460,12 +460,12 @@ public abstract class Chain<T> implements Iterable<T> {
                                                  Func0<T> defaultValue) {
         int index = 0;
         for (T item : this) {
-            if (predicate.invoke(item)) {
+            if (predicate.call(item)) {
                 return Tuples.of(index, item);
             }
             index++;
         }
-        return Tuples.of(-1, defaultValue.invoke());
+        return Tuples.of(-1, defaultValue.call());
     }
 
     public T firstOrElse(Func1<T, Boolean> predicate, Func0<T> defaultValue) {
@@ -486,7 +486,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public T lastOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
-            return defaultValue.invoke();
+            return defaultValue.call();
         }
         T last = iterator.next();
         while (iterator.hasNext()) {
@@ -512,14 +512,14 @@ public abstract class Chain<T> implements Iterable<T> {
         int index = 0;
         boolean found = false;
         for (T item : this) {
-            if (predicate.invoke(item)) {
+            if (predicate.call(item)) {
                 found = true;
                 last = item;
                 lastIndex = index;
             }
             index++;
         }
-        return Tuples.of(lastIndex, found ? last : defaultValue.invoke());
+        return Tuples.of(lastIndex, found ? last : defaultValue.call());
     }
 
     public T lastOrElse(Func1<T, Boolean> predicate, Func0<T> defaultValue) {
@@ -565,7 +565,7 @@ public abstract class Chain<T> implements Iterable<T> {
         T single = null;
         boolean found = false;
         for (T element : this) {
-            if (predicate.invoke(element)) {
+            if (predicate.call(element)) {
                 if (found) {
                     throw new IllegalArgumentException(
                             "Sequence contains more than one matching element.");
@@ -585,7 +585,7 @@ public abstract class Chain<T> implements Iterable<T> {
         T single = null;
         boolean found = false;
         for (T element : this) {
-            if (predicate.invoke(element)) {
+            if (predicate.call(element)) {
                 if (found) {
                     return null;
                 }
@@ -646,7 +646,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <K, V, M extends Map<? super K, ? super V>>
     M associateByTo(M destination, Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         for (T element : this) {
-            destination.put(keySelector.invoke(element), valueTransform.invoke(element));
+            destination.put(keySelector.call(element), valueTransform.call(element));
         }
         return destination;
     }
@@ -667,7 +667,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <K, V, M extends Map<? super K, ? super V>>
     M associateTo(M destination, Func1<T, Tuple2<K, V>> transform) {
         for (T element : this) {
-            Tuple2<K, V> pair = transform.invoke(element);
+            Tuple2<K, V> pair = transform.call(element);
             destination.put(pair.v1(), pair.v2());
         }
         return destination;
@@ -694,13 +694,13 @@ public abstract class Chain<T> implements Iterable<T> {
     public <K, V, M extends Map<? super K, List<V>>> M groupByTo(M destination,
                                                                  Func1<T, K> keySelector, Func1<T, V> valueTransform) {
         for (T element : this) {
-            K key = keySelector.invoke(element);
+            K key = keySelector.call(element);
             List<V> list = destination.get(key);
             if (list == null) {
                 list = new ArrayList<>();
                 destination.put(key, list);
             }
-            list.add(valueTransform.invoke(element));
+            list.add(valueTransform.call(element));
         }
         return destination;
     }
@@ -719,7 +719,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public boolean none(Func1<T, Boolean> predicate) {
         for (T item : this) {
-            if (predicate.invoke(item)) {
+            if (predicate.call(item)) {
                 return false;
             }
         }
@@ -728,7 +728,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public boolean all(Func1<T, Boolean> predicate) {
         for (T item : this) {
-            if (!predicate.invoke(item)) {
+            if (!predicate.call(item)) {
                 return false;
             }
         }
@@ -741,7 +741,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
     public boolean any(Func1<T, Boolean> predicate) {
         for (T item : this) {
-            if (predicate.invoke(item)) {
+            if (predicate.call(item)) {
                 return true;
             }
         }
@@ -751,7 +751,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public <R> R fold(R initial, Func2<R, T, R> operation) {
         R accumulator = initial;
         for (T item : this) {
-            accumulator = operation.invoke(accumulator, item);
+            accumulator = operation.call(accumulator, item);
         }
         return accumulator;
     }
@@ -760,7 +760,7 @@ public abstract class Chain<T> implements Iterable<T> {
         int index = 0;
         R accumulator = initial;
         for (T item : this) {
-            accumulator = operation.invoke(index++, accumulator, item);
+            accumulator = operation.call(index++, accumulator, item);
         }
         return accumulator;
     }
@@ -771,10 +771,10 @@ public abstract class Chain<T> implements Iterable<T> {
             return null;
         }
         T maxElem = iterator.next();
-        R maxValue = selector.invoke(maxElem);
+        R maxValue = selector.call(maxElem);
         while (iterator.hasNext()) {
             T e = iterator.next();
-            R v = selector.invoke(e);
+            R v = selector.call(e);
             if (maxValue.compareTo(v) < 0) {
                 maxElem = e;
                 maxValue = v;
@@ -804,10 +804,10 @@ public abstract class Chain<T> implements Iterable<T> {
             return null;
         }
         T minElem = iterator.next();
-        R minValue = selector.invoke(minElem);
+        R minValue = selector.call(minElem);
         while (iterator.hasNext()) {
             T e = iterator.next();
-            R v = selector.invoke(e);
+            R v = selector.call(e);
             if (minValue.compareTo(v) > 0) {
                 minElem = e;
                 minValue = v;
@@ -838,7 +838,7 @@ public abstract class Chain<T> implements Iterable<T> {
         }
         T accumulator = iterator.next();
         while (iterator.hasNext()) {
-            accumulator = operation.invoke(accumulator, iterator.next());
+            accumulator = operation.call(accumulator, iterator.next());
         }
         return accumulator;
     }
@@ -851,7 +851,7 @@ public abstract class Chain<T> implements Iterable<T> {
         int index = 1;
         T accumulator = iterator.next();
         while (iterator.hasNext()) {
-            accumulator = operation.invoke(index++, accumulator, iterator.next());
+            accumulator = operation.call(index++, accumulator, iterator.next());
         }
         return accumulator;
     }
@@ -860,7 +860,7 @@ public abstract class Chain<T> implements Iterable<T> {
         double sum = 0;
         int count = 0;
         for (T element : this) {
-            sum += selector.invoke(element).doubleValue();
+            sum += selector.call(element).doubleValue();
             count++;
         }
         return count == 0 ? Double.NaN : sum / count;
@@ -869,7 +869,7 @@ public abstract class Chain<T> implements Iterable<T> {
     public double sumBy(Func1<T, ? extends Number> selector) {
         double sum = 0;
         for (T item : this) {
-            sum += selector.invoke(item).doubleValue();
+            sum += selector.call(item).doubleValue();
         }
         return sum;
     }
@@ -896,7 +896,7 @@ public abstract class Chain<T> implements Iterable<T> {
 
                     @Override
                     public R next() {
-                        return transform.invoke(firstIterator.next(), secondIterator.next());
+                        return transform.call(firstIterator.next(), secondIterator.next());
                     }
                 };
             }
@@ -936,7 +936,7 @@ public abstract class Chain<T> implements Iterable<T> {
                                 return false;
                             } else {
                                 T element = iterator.next();
-                                Iterator<R> nextItemIterator = transformer.invoke(element);
+                                Iterator<R> nextItemIterator = transformer.call(element);
                                 if (nextItemIterator.hasNext()) {
                                     itemIterator = nextItemIterator;
                                     return true;
@@ -961,7 +961,7 @@ public abstract class Chain<T> implements Iterable<T> {
                 }
                 if (limit < 0 || count <= limit) {
                     if (transform != null) {
-                        buffer.append(transform.invoke(element));
+                        buffer.append(transform.call(element));
                     } else if (element instanceof CharSequence) {
                         buffer.append((CharSequence) element);
                     } else if (element instanceof Character) {

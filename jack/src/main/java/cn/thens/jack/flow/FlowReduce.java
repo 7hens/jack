@@ -59,7 +59,7 @@ abstract class FlowReduce<T, R> extends AbstractFlow<R> {
 
             @Override
             void accumulate(T data) throws Throwable {
-                value.set(accumulator.invoke(value.get(), data));
+                value.set(accumulator.call(value.get(), data));
             }
         };
     }
@@ -74,7 +74,7 @@ abstract class FlowReduce<T, R> extends AbstractFlow<R> {
                 if (hasValue.compareAndSet(false, true)) {
                     value.set(data);
                 } else {
-                    value.set(accumulator.invoke(value.get(), data));
+                    value.set(accumulator.call(value.get(), data));
                 }
             }
         };

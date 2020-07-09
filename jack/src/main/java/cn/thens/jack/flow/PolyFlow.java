@@ -7,7 +7,7 @@ import cn.thens.jack.func.Func1;
 public abstract class PolyFlow<T> extends Flow<Flowable<T>> {
     public <R> R polyTo(Func1<? super PolyFlow<T>, ? extends R> converter) {
         try {
-            return converter.invoke(this);
+            return converter.call(this);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

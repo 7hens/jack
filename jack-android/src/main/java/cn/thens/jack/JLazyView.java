@@ -25,7 +25,7 @@ public final class JLazyView {
 
     @SuppressWarnings("unchecked")
     public <T extends View> Getter<T> bind(final int id) {
-        return Lazy.of(() -> (T) finder.invoke(id));
+        return Lazy.of(() -> (T) finder.call(id));
     }
 
     public static JLazyView create(Func1<Integer, ? extends View> finder) {
@@ -33,7 +33,7 @@ public final class JLazyView {
     }
 
     public static JLazyView create(Func0<? extends View> view) {
-        return create(id -> view.invoke().findViewById(id));
+        return create(id -> view.call().findViewById(id));
     }
 
     public static JLazyView create(final View view) {

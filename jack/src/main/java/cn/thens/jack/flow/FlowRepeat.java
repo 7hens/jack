@@ -50,7 +50,7 @@ abstract class FlowRepeat<T> extends AbstractFlow<T> {
         return new FlowRepeat<T>(upFlow) {
             @Override
             void onFlowTerminate(CollectorEmitter<? super T> emitter) throws Throwable {
-                if (shouldRepeat.invoke()) {
+                if (shouldRepeat.call()) {
                     collect(emitter);
                 }
             }

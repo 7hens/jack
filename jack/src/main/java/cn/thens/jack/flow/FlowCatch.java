@@ -42,7 +42,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
-                resumeFunc.invoke(error).asFlow().collect(emitter);
+                resumeFunc.call(error).asFlow().collect(emitter);
             }
         };
     }
