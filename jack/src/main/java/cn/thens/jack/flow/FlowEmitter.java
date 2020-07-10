@@ -15,7 +15,7 @@ import cn.thens.jack.scheduler.Schedulers;
  * @author 7hens
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class FlowEmitter<T> implements Emitter<T>, Flowable<T> {
+public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     private final List<Emitter<? super T>> emitters = new CopyOnWriteArrayList<>();
     private Reply<? extends T> terminalReply = null;
     private final CollectorEmitter<T> collectorEmitter =

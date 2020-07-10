@@ -12,11 +12,11 @@ class PolyFlowFlatMerge<T> extends AbstractFlow<T> {
 
     @Override
     protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<Flowable<T>>() {
+        upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends Flowable<T>> reply) {
+            public void onCollect(Reply<? extends IFlow<T>> reply) {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
                 try {

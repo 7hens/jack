@@ -16,19 +16,19 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
 
     @Override
     protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<Flowable<T>>() {
+        upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final AtomicReference<Cancellable> lastCancellable = new AtomicReference<>(null);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends Flowable<T>> reply) {
+            public void onCollect(Reply<? extends IFlow<T>> reply) {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
                 Cancellable cancellable = lastCancellable.get();
                 if (cancellable != null) {
                     cancellable.cancel();
                 }
-                Flowable<T> flow = reply.data();
+                IFlow<T> flow = reply.data();
                 try {
                     lastCancellable.set(flow.asFlow().collect(emitter, innerCollector));
                 } catch (Throwable e) {

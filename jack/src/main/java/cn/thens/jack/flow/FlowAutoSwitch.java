@@ -9,10 +9,10 @@ import cn.thens.jack.scheduler.Cancellable;
  */
 class FlowAutoSwitch<T> extends AbstractFlow<T> {
     private final Flow<T> upFlow;
-    private final Flowable<?> switchFlow;
-    private final Flowable<T> fallback;
+    private final IFlow<?> switchFlow;
+    private final IFlow<T> fallback;
 
-    private FlowAutoSwitch(Flow<T> upFlow, Flowable<?> switchFlow, Flowable<T> fallback) {
+    private FlowAutoSwitch(Flow<T> upFlow, IFlow<?> switchFlow, IFlow<T> fallback) {
         this.upFlow = upFlow;
         this.switchFlow = switchFlow;
         this.fallback = fallback;
@@ -37,11 +37,11 @@ class FlowAutoSwitch<T> extends AbstractFlow<T> {
         });
     }
 
-    static <T> FlowAutoSwitch<T> autoSwitch(Flow<T> upFlow, Flowable<?> switchFlow, Flowable<T> fallback) {
+    static <T> FlowAutoSwitch<T> autoSwitch(Flow<T> upFlow, IFlow<?> switchFlow, IFlow<T> fallback) {
         return new FlowAutoSwitch<>(upFlow, switchFlow, fallback);
     }
 
-    static <T> FlowAutoSwitch<T> autoCancel(Flow<T> upFlow, Flowable<?> switchFlow) {
+    static <T> FlowAutoSwitch<T> autoCancel(Flow<T> upFlow, IFlow<?> switchFlow) {
         return autoSwitch(upFlow, switchFlow, Flow.error(new CancellationException()));
     }
 }

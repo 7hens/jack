@@ -46,7 +46,7 @@ final class FlowCreate {
         };
     }
 
-    static <T> Flow<T> defer(final Flowable<T> flowFactory) {
+    static <T> Flow<T> defer(final IFlow<T> flowFactory) {
         return new AbstractFlow<T>() {
             @Override
             protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {

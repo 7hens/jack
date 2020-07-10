@@ -13,11 +13,11 @@ import cn.thens.jack.scheduler.CompositeCancellable;
  * @author 7hens
  */
 class FlowThrottleFirst<T> implements FlowOperator<T, T> {
-    private final Func1<? super T, ? extends Flowable<?>> flowFactory;
+    private final Func1<? super T, ? extends IFlow<?>> flowFactory;
     private final AtomicBoolean couldEmit = new AtomicBoolean(true);
     private Cancellable lastFlow = CompositeCancellable.cancelled();
 
-    private FlowThrottleFirst(Func1<? super T, ? extends Flowable<?>> flowFactory) {
+    private FlowThrottleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
         this.flowFactory = flowFactory;
     }
 
@@ -53,11 +53,11 @@ class FlowThrottleFirst<T> implements FlowOperator<T, T> {
         };
     }
 
-    static <T> FlowOperator<T, T> throttleFirst(Func1<? super T, ? extends Flowable<?>> flowFactory) {
+    static <T> FlowOperator<T, T> throttleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
         return new FlowThrottleFirst<>(flowFactory);
     }
 
-    static <T> FlowOperator<T, T> throttleFirst(Flowable<?> flow) {
+    static <T> FlowOperator<T, T> throttleFirst(IFlow<?> flow) {
         return new FlowThrottleFirst<>(Funcs.always(flow));
     }
 }

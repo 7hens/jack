@@ -16,16 +16,16 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
 
     @Override
     protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<Flowable<T>>() {
-            final Queue<Flowable<T>> flowQueue = new LinkedList<>();
+        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+            final Queue<IFlow<T>> flowQueue = new LinkedList<>();
             final AtomicBoolean isCollecting = new AtomicBoolean(false);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends Flowable<T>> reply) {
+            public void onCollect(Reply<? extends IFlow<T>> reply) {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
-                Flowable<T> flowable = reply.data();
+                IFlow<T> flowable = reply.data();
                 if (isCollecting.compareAndSet(false, true)) {
                     try {
                         flowable.asFlow().collect(emitter, innerCollector);

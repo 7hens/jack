@@ -38,7 +38,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
 
     abstract void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable;
 
-    static <T> Flow<T> catchError(Flow<T> upFlow, Func1<? super Throwable, ? extends Flowable<T>> resumeFunc) {
+    static <T> Flow<T> catchError(Flow<T> upFlow, Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
@@ -56,7 +56,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         };
     }
 
-    static <T> Flow<T> catchError(Flow<T> upFlow, Flowable<T> resumeFlow) {
+    static <T> Flow<T> catchError(Flow<T> upFlow, IFlow<T> resumeFlow) {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {

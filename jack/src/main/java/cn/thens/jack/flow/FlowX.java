@@ -15,16 +15,16 @@ public final class FlowX {
     private FlowX() {
     }
 
-    public static <T> Func1<Flow<? extends Flowable<T>>, PolyFlow<T>> poly() {
+    public static <T> Func1<Flow<? extends IFlow<T>>, PolyFlow<T>> poly() {
         return flow -> new PolyFlow<T>() {
             @Override
-            protected Cancellable collect(Scheduler scheduler, Collector<? super Flowable<T>> collector) {
+            protected Cancellable collect(Scheduler scheduler, Collector<? super IFlow<T>> collector) {
                 return flow.collect(scheduler, collector);
             }
         };
     }
 
-    public static <Up, Dn> Operator<Up, Dn> pipe(Func1<? super Flow<Up>, ? extends Flowable<Dn>> action) {
+    public static <Up, Dn> Operator<Up, Dn> pipe(Func1<? super Flow<Up>, ? extends IFlow<Dn>> action) {
         return new Operator<Up, Dn>() {
             @Override
             public Collector<? super Up> apply(Emitter<? super Dn> emitter) throws Throwable {

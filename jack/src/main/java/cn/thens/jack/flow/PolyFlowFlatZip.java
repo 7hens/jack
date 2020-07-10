@@ -18,13 +18,13 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
 
     @Override
     protected void onStart(CollectorEmitter<? super List<T>> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<Flowable<T>>() {
+        upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final Queue<Queue<T>> cachedDataQueue = new LinkedList<>();
             final AtomicBoolean isOuterFlowTerminated = new AtomicBoolean(false);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends Flowable<T>> reply) {
+            public void onCollect(Reply<? extends IFlow<T>> reply) {
                 if (reply.isComplete()) {
                     isOuterFlowTerminated.set(true);
                     tryZip();
@@ -35,7 +35,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
                     return;
                 }
                 if (reply.isTerminal()) return;
-                Flowable<T> flow = reply.data();
+                IFlow<T> flow = reply.data();
                 Queue<T> dataQueue = new LinkedList<>();
                 cachedDataQueue.add(dataQueue);
                 try {

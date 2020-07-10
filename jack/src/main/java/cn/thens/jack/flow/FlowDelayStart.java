@@ -6,9 +6,9 @@ package cn.thens.jack.flow;
  */
 class FlowDelayStart<T> extends AbstractFlow<T> {
     private final Flow<T> upFlow;
-    private final Flowable<?> delayFlow;
+    private final IFlow<?> delayFlow;
 
-    private FlowDelayStart(Flow<T> upFlow, Flowable<?> delayFlow) {
+    private FlowDelayStart(Flow<T> upFlow, IFlow<?> delayFlow) {
         this.upFlow = upFlow;
         this.delayFlow = delayFlow;
     }
@@ -29,7 +29,7 @@ class FlowDelayStart<T> extends AbstractFlow<T> {
         }
     }
 
-    public static <T> FlowDelayStart<T> delayStart(Flow<T> upFlow, Flowable<?> delayFlow) {
+    public static <T> FlowDelayStart<T> delayStart(Flow<T> upFlow, IFlow<?> delayFlow) {
         return new FlowDelayStart<>(upFlow, delayFlow);
     }
 }

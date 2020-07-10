@@ -1,5 +1,5 @@
 package cn.thens.jack.flow;
 
-public interface Flowable<T> {
+public interface IFlow<T> {
     Flow<T> asFlow() throws Throwable;
 }

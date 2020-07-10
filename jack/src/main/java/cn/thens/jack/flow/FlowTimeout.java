@@ -11,9 +11,9 @@ import cn.thens.jack.scheduler.Cancellable;
 class FlowTimeout<T> implements FlowOperator<T, T> {
     private final long timeout;
     private final TimeUnit unit;
-    private final Flowable<T> fallback;
+    private final IFlow<T> fallback;
 
-    FlowTimeout(long timeout, TimeUnit unit, Flowable<T> fallback) {
+    FlowTimeout(long timeout, TimeUnit unit, IFlow<T> fallback) {
         this.timeout = timeout;
         this.unit = unit;
         this.fallback = fallback;

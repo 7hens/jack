@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import cn.thens.jack.flow.Flow;
-import cn.thens.jack.flow.Flowable;
+import cn.thens.jack.flow.IFlow;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Comparator;
@@ -26,6 +26,7 @@ import cn.thens.jack.func.Func3;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.func.ThrowableWrapper;
+import cn.thens.jack.ref.IRef;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
@@ -34,13 +35,23 @@ import cn.thens.jack.tuple.Tuples;
  * @author 7hens
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class Chain<T> implements Iterable<T>, Flowable<T> {
+public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef<Chain<T>> {
     @NotNull
     public abstract Iterator<T> iterator();
 
     @Override
+    public Chain<T> asChain() {
+        return this;
+    }
+
+    @Override
     public Flow<T> asFlow() {
         return Flow.from(this);
+    }
+
+    @Override
+    public Ref<Chain<T>> asRef() throws Throwable {
+        return Ref.of(this);
     }
 
     public <R> R to(Func1<? super Chain<T>, ? extends R> converter) {

@@ -9,9 +9,9 @@ import cn.thens.jack.func.Funcs;
  */
 class FlowDelay<T> extends AbstractFlow<T> {
     private final Flow<T> upFlow;
-    private final Func1<? super Reply<? extends T>, ? extends Flowable> delayFunc;
+    private final Func1<? super Reply<? extends T>, ? extends IFlow> delayFunc;
 
-    private FlowDelay(Flow<T> upFlow, Func1<? super Reply<? extends T>, ? extends Flowable<?>> delayFunc) {
+    private FlowDelay(Flow<T> upFlow, Func1<? super Reply<? extends T>, ? extends IFlow<?>> delayFunc) {
         this.upFlow = upFlow;
         this.delayFunc = delayFunc;
     }
@@ -43,11 +43,11 @@ class FlowDelay<T> extends AbstractFlow<T> {
         }
     }
 
-    public static <T> FlowDelay<T> delay(Flow<T> upFlow, Func1<? super Reply<? extends T>, ? extends Flowable<?>> delayFunc) {
+    public static <T> FlowDelay<T> delay(Flow<T> upFlow, Func1<? super Reply<? extends T>, ? extends IFlow<?>> delayFunc) {
         return new FlowDelay<>(upFlow, delayFunc);
     }
 
-    public static <T> FlowDelay<T> delay(Flow<T> upFlow, Flowable<?> delayFlow) {
+    public static <T> FlowDelay<T> delay(Flow<T> upFlow, IFlow<?> delayFlow) {
         return new FlowDelay<>(upFlow, Funcs.always(delayFlow));
     }
 }
