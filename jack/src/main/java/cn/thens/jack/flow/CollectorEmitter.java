@@ -23,7 +23,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
     private final Backpressure<T> backpressure;
 
     private CollectorEmitter(Scheduler scheduler, Collector<? super T> collector, Backpressure<T> backpressure) {
-        this.scheduler = scheduler.cancellable();
+        this.scheduler = scheduler.cancellable().flat();
         this.collector = wrapCollector(collector);
         this.backpressure = backpressure;
     }
@@ -38,7 +38,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
         if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
             if (reply.isCancel()) {
                 buffer.clear();
-                collector.onCollect(reply);
+                scheduler.schedule(() -> collector.onCollect(reply));
                 return;
             }
             if (isCollecting.compareAndSet(false, true)) {

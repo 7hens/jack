@@ -13,12 +13,13 @@ import cn.thens.jack.TestX;
 public class FlowTest {
     @Test
     public void take() {
-        Flow.interval(1, TimeUnit.SECONDS)
+        Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
+                .flowOn(TestX.scheduler("a"))
                 .take(3)
                 .map(it -> it + "..")
                 .onCollect(TestX.collector("B"))
-                .flowOn(TestX.scheduler("a"))
+                .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
     }
 

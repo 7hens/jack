@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CancellableScheduler extends Scheduler implements Cancellable {
     private CompositeCancellable compositeCancellable = new CompositeCancellable();
-    private final Scheduler scheduler;
+    protected final Scheduler scheduler;
 
     CancellableScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
@@ -32,5 +32,23 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     @Override
     public boolean isCancelled() {
         return compositeCancellable.isCancelled();
+    }
+
+    public CancellableScheduler flat() {
+        if (this instanceof FlatCancellableScheduler) {
+            return this;
+        }
+        return new FlatCancellableScheduler(scheduler);
+    }
+
+    private static class FlatCancellableScheduler extends CancellableScheduler {
+        private FlatCancellableScheduler(Scheduler scheduler) {
+            super(scheduler);
+        }
+
+        @Override
+        public CancellableScheduler cancellable() {
+            return new FlatCancellableScheduler(scheduler);
+        }
     }
 }
