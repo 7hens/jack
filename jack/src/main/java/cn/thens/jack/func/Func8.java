@@ -25,6 +25,23 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
             return Action8.X.of(this::call);
         }
 
+        public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>
+        doFirst(Action8<P1, P2, P3, P4, P5, P6, P7, P8> action) {
+            return of((p1, p2, p3, p4, p5, p6, p7, p8) -> {
+                action.run(p1, p2, p3, p4, p5, p6, p7, p8);
+                return call(p1, p2, p3, p4, p5, p6, p7, p8);
+            });
+        }
+
+        public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>
+        doLast(Action8<P1, P2, P3, P4, P5, P6, P7, P8> action) {
+            return of((p1, p2, p3, p4, p5, p6, p7, p8) -> {
+                R result = call(p1, p2, p3, p4, p5, p6, p7, p8);
+                action.run(p1, p2, p3, p4, p5, p6, p7, p8);
+                return result;
+            });
+        }
+
         public static <P1, P2, P3, P4, P5, P6, P7, P8, R>
         X<P1, P2, P3, P4, P5, P6, P7, P8, R>
         of(Func8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? extends R> func) {

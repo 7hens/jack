@@ -23,6 +23,21 @@ public interface Func1<P1, R> {
             return Action1.X.of(this::call);
         }
 
+        public Func1.X<P1, R> doFirst(Action1<P1> action) {
+            return of((p1) -> {
+                action.run(p1);
+                return call(p1);
+            });
+        }
+
+        public Func1.X<P1, R> doLast(Action1<P1> action) {
+            return of((p1) -> {
+                R result = call(p1);
+                action.run(p1);
+                return result;
+            });
+        }
+
         public static <P1, R> X<P1, R> of(Func1<? super P1, ? extends R> func) {
             return new X<P1, R>() {
                 @Override

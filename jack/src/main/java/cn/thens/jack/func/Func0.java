@@ -18,6 +18,21 @@ public interface Func0<R> {
             return Action0.X.of(this::call);
         }
 
+        public X<R> doFirst(Action0 action) {
+            return of(() -> {
+                action.run();
+                return call();
+            });
+        }
+
+        public X<R> doLast(Action0 action) {
+            return of(() -> {
+                R result = call();
+                action.run();
+                return result;
+            });
+        }
+
         public static <R> X<R> of(Func0<? extends R> func) {
             return new X<R>() {
                 @Override

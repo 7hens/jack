@@ -23,6 +23,21 @@ public interface Func5<P1, P2, P3, P4, P5, R> {
             return Action5.X.of(this::call);
         }
 
+        public Func5.X<P1, P2, P3, P4, P5, R> doFirst(Action5<P1, P2, P3, P4, P5> action) {
+            return of((p1, p2, p3, p4, p5) -> {
+                action.run(p1, p2, p3, p4, p5);
+                return call(p1, p2, p3, p4, p5);
+            });
+        }
+
+        public Func5.X<P1, P2, P3, P4, P5, R> doLast(Action5<P1, P2, P3, P4, P5> action) {
+            return of((p1, p2, p3, p4, p5) -> {
+                R result = call(p1, p2, p3, p4, p5);
+                action.run(p1, p2, p3, p4, p5);
+                return result;
+            });
+        }
+
         public static <P1, P2, P3, P4, P5, R> X<P1, P2, P3, P4, P5, R>
         of(Func5<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? extends R> func) {
             return new X<P1, P2, P3, P4, P5, R>() {
