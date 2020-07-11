@@ -12,7 +12,7 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
     private final Flow<T> upFlow;
     private final Collector<? super T> collector;
 
-    FlowOnCollect(Flow<T> upFlow, Collector<? super T> collector) {
+    private FlowOnCollect(Flow<T> upFlow, Collector<? super T> collector) {
         this.upFlow = upFlow;
         this.collector = collector;
     }
@@ -76,8 +76,8 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
     static <T> FlowOnCollect<T> onComplete(Flow<T> upFlow, final Action0 action) {
         return onCollect(upFlow, new CollectorHelper<T>() {
             @Override
-            protected void onTerminate(Throwable error) throws Throwable {
-                super.onError(error);
+            protected void onComplete() throws Throwable {
+                super.onComplete();
                 action.run();
             }
         });
