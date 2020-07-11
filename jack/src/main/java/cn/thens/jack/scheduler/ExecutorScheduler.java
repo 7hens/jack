@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
  * @author 7hens
  */
 class ExecutorScheduler extends Scheduler {
-    private static ThreadLocal<Executor> currentExecutor = new ThreadLocal<>();
-
     private final Scheduler scheduledHelper;
     private final Executor executor;
 
@@ -19,13 +17,8 @@ class ExecutorScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        if (currentExecutor.get() == executor) {
-            runnable.run();
-            return CompositeCancellable.cancelled();
-        }
         CompositeCancellable cancellable = new CompositeCancellable();
         executor.execute(() -> {
-//            currentExecutor.set(executor);
             if (!cancellable.isCancelled()) {
                 runnable.run();
             }

@@ -41,16 +41,22 @@ public class LifecycleFlow {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 if (view.isAttachedToWindow()) {
                     emitter.data(Lifecycle.Event.ON_CREATE);
+                    emitter.data(Lifecycle.Event.ON_START);
+                    emitter.data(Lifecycle.Event.ON_RESUME);
                 }
             }
             View.OnAttachStateChangeListener listener = new View.OnAttachStateChangeListener() {
                 @Override
                 public void onViewAttachedToWindow(View v) {
                     emitter.data(Lifecycle.Event.ON_CREATE);
+                    emitter.data(Lifecycle.Event.ON_START);
+                    emitter.data(Lifecycle.Event.ON_RESUME);
                 }
 
                 @Override
                 public void onViewDetachedFromWindow(View v) {
+                    emitter.data(Lifecycle.Event.ON_PAUSE);
+                    emitter.data(Lifecycle.Event.ON_STOP);
                     emitter.data(Lifecycle.Event.ON_DESTROY);
                     emitter.complete();
                     view.removeOnAttachStateChangeListener(this);

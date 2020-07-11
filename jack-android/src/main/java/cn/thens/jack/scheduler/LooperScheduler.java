@@ -16,8 +16,18 @@ class LooperScheduler extends Scheduler {
     }
 
     @Override
+    public Cancellable schedule(Runnable runnable) {
+        handler.post(runnable);
+        return cancellableOf(runnable);
+    }
+
+    @Override
     public Cancellable schedule(final Runnable runnable, long delay, TimeUnit unit) {
         handler.postDelayed(runnable, unit.toMillis(delay));
+        return cancellableOf(runnable);
+    }
+
+    private Cancellable cancellableOf(Runnable runnable) {
         return new CompositeCancellable() {
             @Override
             protected void onCancel() {
