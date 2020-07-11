@@ -35,9 +35,6 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     }
 
     public CancellableScheduler flat() {
-        if (this instanceof FlatCancellableScheduler) {
-            return this;
-        }
         return new FlatCancellableScheduler(scheduler);
     }
 
@@ -49,6 +46,11 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
         @Override
         public CancellableScheduler cancellable() {
             return new FlatCancellableScheduler(scheduler);
+        }
+
+        @Override
+        public CancellableScheduler flat() {
+            return this;
         }
     }
 }
