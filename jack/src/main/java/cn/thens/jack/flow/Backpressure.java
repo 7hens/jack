@@ -1,14 +1,14 @@
 package cn.thens.jack.flow;
 
 import java.nio.BufferOverflowException;
-import java.util.LinkedList;
+import java.util.List;
 
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class Backpressure<T> {
-    abstract void apply(LinkedList<T> buffer) throws Throwable;
+    abstract void apply(List<T> buffer) throws Throwable;
 
     @Deprecated
     public final Backpressure<T> catchError(Func1<? super Throwable, ? extends Backpressure<T>> catchError) {
@@ -24,7 +24,7 @@ public abstract class Backpressure<T> {
         Backpressure<T> self = this;
         return new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
+            void apply(List<T> buffer) throws Throwable {
                 try {
                     self.apply(buffer);
                 } catch (Throwable e) {
@@ -41,7 +41,7 @@ public abstract class Backpressure<T> {
     public final Backpressure<T> dropAll() {
         return or(new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
+            void apply(List<T> buffer) throws Throwable {
                 buffer.clear();
             }
         });
@@ -50,8 +50,8 @@ public abstract class Backpressure<T> {
     public final Backpressure<T> dropLatest() {
         return or(new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
-                buffer.removeLast();
+            void apply(List<T> buffer) throws Throwable {
+                buffer.remove(buffer.size() - 1);
             }
         });
     }
@@ -59,8 +59,8 @@ public abstract class Backpressure<T> {
     public final Backpressure<T> dropOldest() {
         return or(new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
-                buffer.removeFirst();
+            void apply(List<T> buffer) throws Throwable {
+                buffer.remove(0);
             }
         });
     }
@@ -68,7 +68,7 @@ public abstract class Backpressure<T> {
     public static <T> Backpressure<T> buffer(int capacity) {
         return new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) {
+            void apply(List<T> buffer) {
                 if (buffer.size() > capacity) {
                     throw new BufferOverflowException();
                 }
@@ -79,7 +79,7 @@ public abstract class Backpressure<T> {
     public static <T> Backpressure<T> error() {
         return new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
+            void apply(List<T> buffer) throws Throwable {
                 throw new BufferOverflowException();
             }
         };
@@ -93,7 +93,7 @@ public abstract class Backpressure<T> {
     public static <T> Backpressure<T> success() {
         return new Backpressure<T>() {
             @Override
-            void apply(LinkedList<T> buffer) throws Throwable {
+            void apply(List<T> buffer) throws Throwable {
             }
         };
     }

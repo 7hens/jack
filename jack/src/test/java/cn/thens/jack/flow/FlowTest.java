@@ -249,6 +249,17 @@ public class FlowTest {
     }
 
     @Test
+    public void rangeOnBackpressure() {
+        Flow.range(0, 100)
+//                .onCollect(TestX.collector("A"))
+                .flowOn(TestX.scheduler("a"))
+//                .onBackpressure(Backpressure.buffer(16))
+                .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void onBackpressureBuffer() {
         backpressure(Backpressure.<Long>buffer(32));
     }

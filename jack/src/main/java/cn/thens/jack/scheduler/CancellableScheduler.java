@@ -15,11 +15,24 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     }
 
     @Override
+    public Cancellable schedule(Runnable runnable) {
+        if (isCancelled()) return this;
+        return addCancellable(scheduler.schedule(runnable));
+    }
+
+    @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
-        if (isCancelled()) {
-            return this;
-        }
-        Cancellable cancellable = scheduler.schedule(runnable, delay, unit);
+        if (isCancelled()) return this;
+        return addCancellable(scheduler.schedule(runnable, delay, unit));
+    }
+
+    @Override
+    public Cancellable schedulePeriodically(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+        if (isCancelled()) return this;
+        return addCancellable(scheduler.schedulePeriodically(runnable, initialDelay, period, unit));
+    }
+
+    private Cancellable addCancellable(Cancellable cancellable) {
         compositeCancellable.addCancellable(cancellable);
         return cancellable;
     }

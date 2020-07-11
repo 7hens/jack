@@ -36,12 +36,12 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         });
     }
 
-    abstract void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable;
+    abstract void handleError(Throwable error, CollectorEmitter<? super T> emitter) throws Throwable;
 
     static <T> Flow<T> catchError(Flow<T> upFlow, Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
         return new FlowCatch<T>(upFlow) {
             @Override
-            void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
+            void handleError(Throwable error, CollectorEmitter<? super T> emitter) throws Throwable {
                 resumeFunc.call(error).asFlow().collect(emitter);
             }
         };
@@ -50,7 +50,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     static <T> Flow<T> catchError(Flow<T> upFlow, Action2<? super Throwable, ? super Emitter<? super T>> resumeConsumer) {
         return new FlowCatch<T>(upFlow) {
             @Override
-            void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
+            void handleError(Throwable error, CollectorEmitter<? super T> emitter) throws Throwable {
                 resumeConsumer.run(error, emitter);
             }
         };
@@ -59,7 +59,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     static <T> Flow<T> catchError(Flow<T> upFlow, IFlow<T> resumeFlow) {
         return new FlowCatch<T>(upFlow) {
             @Override
-            void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
+            void handleError(Throwable error, CollectorEmitter<? super T> emitter) throws Throwable {
                 resumeFlow.asFlow().collect(emitter);
             }
         };
@@ -68,7 +68,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     static <T> Flow<T> retry(Flow<T> upFlow, Predicate<? super Throwable> predicate) {
         return new FlowCatch<T>(upFlow) {
             @Override
-            void handleError(Throwable error, Emitter<? super T> emitter) throws Throwable {
+            void handleError(Throwable error, CollectorEmitter<? super T> emitter) throws Throwable {
                 boolean shouldRetry = predicate.test(error);
                 if (shouldRetry) {
                     collect(emitter);

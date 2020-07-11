@@ -1,7 +1,8 @@
 package cn.thens.jack.flow;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.scheduler.CancellableScheduler;
@@ -15,7 +16,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
     private final AtomicBoolean isCollecting = new AtomicBoolean(false);
     private final AtomicBoolean isCollectorTerminated = new AtomicBoolean(false);
     private final AtomicBoolean isEmitterTerminated = new AtomicBoolean(false);
-    private final LinkedList<T> buffer = new LinkedList<>();
+    private final List<T> buffer = new CopyOnWriteArrayList<>();
     private Reply<? extends T> terminalReply = null;
 
     private final CancellableScheduler scheduler;
@@ -37,7 +38,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
     public void onCollect(Reply<? extends T> reply) {
         if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
             if (reply.isCancel()) {
-                buffer.clear();
+                clearBuffer();
                 collectScheduled(reply);
                 return;
             }
@@ -53,10 +54,18 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
                 buffer.add(reply.data());
                 backpressure.apply(buffer);
             } catch (Throwable e) {
+                clearBuffer();
                 collectScheduled(Reply.error(e));
 //                error(e);
             }
         }
+    }
+
+    private void clearBuffer() {
+        isEmitterTerminated.set(true);
+        isCollectorTerminated.set(true);
+        terminalReply = null;
+        buffer.clear();
     }
 
     private void collectScheduled(Reply<? extends T> reply) {
@@ -71,12 +80,12 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
                 if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
                     collector.onCollect(reply);
                     if (reply.isTerminal()) {
-                        buffer.clear();
+                        clearBuffer();
                         CollectorEmitter.super.cancel();
                         return;
                     }
                     if (!buffer.isEmpty()) {
-                        onCollect(Reply.data(buffer.poll()));
+                        onCollect(Reply.data(buffer.remove(0)));
                     } else if (terminalReply != null) {
                         onCollect(terminalReply);
                     } else {
@@ -127,7 +136,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
         return new CollectorEmitter<>(scheduler, collector, backpressure);
     }
 
-    private static final Backpressure DEFAULT_BACKPRESSURE = Backpressure.buffer(16);
+    private static final Backpressure DEFAULT_BACKPRESSURE = Backpressure.success();
 
     @SuppressWarnings("unchecked")
     static <T> CollectorEmitter<T> create(Scheduler scheduler, Collector<? super T> collector) {

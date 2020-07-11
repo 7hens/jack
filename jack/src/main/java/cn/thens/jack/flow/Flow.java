@@ -7,7 +7,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import cn.thens.jack.func.*;
+import cn.thens.jack.func.Action0;
+import cn.thens.jack.func.Action1;
+import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Func0;
+import cn.thens.jack.func.Func1;
+import cn.thens.jack.func.Func2;
+import cn.thens.jack.func.Predicate;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
