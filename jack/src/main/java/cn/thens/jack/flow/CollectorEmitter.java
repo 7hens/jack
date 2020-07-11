@@ -38,11 +38,11 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
         if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
             if (reply.isCancel()) {
                 buffer.clear();
-                scheduler.schedule(() -> collector.onCollect(reply));
+                collectScheduled(reply);
                 return;
             }
             if (isCollecting.compareAndSet(false, true)) {
-                scheduler.schedule(() -> collector.onCollect(reply));
+                collectScheduled(reply);
                 return;
             }
             if (reply.isTerminal()) {
@@ -53,9 +53,14 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
                 buffer.add(reply.data());
                 backpressure.apply(buffer);
             } catch (Throwable e) {
-                error(e);
+                collectScheduled(Reply.error(e));
+//                error(e);
             }
         }
+    }
+
+    private void collectScheduled(Reply<? extends T> reply) {
+        scheduler.schedule(() -> collector.onCollect(reply));
     }
 
     private Collector<T> wrapCollector(Collector<? super T> collector) {

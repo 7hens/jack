@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
+import cn.thens.jack.scheduler.Schedulers;
 
 /**
  * @author 7hens
@@ -234,16 +235,22 @@ public class FlowTest {
 
     private void backpressure(Backpressure<Long> backpressure) {
         Flow.interval(100, TimeUnit.MILLISECONDS)
-                .take(16)
+                .take(100)
 //                .onCollect(TestX.collector("A"))
                 .onBackpressure(backpressure)
                 .map(it -> {
-                    TestX.delay(400);
+                    TestX.delay(1000);
                     return it;
                 })
 //                .take(6)
                 .onCollect(TestX.collector("B"))
+                .flowOn(Schedulers.core())
                 .to(TestX.collect());
+    }
+
+    @Test
+    public void onBackpressureBuffer() {
+        backpressure(Backpressure.<Long>buffer(32));
     }
 
     @Test
