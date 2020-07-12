@@ -1,5 +1,9 @@
 package cn.thens.jack.flow;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -361,5 +365,17 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public static Flow<Long> interval(long period, TimeUnit unit) {
         return interval(period, period, unit);
+    }
+
+    public static Flow<Integer> from(@NotNull InputStream input, byte[] buffer) {
+        return FlowCreate.from(input, buffer);
+    }
+
+    public static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
+        return FlowCreate.copy(input, output, buffer);
+    }
+
+    public static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output) {
+        return copy(input, output, new byte[8 * 1024]);
     }
 }

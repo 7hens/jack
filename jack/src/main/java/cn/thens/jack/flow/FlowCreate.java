@@ -1,6 +1,10 @@
 package cn.thens.jack.flow;
 
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -131,5 +135,29 @@ final class FlowCreate {
                 }, initialDelay, period, unit);
             }
         };
+    }
+
+    static Flow<Integer> from(@NotNull InputStream input, byte[] buffer) {
+        return create(emitter -> {
+            try {
+                int bytes = input.read(buffer);
+                while (bytes >= 0) {
+                    emitter.data(bytes);
+                    bytes = input.read(buffer);
+                }
+            } catch (Throwable e) {
+                emitter.error(e);
+                return;
+            } finally {
+                input.close();
+            }
+            emitter.complete();
+        });
+    }
+
+    static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
+        return from(input, buffer)
+                .onEach(bytes -> output.write(buffer, 0, bytes))
+                .onTerminate(it -> output.close());
     }
 }

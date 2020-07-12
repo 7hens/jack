@@ -2,6 +2,10 @@ package cn.thens.jack.flow;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -277,5 +281,14 @@ public class FlowTest {
     @Test
     public void onBackpressureDropAll() {
         backpressure(Backpressure.<Long>buffer(2).dropAll());
+    }
+
+    @Test
+    public void copy() throws FileNotFoundException {
+        File sourceFile = new File("build.gradle");
+        File destFile = new File("build/build.gradle");
+        Flow.copy(new FileInputStream(sourceFile), new FileOutputStream(destFile))
+                .onCollect(TestX.collector("A"))
+                .to(TestX.collect());
     }
 }
