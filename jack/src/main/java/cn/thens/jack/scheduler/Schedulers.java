@@ -16,6 +16,19 @@ public final class Schedulers {
     private Schedulers() {
     }
 
+    private static Scheduler UNCONFINED = new UnconfinedScheduler();
+
+    public static Scheduler unconfined() {
+        return UNCONFINED;
+    }
+
+    public static Scheduler from(final Executor executor) {
+        if (executor instanceof ScheduledExecutorService) {
+            return new ScheduledExecutorScheduler((ScheduledExecutorService) executor);
+        }
+        return new ExecutorScheduler(single(), executor);
+    }
+
     private static Ref<Scheduler> SINGLE = Ref.lazy(() -> {
         return from(Executors.newScheduledThreadPool(1, runnable -> {
             Thread thread = new Thread(runnable);
@@ -27,13 +40,6 @@ public final class Schedulers {
 
     public static Scheduler single() {
         return SINGLE.get();
-    }
-
-    public static Scheduler from(final Executor executor) {
-        if (executor instanceof ScheduledExecutorService) {
-            return new ScheduledExecutorScheduler((ScheduledExecutorService) executor);
-        }
-        return new ExecutorScheduler(single(), executor);
     }
 
     private static Ref<Scheduler> IO = Ref.lazy(() -> newScheduler("io", 64));

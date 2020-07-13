@@ -14,10 +14,10 @@ public class SchedulerTest {
     @Test
     public void unconfined() {
         TestX.Logger logger = TestX.logger();
-//        Schedulers.unconfined().schedule(() -> {
-//            logger.log("A");
-//        });
-//        logger.log("B");
+        Schedulers.unconfined().schedule(() -> {
+            logger.log("A");
+        });
+        logger.log("B");
 //
 //        Schedulers.unconfined().schedule(() -> {
 //            logger.log("C");

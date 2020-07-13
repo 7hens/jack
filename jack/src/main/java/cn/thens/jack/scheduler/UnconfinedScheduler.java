@@ -5,7 +5,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author 7hens
  */
-class UnconfinedScheduler extends Scheduler {
+class UnconfinedScheduler extends CancellableScheduler {
+
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
         if (delay == 0) {
@@ -19,5 +20,24 @@ class UnconfinedScheduler extends Scheduler {
             }
         }
         return CompositeCancellable.cancelled();
+    }
+
+    @Override
+    public CancellableScheduler cancellable() {
+        return this;
+    }
+
+    @Override
+    public CancellableScheduler flat() {
+        return this;
+    }
+
+    @Override
+    public void cancel() {
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return false;
     }
 }

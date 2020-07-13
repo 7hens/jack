@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.func.Action1;
+import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.Schedulers;
 
 
 /**
@@ -107,11 +109,15 @@ final class FlowCreate {
         };
     }
 
+    private static Scheduler getDelayedScheduler(Scheduler scheduler) {
+        return scheduler != Schedulers.unconfined() ? scheduler : Schedulers.single();
+    }
+
     static Flow<Long> timer(long delay, TimeUnit unit) {
         return new AbstractFlow<Long>() {
             @Override
             protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
-                emitter.scheduler().schedule(new Runnable() {
+                getDelayedScheduler(emitter.scheduler()).schedule(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(0L);
@@ -127,7 +133,7 @@ final class FlowCreate {
             @Override
             protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
                 final AtomicLong count = new AtomicLong(0);
-                emitter.scheduler().schedulePeriodically(new Runnable() {
+                getDelayedScheduler(emitter.scheduler()).schedulePeriodically(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(count.getAndIncrement());
