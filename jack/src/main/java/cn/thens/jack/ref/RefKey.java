@@ -4,11 +4,11 @@ import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Actions;
 
 public abstract class RefKey<T, V> {
-    protected abstract V get(T target, V defaultValue);
+    protected abstract V get(T target, V defaultValue) throws Throwable;
 
-    protected abstract boolean exists(T target);
+    protected abstract boolean exists(T target) throws Throwable;
 
-    protected V getDefaultValue() {
+    protected V getDefaultValue() throws Throwable {
         return null;
     }
 
@@ -21,17 +21,17 @@ public abstract class RefKey<T, V> {
             }
 
             @Override
-            protected V get(T target, V defaultValue) {
+            protected V get(T target, V defaultValue) throws Throwable {
                 return self.get(target, defaultValue);
             }
 
             @Override
-            protected boolean exists(T target) {
+            protected boolean exists(T target) throws Throwable {
                 return self.exists(target);
             }
 
             @Override
-            protected V getDefaultValue() {
+            protected V getDefaultValue() throws Throwable {
                 return self.getDefaultValue();
             }
         };
@@ -46,12 +46,12 @@ public abstract class RefKey<T, V> {
             }
 
             @Override
-            protected boolean exists(T target) {
+            protected boolean exists(T target) throws Throwable {
                 return source.exists(target);
             }
 
             @Override
-            protected V get(T target, V defaultValue) {
+            protected V get(T target, V defaultValue) throws Throwable {
                 return source.get(target, defaultValue);
             }
         };

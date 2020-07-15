@@ -168,21 +168,37 @@ public abstract class Ref<T> implements IRef<T> {
         };
     }
 
-    public <V> boolean contains(RefKey<T, V> key) {
-        return key.exists(get());
+    public <V> boolean contains(RefKey<? super T, V> key) {
+        try {
+            return key.exists(get());
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
+        }
     }
 
     public <V> Ref<T> put(MutRefKey<T, V> key, V value) {
-        key.set(get(), value);
-        return this;
+        try {
+            key.set(get(), value);
+            return this;
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
+        }
     }
 
     public <V> V get(RefKey<T, V> key, V defaultValue) {
-        return key.get(get(), defaultValue);
+        try {
+            return key.get(get(), defaultValue);
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
+        }
     }
 
     public <V> V get(RefKey<T, V> key) {
-        return get(key, key.getDefaultValue());
+        try {
+            return get(key, key.getDefaultValue());
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
+        }
     }
 
     public <V> V getOrPut(MutRefKey<T, V> key, V defaultValue) {
