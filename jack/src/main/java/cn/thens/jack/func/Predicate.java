@@ -67,7 +67,7 @@ public interface Predicate<T> {
                     try {
                         return predicate.test(t);
                     } catch (Throwable throwable) {
-                        throw ThrowableWrapper.of(throwable);
+                        throw Exceptions.runtime(throwable);
                     }
                 }
             };

@@ -25,7 +25,7 @@ import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.ThrowableWrapper;
+import cn.thens.jack.func.Exceptions;
 import cn.thens.jack.ref.IRef;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
@@ -901,7 +901,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
             }
             return buffer;
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 

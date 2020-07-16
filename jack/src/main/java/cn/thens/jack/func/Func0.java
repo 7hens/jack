@@ -40,7 +40,7 @@ public interface Func0<R> {
                     try {
                         return func.call();
                     } catch (Throwable e) {
-                        throw ThrowableWrapper.of(e);
+                        throw Exceptions.runtime(e);
                     }
                 }
             };

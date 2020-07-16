@@ -41,7 +41,7 @@ public interface Comparator<T> {
                     try {
                         return comparator.compare(a, b);
                     } catch (Throwable e) {
-                        throw ThrowableWrapper.of(e);
+                        throw Exceptions.runtime(e);
                     }
                 }
             };

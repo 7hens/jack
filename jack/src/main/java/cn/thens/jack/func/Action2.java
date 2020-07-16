@@ -37,7 +37,7 @@ public interface Action2<P1, P2> {
                     try {
                         action.run(p1, p2);
                     } catch (Throwable e) {
-                        throw ThrowableWrapper.of(e);
+                        throw Exceptions.runtime(e);
                     }
                 }
             };

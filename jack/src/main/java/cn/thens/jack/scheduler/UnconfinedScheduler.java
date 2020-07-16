@@ -2,7 +2,7 @@ package cn.thens.jack.scheduler;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.thens.jack.func.ThrowableWrapper;
+import cn.thens.jack.func.Exceptions;
 
 /**
  * @author 7hens
@@ -23,7 +23,7 @@ class UnconfinedScheduler extends Scheduler {
             Thread.sleep(unit.toMillis(delay), (int) (unit.toNanos(delay) % 1000000));
             runnable.run();
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
         return CompositeCancellable.cancelled();
     }

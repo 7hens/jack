@@ -1,17 +1,15 @@
 package cn.thens.jack.ref;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Actions;
+import cn.thens.jack.func.Exceptions;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.ThrowableWrapper;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
 public abstract class Ref<T> implements IRef<T> {
@@ -172,7 +170,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.exists(get());
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 
@@ -181,7 +179,7 @@ public abstract class Ref<T> implements IRef<T> {
             key.set(get(), value);
             return this;
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 
@@ -189,7 +187,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.get(get(), defaultValue);
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 
@@ -197,7 +195,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return get(key, key.getDefaultValue());
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 
@@ -260,7 +258,7 @@ public abstract class Ref<T> implements IRef<T> {
             throw (RuntimeException) message;
         }
         if (message instanceof Throwable) {
-            throw ThrowableWrapper.of((Throwable) message);
+            throw Exceptions.runtime((Throwable) message);
         }
         throw new IllegalArgumentException(messageOf(message));
     }
@@ -273,7 +271,7 @@ public abstract class Ref<T> implements IRef<T> {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
         if (obj instanceof Func0) return messageOf(Funcs.of((Func0<?>) obj).call());
-        if (obj instanceof Throwable) return messageOf((Throwable) obj);
+        if (obj instanceof Throwable) return Exceptions.getStackTraceString((Throwable) obj);
         if (!obj.getClass().isArray()) return obj.toString();
         if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);
         if (obj instanceof byte[]) return Arrays.toString((byte[]) obj);
@@ -285,13 +283,5 @@ public abstract class Ref<T> implements IRef<T> {
         if (obj instanceof double[]) return Arrays.toString((double[]) obj);
         if (obj instanceof Object[]) return Arrays.deepToString((Object[]) obj);
         return obj.toString();
-    }
-
-    private static String messageOf(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw, false);
-        throwable.printStackTrace(pw);
-        pw.flush();
-        return sw.toString();
     }
 }

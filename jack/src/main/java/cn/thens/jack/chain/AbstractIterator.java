@@ -3,7 +3,7 @@ package cn.thens.jack.chain;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import cn.thens.jack.func.ThrowableWrapper;
+import cn.thens.jack.func.Exceptions;
 
 /**
  * @author 7hens
@@ -31,7 +31,7 @@ abstract class AbstractIterator<T> implements Iterator<T> {
                     return tryToComputeNext();
             }
         } catch (Throwable e) {
-            throw ThrowableWrapper.of(e);
+            throw Exceptions.runtime(e);
         }
     }
 

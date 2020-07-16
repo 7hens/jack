@@ -27,7 +27,6 @@ public class PolyFlowTest {
                 .to(TestX.collect());
     }
 
-
     @Test
     public void delayErrors() {
         flat(flow -> flow.delayErrors().flatMerge());
