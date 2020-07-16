@@ -18,7 +18,7 @@ public class FlowEmitterTest {
     @Test
     public void behavior() {
         test(FlowEmitter.behavior());
-        test(FlowEmitter.behavior(32L));
+        test(FlowEmitter.behavior(100L));
     }
 
     @Test
@@ -27,19 +27,24 @@ public class FlowEmitterTest {
     }
 
     private void test(FlowEmitter<Long> emitter) {
-        emitter.data(1L);
-        emitter.data(2L);
-        emitter.data(3L);
-//        emitter.complete();
+        emitter.asFlow()
+                .onCollect(TestX.collector("A"))
+                .collect();
+
+        emitter.data(-1L);
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
-                .onEach(it -> emitter.data(it + 4))
+                .onEach(emitter::data)
                 .onTerminate(it -> emitter.complete())
                 .take(5)
                 .collect();
-
         emitter.asFlow()
-                .onCollect(TestX.collector("A"))
+                .onCollect(TestX.collector("B"))
+                .collect();
+
+        TestX.delay(600);
+        emitter.asFlow()
+                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 }
