@@ -11,7 +11,7 @@ public final class Exceptions {
         if (e instanceof RuntimeException) {
             return (RuntimeException) e;
         }
-        return new RuntimeException(e);
+        return new Wrapper(e);
     }
 
     public static String getStackTraceString(Throwable e) {
@@ -20,5 +20,11 @@ public final class Exceptions {
         e.printStackTrace(pw);
         pw.flush();
         return sw.toString();
+    }
+
+    public static class Wrapper extends RuntimeException {
+        private Wrapper(Throwable cause) {
+            super(cause);
+        }
     }
 }
