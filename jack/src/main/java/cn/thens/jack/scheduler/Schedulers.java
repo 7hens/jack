@@ -20,11 +20,11 @@ public final class Schedulers {
     private Schedulers() {
     }
 
-    private static Scheduler UNCONFINED = new UnconfinedScheduler().cancellable();
+    private static Ref<Scheduler> UNCONFINED = Ref.lazy(() -> new UnconfinedScheduler(single()));
 
     @ApiStatus.Experimental
     static Scheduler unconfined() {
-        return UNCONFINED;
+        return UNCONFINED.get();
     }
 
     public static Scheduler from(final Executor executor) {

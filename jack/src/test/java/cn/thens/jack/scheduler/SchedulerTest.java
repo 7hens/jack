@@ -16,17 +16,23 @@ public class SchedulerTest {
     @Test
     public void unconfined() {
         TestX.Logger logger = TestX.logger();
-        Schedulers.unconfined().schedule(() -> {
+        Scheduler scheduler = Schedulers.unconfined();
+        scheduler.schedule(() -> {
             logger.log("A");
         });
-        logger.log("B");
 
-        Schedulers.unconfined().schedule(() -> {
-            logger.log("C");
+        Cancellable cancellable = scheduler.schedule(() -> {
+            logger.log("B");
         }, 1, TimeUnit.SECONDS);
-        logger.log("D");
 
-        Schedulers.unconfined().schedulePeriodically(() -> {
+        logger.log("C");
+
+        scheduler.schedule(() -> {
+            logger.log("D");
+            cancellable.cancel();
+        }, 100, TimeUnit.MILLISECONDS);
+
+        scheduler.schedulePeriodically(() -> {
             logger.log("E: " + System.currentTimeMillis());
         }, 2, 1, TimeUnit.SECONDS);
         logger.log("F");
@@ -35,9 +41,9 @@ public class SchedulerTest {
     @Test
     public void unconfinedFlow() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
-                .take(10)
                 .onCollect(TestX.collector("A"))
                 .flowOn(Schedulers.unconfined())
+                .take(10)
                 .onCollect(TestX.collector("B"))
                 .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
