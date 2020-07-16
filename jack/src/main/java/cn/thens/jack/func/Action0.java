@@ -28,7 +28,7 @@ public interface Action0 {
                     try {
                         action.run();
                     } catch (Throwable e) {
-                        throw Exceptions.runtime(e);
+                        throw Exceptions.wrap(e);
                     }
                 }
             };

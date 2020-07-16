@@ -28,7 +28,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
                 onComplete();
             }
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 

@@ -23,7 +23,7 @@ class UnconfinedScheduler extends Scheduler {
             Thread.sleep(unit.toMillis(delay), (int) (unit.toNanos(delay) % 1000000));
             runnable.run();
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
         return CompositeCancellable.cancelled();
     }

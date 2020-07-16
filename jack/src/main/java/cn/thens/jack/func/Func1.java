@@ -45,7 +45,7 @@ public interface Func1<P1, R> {
                     try {
                         return func.call(p1);
                     } catch (Throwable e) {
-                        throw Exceptions.runtime(e);
+                        throw Exceptions.wrap(e);
                     }
                 }
             };

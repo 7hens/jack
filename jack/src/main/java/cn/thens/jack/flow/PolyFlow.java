@@ -10,7 +10,7 @@ public abstract class PolyFlow<T> extends Flow<IFlow<T>> {
         try {
             return converter.call(this);
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 

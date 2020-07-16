@@ -901,7 +901,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
             }
             return buffer;
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 

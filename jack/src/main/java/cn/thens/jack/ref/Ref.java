@@ -170,7 +170,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.exists(get());
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 
@@ -179,7 +179,7 @@ public abstract class Ref<T> implements IRef<T> {
             key.set(get(), value);
             return this;
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 
@@ -187,7 +187,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.get(get(), defaultValue);
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return get(key, key.getDefaultValue());
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 
@@ -258,7 +258,7 @@ public abstract class Ref<T> implements IRef<T> {
             throw (RuntimeException) message;
         }
         if (message instanceof Throwable) {
-            throw Exceptions.runtime((Throwable) message);
+            throw Exceptions.wrap((Throwable) message);
         }
         throw new IllegalArgumentException(messageOf(message));
     }

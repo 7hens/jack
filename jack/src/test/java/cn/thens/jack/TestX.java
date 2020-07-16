@@ -94,7 +94,7 @@ public class TestX {
         try {
             Thread.sleep(timeMs);
         } catch (InterruptedException e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 

@@ -57,7 +57,7 @@ public abstract class Flow<T> implements IFlow<T> {
         try {
             return converter.call(this);
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 

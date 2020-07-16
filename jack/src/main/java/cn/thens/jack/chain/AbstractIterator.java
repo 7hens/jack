@@ -31,7 +31,7 @@ abstract class AbstractIterator<T> implements Iterator<T> {
                     return tryToComputeNext();
             }
         } catch (Throwable e) {
-            throw Exceptions.runtime(e);
+            throw Exceptions.wrap(e);
         }
     }
 
