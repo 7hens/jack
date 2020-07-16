@@ -4,8 +4,10 @@ import org.junit.Test;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.util.concurrent.TimeUnit;
 
 import cn.thens.jack.TestX;
+import cn.thens.jack.flow.Flow;
 
 /**
  * @author 7hens
@@ -18,16 +20,27 @@ public class SchedulerTest {
             logger.log("A");
         });
         logger.log("B");
-//
-//        Schedulers.unconfined().schedule(() -> {
-//            logger.log("C");
-//        }, 1, TimeUnit.SECONDS);
-//        logger.log("D");
-//
-//        Schedulers.unconfined().schedulePeriodically(() -> {
-//            logger.log("E: " + System.currentTimeMillis());
-//        }, 2, 1, TimeUnit.SECONDS);
-//        logger.log("F");
+
+        Schedulers.unconfined().schedule(() -> {
+            logger.log("C");
+        }, 1, TimeUnit.SECONDS);
+        logger.log("D");
+
+        Schedulers.unconfined().schedulePeriodically(() -> {
+            logger.log("E: " + System.currentTimeMillis());
+        }, 2, 1, TimeUnit.SECONDS);
+        logger.log("F");
+    }
+
+    @Test
+    public void unconfinedFlow() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .take(10)
+                .onCollect(TestX.collector("A"))
+                .flowOn(Schedulers.unconfined())
+                .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
+                .to(TestX.collect());
     }
 
     @Test

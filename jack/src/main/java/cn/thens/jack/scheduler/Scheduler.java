@@ -28,6 +28,6 @@ public abstract class Scheduler {
     }
 
     public CancellableScheduler cancellable() {
-        return new StructuredScheduler(this);
+        return new CancellableScheduler(this);
     }
 }

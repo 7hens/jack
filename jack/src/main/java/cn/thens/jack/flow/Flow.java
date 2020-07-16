@@ -35,7 +35,7 @@ public abstract class Flow<T> implements IFlow<T> {
     protected abstract Cancellable collect(Scheduler scheduler, Collector<? super T> collector);
 
     public Cancellable collect() {
-        return collect(Schedulers.unconfined(), CollectorHelper.get());
+        return collect(Schedulers.single(), CollectorHelper.get());
     }
 
     Cancellable collect(Emitter<?> emitter, Collector<? super T> collector) {

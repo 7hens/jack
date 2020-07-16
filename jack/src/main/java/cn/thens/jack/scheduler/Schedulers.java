@@ -1,11 +1,15 @@
 package cn.thens.jack.scheduler;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.ref.Ref;
 
@@ -16,9 +20,10 @@ public final class Schedulers {
     private Schedulers() {
     }
 
-    private static Scheduler UNCONFINED = new UnconfinedScheduler();
+    private static Scheduler UNCONFINED = new UnconfinedScheduler().cancellable();
 
-    public static Scheduler unconfined() {
+    @ApiStatus.Experimental
+    static Scheduler unconfined() {
         return UNCONFINED;
     }
 
@@ -29,36 +34,44 @@ public final class Schedulers {
         return new ExecutorScheduler(single(), executor);
     }
 
-    private static Ref<Scheduler> SINGLE = Ref.lazy(() -> {
-        return from(Executors.newScheduledThreadPool(1, runnable -> {
-            Thread thread = new Thread(runnable);
-            thread.setName("single");
-            thread.setDaemon(true);
-            return thread;
-        }));
-    }).lazy();
+    private static Ref<Scheduler> SINGLE = Ref.lazy(Schedulers::singleScheduler);
 
     public static Scheduler single() {
         return SINGLE.get();
     }
 
-    private static Ref<Scheduler> IO = Ref.lazy(() -> newScheduler("io", 64));
+    private static Ref<Scheduler> IO = Ref.lazy(() -> executorScheduler("io", 64));
 
     public static Scheduler io() {
         return IO.get();
     }
 
-    private static Ref<Scheduler> CORE = Ref.lazy(() -> newScheduler("core", 2));
+    private static Ref<Scheduler> CORE = Ref.lazy(() -> executorScheduler("core", 2));
 
     public static Scheduler core() {
         return CORE.get();
     }
 
-    private static Scheduler newScheduler(String name, int expectedThreadCount) {
+    private static Scheduler executorScheduler(String name, int expectedThreadCount) {
         int processorCount = Runtime.getRuntime().availableProcessors();
         int maxThreadCount = Math.max(processorCount, expectedThreadCount);
         return from(new ThreadPoolExecutor(processorCount, maxThreadCount,
                 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
-                new SchedulerThreadFactory(name)));
+                threadFactory(name, false)));
+    }
+
+    private static Scheduler singleScheduler() {
+        return from(Executors.newScheduledThreadPool(1, threadFactory("single", true)));
+    }
+
+    private static ThreadFactory threadFactory(String name, boolean isSingle) {
+        final AtomicLong n = new AtomicLong();
+        return runnable -> {
+            Thread thread = new Thread(runnable);
+            thread.setName(name + (isSingle ? "" : "-" + n.incrementAndGet()));
+            thread.setPriority(Thread.NORM_PRIORITY);
+            thread.setDaemon(true);
+            return thread;
+        };
     }
 }

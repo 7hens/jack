@@ -109,15 +109,11 @@ final class FlowCreate {
         };
     }
 
-    private static Scheduler getDelayedScheduler(Scheduler scheduler) {
-        return scheduler != Schedulers.unconfined() ? scheduler : Schedulers.single();
-    }
-
     static Flow<Long> timer(long delay, TimeUnit unit) {
         return new AbstractFlow<Long>() {
             @Override
             protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
-                getDelayedScheduler(emitter.scheduler()).schedule(new Runnable() {
+                emitter.scheduler().schedule(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(0L);
@@ -133,7 +129,7 @@ final class FlowCreate {
             @Override
             protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
                 final AtomicLong count = new AtomicLong(0);
-                getDelayedScheduler(emitter.scheduler()).schedulePeriodically(new Runnable() {
+                emitter.scheduler().schedulePeriodically(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(count.getAndIncrement());
@@ -151,19 +147,31 @@ final class FlowCreate {
                     emitter.data(bytes);
                     bytes = input.read(buffer);
                 }
+                emitter.complete();
             } catch (Throwable e) {
                 emitter.error(e);
-                return;
             } finally {
                 input.close();
             }
-            emitter.complete();
         });
     }
 
     static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
-        return from(input, buffer)
-                .onEach(bytes -> output.write(buffer, 0, bytes))
-                .onTerminate(it -> output.close());
+        return create(emitter -> {
+            try {
+                int bytes = input.read(buffer);
+                while (bytes >= 0) {
+                    output.write(buffer, 0, bytes);
+                    emitter.data(bytes);
+                    bytes = input.read(buffer);
+                }
+                emitter.complete();
+            } catch (Throwable e) {
+                emitter.error(e);
+            } finally {
+                input.close();
+                output.close();
+            }
+        });
     }
 }

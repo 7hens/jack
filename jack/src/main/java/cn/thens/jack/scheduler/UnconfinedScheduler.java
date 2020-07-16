@@ -2,42 +2,39 @@ package cn.thens.jack.scheduler;
 
 import java.util.concurrent.TimeUnit;
 
+import cn.thens.jack.func.ThrowableWrapper;
+
 /**
  * @author 7hens
  */
-class UnconfinedScheduler extends CancellableScheduler {
+class UnconfinedScheduler extends Scheduler {
+    @Override
+    public Cancellable schedule(Runnable runnable) {
+        runnable.run();
+        return CompositeCancellable.cancelled();
+    }
 
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
         if (delay == 0) {
+            return schedule(runnable);
+        }
+        try {
+            Thread.sleep(unit.toMillis(delay), (int) (unit.toNanos(delay) % 1000000));
             runnable.run();
-        } else {
-            try {
-                Thread.sleep(unit.toMillis(delay), (int) (unit.toNanos(delay) % 1000000));
-                runnable.run();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
+        } catch (Throwable e) {
+            throw ThrowableWrapper.of(e);
         }
         return CompositeCancellable.cancelled();
     }
 
     @Override
     public CancellableScheduler cancellable() {
-        return this;
-    }
-
-    @Override
-    public CancellableScheduler flat() {
-        return this;
-    }
-
-    @Override
-    public void cancel() {
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return false;
+        return new CancellableScheduler(this) {
+            @Override
+            public CancellableScheduler cancellable() {
+                return this;
+            }
+        };
     }
 }
