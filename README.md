@@ -225,7 +225,7 @@ Flow.just(1, 2, 3, 4, 5)
             }
         })
         .flowOn(Schedulers.io())
-        .autoCancel(AndroidFlow.lifecycle(activity))
+        .autoCancel(LifecycleFlow.from(activity))
         .collect();
 ```
 
