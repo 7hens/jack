@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
+import cn.thens.jack.ref.Ref;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -82,9 +83,9 @@ public class FlowTest {
 
     @Test
     public void timeout() {
-        Flow.timer(2, TimeUnit.SECONDS)
+        Flow.timer(200, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .timeout(1, TimeUnit.SECONDS)
+                .timeout(Flow.timer(100, TimeUnit.MILLISECONDS), Flow.just(33L))
                 .onCollect(TestX.collector("B"))
                 .to(TestX.collect());
     }
@@ -169,6 +170,17 @@ public class FlowTest {
                 .onCollect(TestX.collector("A"))
                 .take(3)
                 .delayStart(Flow.timer(5, TimeUnit.SECONDS))
+                .onCollect(TestX.collector("B"))
+                .to(TestX.collect());
+    }
+
+    @Test
+    public void delayError() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .onCollect(TestX.collector("A"))
+                .filter(it -> Ref.require(it < 3L))
+                .delayError(Flow.timer(3, TimeUnit.SECONDS))
+//                .take(3)
                 .onCollect(TestX.collector("B"))
                 .to(TestX.collect());
     }

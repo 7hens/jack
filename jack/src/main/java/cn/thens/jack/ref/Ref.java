@@ -252,8 +252,8 @@ public abstract class Ref<T> implements IRef<T> {
         return Ref.<T>get(func).lazy();
     }
 
-    public static void require(boolean value, Object message) {
-        if (value) return;
+    public static boolean require(boolean value, Object message) {
+        if (value) return true;
         if (message instanceof RuntimeException) {
             throw (RuntimeException) message;
         }
@@ -263,8 +263,8 @@ public abstract class Ref<T> implements IRef<T> {
         throw new IllegalArgumentException(messageOf(message));
     }
 
-    public static void require(boolean value) {
-        require(value, "Failed requirement");
+    public static boolean require(boolean value) {
+        return require(value, "Failed requirement");
     }
 
     private static String messageOf(Object obj) {

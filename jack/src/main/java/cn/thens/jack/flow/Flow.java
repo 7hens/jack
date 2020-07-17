@@ -239,12 +239,20 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowReduce.reduce(this, accumulator);
     }
 
+    public Flow<T> timeout(IFlow<?> timeoutFlow, IFlow<T> fallback) {
+        return new FlowTimeout<>(this, timeoutFlow, fallback);
+    }
+
+    public Flow<T> timeout(IFlow<?> timeoutFlow) {
+        return timeout(timeoutFlow, Flow.error(new TimeoutException()));
+    }
+
     public Flow<T> timeout(long timeout, TimeUnit unit, IFlow<T> fallback) {
-        return transform(new FlowTimeout<>(timeout, unit, fallback));
+        return timeout(Flow.timer(timeout, unit), fallback);
     }
 
     public Flow<T> timeout(long timeout, TimeUnit unit) {
-        return timeout(timeout, unit, Flow.error(new TimeoutException()));
+        return timeout(Flow.timer(timeout, unit));
     }
 
     public Flow<T> delay(Func1<? super Reply<? extends T>, ? extends IFlow<?>> delayFunc) {
@@ -253,6 +261,10 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<T> delay(IFlow<?> delayFlow) {
         return FlowDelay.delay(this, delayFlow);
+    }
+
+    public Flow<T> delayError(IFlow<?> delayFlow) {
+        return delay(reply -> reply.isError() ? delayFlow : Flow.empty());
     }
 
     public Flow<T> delayStart(IFlow<?> delayFlow) {

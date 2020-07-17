@@ -1,66 +1,57 @@
 package cn.thens.jack.flow;
 
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.scheduler.Cancellable;
+import cn.thens.jack.scheduler.CompositeCancellable;
 
 /**
  * @author 7hens
  */
-class FlowTimeout<T> implements FlowOperator<T, T> {
-    private final long timeout;
-    private final TimeUnit unit;
+class FlowTimeout<T> extends AbstractFlow<T> {
+    private final Flow<T> upFlow;
+    private final IFlow<?> timeoutFlow;
     private final IFlow<T> fallback;
+    private CompositeCancellable upFlowCancellable = new CompositeCancellable();
+    private Cancellable timeoutCancellable = new CompositeCancellable();
+    private final AtomicBoolean isTransferred = new AtomicBoolean(false);
 
-    FlowTimeout(long timeout, TimeUnit unit, IFlow<T> fallback) {
-        this.timeout = timeout;
-        this.unit = unit;
+    FlowTimeout(Flow<T> upFlow, IFlow<?> timeoutFlow, IFlow<T> fallback) {
+        this.upFlow = upFlow;
+        this.timeoutFlow = timeoutFlow;
         this.fallback = fallback;
     }
 
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return new MyCollector(emitter);
-    }
-
-    private class MyCollector implements Collector<T>, Runnable {
-        private final AtomicBoolean isTransferred = new AtomicBoolean(false);
-        private final Emitter<? super T> emitter;
-        private Cancellable cancellable;
-
-        MyCollector(Emitter<? super T> emitter) {
-            this.emitter = emitter;
-            cancellable = emitter.scheduler().schedule(this, timeout, unit);
-        }
-
-        @Override
-        public void onCollect(Reply<? extends T> reply) {
+    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+        timeoutCancellable = startTimeoutFlow(emitter);
+        upFlowCancellable.addCancellable(upFlow.collect(emitter, reply -> {
             if (isTransferred.get()) return;
             emitter.emit(reply);
-            if (cancellable != null) {
-                cancellable.cancel();
-            }
+            timeoutCancellable.cancel();
             if (reply.isTerminal() || emitter.isTerminated()) {
                 return;
             }
-            cancellable = emitter.scheduler().schedule(this, timeout, unit);
-        }
+            try {
+                timeoutCancellable = startTimeoutFlow(emitter);
+            } catch (Throwable e) {
+                emitter.error(e);
+            }
+        }));
+    }
 
-        @Override
-        public void run() {
-            if (isTransferred.compareAndSet(false, true)) {
-                try {
-                    fallback.asFlow().collect(emitter, new Collector<T>() {
-                        @Override
-                        public void onCollect(Reply<? extends T> reply) {
-                            emitter.emit(reply);
-                        }
-                    });
-                } catch (Throwable e) {
-                    emitter.error(e);
+    private Cancellable startTimeoutFlow(CollectorEmitter<? super T> emitter) throws Throwable {
+        return timeoutFlow.asFlow().collect(emitter, reply -> {
+            if (reply.isTerminal() && !emitter.isTerminated()) {
+                upFlowCancellable.cancel();
+                if (isTransferred.compareAndSet(false, true)) {
+                    try {
+                        fallback.asFlow().collect(emitter);
+                    } catch (Throwable e) {
+                        emitter.error(e);
+                    }
                 }
             }
-        }
+        });
     }
 }
