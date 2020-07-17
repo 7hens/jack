@@ -303,4 +303,19 @@ public class FlowTest {
                 .onCollect(TestX.collector("A"))
                 .to(TestX.collect());
     }
+
+    @Test
+    public void terminalPoly() {
+        Flow.just(
+                Flow.timer(100, TimeUnit.MILLISECONDS)
+                        .onCollect(TestX.collector("A")),
+                Flow.timer(200, TimeUnit.MILLISECONDS)
+                        .onCollect(TestX.collector("B")),
+                Flow.error(new NullPointerException())
+                        .delayError(Flow.timer(300, TimeUnit.MILLISECONDS))
+                        .onCollect(TestX.collector("C"))
+        ).to(FlowX.terminalPoly()).flatMerge()
+                .onCollect(TestX.collector("X"))
+                .to(TestX.collect());
+    }
 }

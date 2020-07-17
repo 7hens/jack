@@ -24,6 +24,13 @@ public final class FlowX {
         };
     }
 
+    public static Func1<? super Flow<? extends Flow<?>>, ? extends PolyFlow<Object>> terminalPoly() {
+        return flows -> {
+            return flows.map(it -> it.asFlow().ignoreElements().cast(Object.class))
+                    .to(FlowX.poly());
+        };
+    }
+
     public static <Up, Dn> Operator<Up, Dn> pipe(Func1<? super Flow<Up>, ? extends IFlow<Dn>> action) {
         return new Operator<Up, Dn>() {
             @Override
