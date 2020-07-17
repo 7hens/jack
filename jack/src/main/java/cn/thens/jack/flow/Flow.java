@@ -118,6 +118,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return mapToFlow(mapper).flatMerge();
     }
 
+    public <R> Flow<R> cast(Class<? extends R> cls) {
+        return map(cls::cast);
+    }
+
     public <C extends Collection<T>> Flow<C> toCollection(C collection) {
         return transform(new FlowToCollection<>(collection));
     }

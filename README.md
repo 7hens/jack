@@ -237,7 +237,7 @@ Flow.just(1, 2, 3, 4, 5)
 | Convert      | transform / to / polyTo                                                         |
 | Scheduler    | flowOn                                                                          |
 | Collect      | onCollect / toCollection / toList                                               |
-| Map          | map / mapToFlow / flatMap                                                       |
+| Map          | map / mapToFlow / flatMap / cast                                                |
 | Throttle     | throttleFirst / throttleLast                                                    |
 | Filter       | filter / distinct / distinctUntilChanged / ignoreElements / skip                |
 | Take         | take / takeLast / takeWhile / takeUntil                                         |
