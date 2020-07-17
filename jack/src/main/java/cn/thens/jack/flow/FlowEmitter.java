@@ -1,9 +1,9 @@
 package cn.thens.jack.flow;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.CompositeCancellable;
@@ -16,26 +16,20 @@ import cn.thens.jack.scheduler.Schedulers;
  */
 @SuppressWarnings("WeakerAccess")
 public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
-    private Reply<? extends T> terminalReply = null;
+    private final AtomicReference<Reply<? extends T>> terminalReplyRef = new AtomicReference<>();
     private final List<Emitter<? super T>> emitters = new CopyOnWriteArrayList<>();
-    private final CollectorEmitter<T> collectorEmitter =
-            CollectorEmitter.create(Schedulers.core(), reply -> {
-                FlowEmitter.this.onCollect(reply);
-                for (Emitter<? super T> emitter : emitters) {
-                    emitter.emit(reply);
-                }
-                if (reply.isTerminal()) {
-                    emitters.clear();
-                }
-            });
+    private final CollectorEmitter<T> collectorEmitter;
 
     private FlowEmitter() {
+        Scheduler scheduler = Schedulers.core();
+        Collector<T> collector = this::onCollect;
+        collectorEmitter = CollectorEmitter.create(scheduler, collector);
     }
 
     @Override
     public void emit(Reply<? extends T> reply) {
         if (reply.isTerminal()) {
-            terminalReply = reply;
+            terminalReplyRef.compareAndSet(null, reply);
         }
         collectorEmitter.emit(reply);
     }
@@ -78,6 +72,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     @Override
     public Flow<T> asFlow() {
         return Flow.create(emitter -> {
+            Reply<? extends T> terminalReply = terminalReplyRef.get();
             if (terminalReply != null) {
                 emitter.emit(terminalReply);
                 return;
@@ -94,6 +89,12 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     protected void onCollect(Reply<? extends T> reply) {
+        for (Emitter<? super T> emitter : emitters) {
+            emitter.emit(reply);
+        }
+        if (reply.isTerminal()) {
+            emitters.clear();
+        }
     }
 
     public static <T> FlowEmitter<T> publish() {
@@ -106,20 +107,22 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
             @Override
             protected void onCollect(Reply<? extends T> reply) {
-                super.onCollect(reply);
                 if (!reply.isTerminal()) {
                     lastReply = reply;
                 }
+                super.onCollect(reply);
             }
 
             @Override
             public Flow<T> asFlow() {
-                if (lastReply != null) {
-                    return super.asFlow()
-                            .polyWith(Flow.just(lastReply.data()))
-                            .flatMerge();
-                }
-                return super.asFlow();
+                return Flow.<T>create(emitter -> {
+                    if (lastReply != null) {
+                        emitter.emit(lastReply);
+                    }
+                    emitter.complete();
+                }) ////////////////
+                        .polyWith(super.asFlow())
+                        .flatMerge();
             }
         };
     }
@@ -134,12 +137,12 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     public static <T> FlowEmitter<T> replay() {
         return new FlowEmitter<T>() {
-            private List<Reply<? extends T>> replyBuffer = new ArrayList<>();
+            private List<Reply<? extends T>> replyBuffer = new CopyOnWriteArrayList<>();
 
             @Override
             protected void onCollect(Reply<? extends T> reply) {
-                super.onCollect(reply);
                 replyBuffer.add(reply);
+                super.onCollect(reply);
             }
 
             @Override

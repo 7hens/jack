@@ -31,6 +31,7 @@ public class FlowEmitterTest {
                 .onCollect(TestX.collector("A"))
                 .collect();
 
+        TestX.delay(100);
         emitter.data(-1L);
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
