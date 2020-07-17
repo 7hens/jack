@@ -24,9 +24,9 @@ public final class FlowX {
         };
     }
 
-    public static Func1<? super Flow<? extends Flow<?>>, ? extends PolyFlow<Object>> terminalPoly() {
+    public static Func1<? super Flow<? extends IFlow<?>>, ? extends PolyFlow<Void>> terminalPoly() {
         return flows -> {
-            return flows.map(it -> it.asFlow().ignoreElements().cast(Object.class))
+            return flows.map(it -> it.asFlow().ignoreElements().cast(Void.class))
                     .to(FlowX.poly());
         };
     }
