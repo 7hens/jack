@@ -9,7 +9,7 @@
 > 公司项目不让用 Kotlin，所以我就用 Java 写了个模拟 Kotlin 的库。哈哈~
 
 ```groovy
-implementation 'com.github.7hens.jack:jack-android:0.5'
+implementation 'com.github.7hens.jack:jack-android:0.6'
 ```
 
 ## View 注入
