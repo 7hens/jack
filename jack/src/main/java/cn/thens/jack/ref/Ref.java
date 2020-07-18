@@ -244,7 +244,7 @@ public abstract class Ref<T> implements IRef<T> {
         };
     }
 
-    public static <T> Ref<T> defer(IRef<T> ref) {
+    public static <T> Ref<T> obtain(IRef<? extends T> ref) {
         return get(() -> ref.asRef().get());
     }
 

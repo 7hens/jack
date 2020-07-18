@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         vButton.get().setOnClickListener(v -> {
             IntentRef.create(this, MainActivity.class)
                     .put(TITLE, "Hello, Jack")
-                    .startForResult(this)
+                    .startActivityForResult(this)
                     .onEach(data -> {
 
                     })

@@ -3,13 +3,13 @@ package cn.thens.jack.ref;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import java.util.concurrent.CancellationException;
 
 import cn.thens.jack.app.ActivityRequest;
 import cn.thens.jack.flow.Flow;
-import cn.thens.jack.func.Func1;
 
 public abstract class IntentRef extends Ref<Intent> {
     public static IntentRef of(Intent intent) {
@@ -37,8 +37,8 @@ public abstract class IntentRef extends Ref<Intent> {
         return of(new Intent(action));
     }
 
-    public static Func1<Ref<Intent>, IntentRef> self() {
-        return ref -> of(ref.get());
+    public static IntentRef self(Ref<Intent> ref) {
+        return of(ref.get());
     }
 
     @Override
@@ -53,7 +53,16 @@ public abstract class IntentRef extends Ref<Intent> {
         return this;
     }
 
-    public Flow<Intent> startForResult(Context context, Bundle options) {
+    public IntentRef setAction(String action) {
+        get().setAction(action);
+        return this;
+    }
+
+    public String getAction() {
+        return get().getAction();
+    }
+
+    public Flow<Intent> startActivityForResult(Context context, Bundle options) {
         return ActivityRequest.with(context)
                 .startForResult(get(), options)
                 .map(result -> {
@@ -69,7 +78,20 @@ public abstract class IntentRef extends Ref<Intent> {
                 });
     }
 
-    public Flow<Intent> startForResult(Context context) {
-        return startForResult(context, null);
+    public Flow<Intent> startActivityForResult(Context context) {
+        return startActivityForResult(context, null);
+    }
+
+    public IntentRef startActivity(Context context, Bundle options) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            context.startActivity(get(), options);
+        } else {
+            context.startActivity(get());
+        }
+        return this;
+    }
+
+    public IntentRef startActivity(Context context) {
+        return startActivity(context, null);
     }
 }

@@ -143,24 +143,4 @@ public abstract class IntentKey<V> extends MutRefKey<Intent, V> {
     public static IntentKey<Serializable> serializable(String key) {
         return create(key, Intent::getSerializableExtra, Intent::putExtra);
     }
-
-    public static IntentKey<String> action() {
-        return new IntentKey<String>() {
-            @Override
-            protected void set(Intent target, String value) {
-                target.setAction(value);
-            }
-
-            @Override
-            protected String get(Intent target, String defaultValue) {
-                String result = target.getAction();
-                return result != null ? result : defaultValue;
-            }
-
-            @Override
-            protected boolean exists(Intent target) {
-                return target.getAction() != null;
-            }
-        };
-    }
 }

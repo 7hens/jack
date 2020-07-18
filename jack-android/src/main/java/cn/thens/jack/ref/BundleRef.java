@@ -4,8 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import cn.thens.jack.func.Func1;
-
 public abstract class BundleRef extends Ref<Bundle> {
     public static BundleRef of(Bundle bundle) {
         return new BundleRef() {
@@ -29,8 +27,8 @@ public abstract class BundleRef extends Ref<Bundle> {
         return of(new Bundle());
     }
 
-    public static Func1<Ref<Bundle>, BundleRef> self() {
-        return ref -> of(ref.get());
+    public static BundleRef self(Ref<Bundle> ref) {
+        return of(ref.get());
     }
 
     @Override
