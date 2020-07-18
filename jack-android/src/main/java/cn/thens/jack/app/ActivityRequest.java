@@ -46,10 +46,19 @@ public final class ActivityRequest {
                 fragment.startActivityForResult(intent, requestCode, options));
     }
 
+    public Flow<Result> startForResult(Intent intent) {
+        return startForResult(intent, null);
+    }
+
     public Flow<Result> startForResult(IntentSender intent, Intent fillInIntent, int flagsMask,
                                        int flagsValues, int extraFlags, Bundle options) {
         return request((fragment, requestCode) ->
                 fragment.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options));
+    }
+
+    public Flow<Result> startForResult(IntentSender intent, Intent fillInIntent, int flagsMask,
+                                       int flagsValues, int extraFlags) {
+        return startForResult(intent, fillInIntent, flagsMask, flagsValues, extraFlags, null);
     }
 
     public Flow<Map<String, Boolean>> requestPermissions(String... permissions) {
