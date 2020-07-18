@@ -1,8 +1,11 @@
-package cn.thens.jack.ref;
+package cn.thens.jack.app;
 
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+
+import cn.thens.jack.ref.MutRefKey;
+import cn.thens.jack.ref.Ref;
 
 public abstract class BundleRef extends Ref<Bundle> {
     public static BundleRef of(Bundle bundle) {

@@ -1,4 +1,4 @@
-package cn.thens.jack.ref;
+package cn.thens.jack.view;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
+import cn.thens.jack.ref.Ref;
 
 /**
  * @author 7hens

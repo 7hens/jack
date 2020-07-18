@@ -1,4 +1,4 @@
-package cn.thens.jack.ref;
+package cn.thens.jack.app;
 
 import android.content.SharedPreferences;
 
@@ -6,6 +6,7 @@ import java.util.Set;
 
 import cn.thens.jack.func.Action3;
 import cn.thens.jack.func.Func3;
+import cn.thens.jack.ref.MutRefKey;
 
 /**
  * @author 7hens

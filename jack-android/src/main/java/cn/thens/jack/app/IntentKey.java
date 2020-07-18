@@ -1,4 +1,4 @@
-package cn.thens.jack.ref;
+package cn.thens.jack.app;
 
 import android.content.Intent;
 import android.os.Parcelable;
@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import cn.thens.jack.func.Action3;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
+import cn.thens.jack.ref.MutRefKey;
+import cn.thens.jack.ref.Ref;
 
 /**
  * @author 7hens

@@ -1,4 +1,4 @@
-package cn.thens.jack.ref;
+package cn.thens.jack.app;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,8 @@ import java.util.concurrent.CancellationException;
 
 import cn.thens.jack.app.ActivityRequest;
 import cn.thens.jack.flow.Flow;
+import cn.thens.jack.ref.MutRefKey;
+import cn.thens.jack.ref.Ref;
 
 public abstract class IntentRef extends Ref<Intent> {
     public static IntentRef of(Intent intent) {

@@ -7,12 +7,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import cn.thens.jack.app.IntentKey;
+import cn.thens.jack.app.IntentRef;
 import cn.thens.jack.app.Permissions;
-import cn.thens.jack.ref.IntentKey;
-import cn.thens.jack.ref.IntentRef;
-import cn.thens.jack.ref.LazyView;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.scheduler.AndroidSchedulers;
+import cn.thens.jack.view.LazyView;
 
 public class MainActivity extends AppCompatActivity {
     // 创建注入工具，支持 Activity、Fragment、View、Dialog 等
