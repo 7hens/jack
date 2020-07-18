@@ -6,11 +6,11 @@ group = "com.github.7hens.jack"
 version = "-SNAPSHOT"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
+        minSdkVersion 15
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
