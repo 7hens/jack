@@ -1,2 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.thens.jack" />
+    package="cn.thens.jack">
+
+    <application>
+        <activity
+            android:name=".app.ActivityRequest$ShadowActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleInstance"
+            android:multiprocess="true"
+            android:theme="@style/Jack.ActivityRequestTheme" />
+    </application>
+</manifest>

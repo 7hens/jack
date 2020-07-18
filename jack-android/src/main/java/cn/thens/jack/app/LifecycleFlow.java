@@ -1,4 +1,4 @@
-package cn.thens.jack.flow;
+package cn.thens.jack.app;
 
 import android.os.Build;
 import android.view.View;
@@ -8,12 +8,13 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import cn.thens.jack.flow.Flow;
 import cn.thens.jack.scheduler.CompositeCancellable;
 
 /**
  * @author 7hens
  */
-public class LifecycleFlow {
+public final class LifecycleFlow {
     public static Flow<Lifecycle.Event> from(final LifecycleOwner lifecycleOwner) {
         return Flow.create(emitter -> {
             LifecycleEventObserver observer = new LifecycleEventObserver() {
