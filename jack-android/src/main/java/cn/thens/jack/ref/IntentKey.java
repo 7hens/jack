@@ -136,7 +136,7 @@ public abstract class IntentKey<V> extends MutRefKey<Intent, V> {
         return create(key, Intent::getParcelableArrayExtra, Intent::putExtra);
     }
 
-    public static IntentKey<ArrayList> parcelableList(String key) {
+    public static IntentKey<ArrayList<Parcelable>> parcelableList(String key) {
         return create(key, Intent::getParcelableArrayListExtra, Intent::putExtra);
     }
 
