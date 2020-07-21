@@ -14,11 +14,11 @@ public abstract class Pack<V> {
         return new PackCache<>(this, cache);
     }
 
-    public Pack<V> weakRef() {
+    public static <V> Pack<V> weakRef() {
         return new PackWeakRef<>();
     }
 
-    public Pack<V> strongRef() {
+    public static <V> Pack<V> strongRef() {
         return new PackStrongRef<>();
     }
 }

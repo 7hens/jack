@@ -5,12 +5,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
-import cn.thens.jack.scheduler.Scheduler;
-import cn.thens.jack.scheduler.Schedulers;
+import cn.thens.jack.func.Func0;
 
 
 /**
@@ -80,6 +81,36 @@ final class FlowCreate {
                 for (T item : iterable) {
                     emitter.data(item);
                 }
+                emitter.complete();
+            }
+        };
+    }
+
+    static <T> Flow<T> fromFuture(Future<? extends T> future) {
+        return new AbstractFlow<T>() {
+            @Override
+            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+                emitter.data(future.get());
+                emitter.complete();
+            }
+        };
+    }
+
+    static <T> Flow<T> fromFunc(Func0<? extends T> func) {
+        return new AbstractFlow<T>() {
+            @Override
+            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+                emitter.data(func.call());
+                emitter.complete();
+            }
+        };
+    }
+
+    static <T> Flow<T> fromAction(Action0 action) {
+        return new AbstractFlow<T>() {
+            @Override
+            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+                action.run();
                 emitter.complete();
             }
         };

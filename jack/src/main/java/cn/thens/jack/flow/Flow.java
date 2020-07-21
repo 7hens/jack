@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -94,11 +95,32 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     @SafeVarargs
-    public final PolyFlow<T> polyWith(IFlow<T>... flows) {
+    public final PolyFlow<T> polyWith(IFlow<T> flow, IFlow<T>... moreFlows) {
         ArrayList<IFlow<T>> flowList = new ArrayList<>();
         flowList.add(this);
-        flowList.addAll(Arrays.asList(flows));
+        flowList.add(flow);
+        flowList.addAll(Arrays.asList(moreFlows));
         return from(flowList).to(FlowX.poly());
+    }
+
+    @SafeVarargs
+    public final Flow<T> concatWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+        return polyWith(flow, moreFlows).flatConcat();
+    }
+
+    @SafeVarargs
+    public final Flow<T> mergeWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+        return polyWith(flow, moreFlows).flatMerge();
+    }
+
+    @SafeVarargs
+    public final Flow<T> switchWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+        return polyWith(flow, moreFlows).flatSwitch();
+    }
+
+    @SafeVarargs
+    public final Flow<List<T>> zipWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+        return polyWith(flow, moreFlows).flatZip();
     }
 
     public <R> Flow<R> map(Func1<? super T, ? extends R> mapper) {
@@ -344,12 +366,24 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCreate.fromArray(items);
     }
 
+    public static <T> Flow<T> from(T[] array) {
+        return FlowCreate.fromArray(array);
+    }
+
     public static <T> Flow<T> from(Iterable<T> iterable) {
         return FlowCreate.fromIterable(iterable);
     }
 
-    public static <T> Flow<T> from(T[] array) {
-        return FlowCreate.fromArray(array);
+    public static <T> Flow<T> from(Future<? extends T> future) {
+        return FlowCreate.fromFuture(future);
+    }
+
+    public static <T> Flow<T> single(Func0<? extends T> func) {
+        return FlowCreate.fromFunc(func);
+    }
+
+    public static <T> Flow<T> complete(Action0 action) {
+        return FlowCreate.fromAction(action);
     }
 
     public static Flow<Integer> range(int start, int end, int step) {
