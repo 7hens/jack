@@ -15,11 +15,11 @@ import java.util.concurrent.TimeoutException;
 import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Action2;
-import cn.thens.jack.func.Exceptions;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
@@ -58,7 +58,7 @@ public abstract class Flow<T> implements IFlow<T> {
         try {
             return converter.call(this);
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 

@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
-import cn.thens.jack.ref.Ref;
+import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -178,7 +178,7 @@ public class FlowTest {
     public void delayError() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .filter(it -> Ref.require(it < 3L))
+                .onEach(it -> Things.require(it < 3L))
                 .delayError(Flow.timer(3, TimeUnit.SECONDS))
 //                .take(3)
                 .onCollect(TestX.collector("B"))

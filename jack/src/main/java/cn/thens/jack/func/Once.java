@@ -24,7 +24,7 @@ public final class Once<R> {
             try {
                 result = func.call();
             } catch (Throwable e) {
-                throw Exceptions.wrap(e);
+                throw Things.wrap(e);
             } finally {
                 state.set(ENDED);
             }
@@ -41,7 +41,7 @@ public final class Once<R> {
         });
     }
 
-    public int getState() {
+    public int state() {
         return state.get();
     }
 }

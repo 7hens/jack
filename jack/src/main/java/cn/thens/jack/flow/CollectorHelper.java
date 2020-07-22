@@ -3,7 +3,7 @@ package cn.thens.jack.flow;
 
 import java.util.concurrent.CancellationException;
 
-import cn.thens.jack.func.Exceptions;
+import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -28,7 +28,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
                 onComplete();
             }
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 

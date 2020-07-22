@@ -1,15 +1,13 @@
 package cn.thens.jack.ref;
 
-import java.util.Arrays;
-
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Actions;
-import cn.thens.jack.func.Exceptions;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.func.Things;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
 public abstract class Ref<T> implements IRef<T> {
@@ -43,7 +41,7 @@ public abstract class Ref<T> implements IRef<T> {
 
     @Override
     public String toString() {
-        return messageOf(get());
+        return Things.toString(get());
     }
 
     public Class<?> type() {
@@ -71,17 +69,17 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> requireEquals(T value) {
-        require(equals(value));
+        Things.require(equals(value));
         return this;
     }
 
     public Ref<T> requireNotNull() {
-        require(isNotNull(), new NullPointerException());
+        Things.requireNotNull(get());
         return this;
     }
 
     public Ref<T> require(Predicate<? super Ref<? extends T>> predicate) {
-        require(Predicate.X.of(predicate).test(this));
+        Things.require(Predicate.X.of(predicate).test(this));
         return this;
     }
 
@@ -170,7 +168,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.exists(get());
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 
@@ -179,7 +177,7 @@ public abstract class Ref<T> implements IRef<T> {
             key.set(get(), value);
             return this;
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 
@@ -187,7 +185,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.get(get(), defaultValue);
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 
@@ -195,7 +193,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return get(key, key.getDefaultValue());
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 
@@ -250,38 +248,5 @@ public abstract class Ref<T> implements IRef<T> {
 
     public static <T> Ref<T> lazy(Func0<? extends T> func) {
         return Ref.<T>get(func).lazy();
-    }
-
-    public static boolean require(boolean value, Object message) {
-        if (value) return true;
-        if (message instanceof RuntimeException) {
-            throw (RuntimeException) message;
-        }
-        if (message instanceof Throwable) {
-            throw Exceptions.wrap((Throwable) message);
-        }
-        throw new IllegalArgumentException(messageOf(message));
-    }
-
-    public static boolean require(boolean value) {
-        return require(value, "Failed requirement");
-    }
-
-    private static String messageOf(Object obj) {
-        if (obj == null) return "null";
-        if (obj instanceof String) return (String) obj;
-        if (obj instanceof Func0) return messageOf(Funcs.of((Func0<?>) obj).call());
-        if (obj instanceof Throwable) return Exceptions.getStackTraceString((Throwable) obj);
-        if (!obj.getClass().isArray()) return obj.toString();
-        if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);
-        if (obj instanceof byte[]) return Arrays.toString((byte[]) obj);
-        if (obj instanceof char[]) return Arrays.toString((char[]) obj);
-        if (obj instanceof short[]) return Arrays.toString((short[]) obj);
-        if (obj instanceof int[]) return Arrays.toString((int[]) obj);
-        if (obj instanceof long[]) return Arrays.toString((long[]) obj);
-        if (obj instanceof float[]) return Arrays.toString((float[]) obj);
-        if (obj instanceof double[]) return Arrays.toString((double[]) obj);
-        if (obj instanceof Object[]) return Arrays.deepToString((Object[]) obj);
-        return obj.toString();
     }
 }

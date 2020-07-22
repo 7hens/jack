@@ -25,7 +25,7 @@ import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Exceptions;
+import cn.thens.jack.func.Things;
 import cn.thens.jack.ref.IRef;
 import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
@@ -95,10 +95,10 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
     }
 
     public Chain<T> sub(int startIndex, int endIndex) {
-        Ref.require(startIndex >= 0,
+        Things.require(startIndex >= 0,
                 "startIndex should be non-negative, but is " + startIndex);
-        Ref.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
-        Ref.require(endIndex >= startIndex,
+        Things.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
+        Things.require(endIndex >= startIndex,
                 "endIndex should be not less than startIndex, but was " + endIndex + " < " +
                         startIndex);
         Chain<T> source = this;
@@ -156,7 +156,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
     }
 
     public Chain<T> take(int n) {
-        Ref.require(n > 0, "Requested element count " + n + " is less than zero");
+        Things.require(n > 0, "Requested element count " + n + " is less than zero");
         if (n == 0) return empty();
         return takeUtil(Predicate.X.skip(n - 1));
     }
@@ -170,7 +170,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
     }
 
     public Chain<T> skip(int n) {
-        Ref.require(n >= 0, "Requested element count " + n + " is less than zero");
+        Things.require(n >= 0, "Requested element count " + n + " is less than zero");
         return filter(Predicate.X.skip(n));
     }
 
@@ -901,7 +901,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
             }
             return buffer;
         } catch (Throwable e) {
-            throw Exceptions.wrap(e);
+            throw Things.wrap(e);
         }
     }
 
