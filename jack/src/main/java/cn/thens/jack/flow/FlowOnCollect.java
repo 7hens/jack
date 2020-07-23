@@ -67,7 +67,7 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
         return onCollect(upFlow, new CollectorHelper<T>() {
             @Override
             protected void onTerminate(Throwable error) throws Throwable {
-                super.onError(error);
+                super.onTerminate(error);
                 consumer.run(error);
             }
         });

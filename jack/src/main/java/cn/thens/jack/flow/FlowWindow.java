@@ -23,7 +23,12 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
                 emitter.error(reply.error());
             }
         });
-        upFlow.collect(emitter, this::emitReply);
+        upFlow.collect(emitter, reply -> {
+            emitReply(reply);
+            if (reply.isTerminal()) {
+                emitter.emit(reply.newReply(null));
+            }
+        });
     }
 
     private void emitNewFlow(CollectorEmitter<? super IFlow<T>> emitter) {

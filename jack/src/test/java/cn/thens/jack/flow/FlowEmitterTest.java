@@ -35,8 +35,7 @@ public class FlowEmitterTest {
         emitter.data(-1L);
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
-                .onEach(emitter::data)
-                .onTerminate(it -> emitter.complete())
+                .onCollect(CollectorHelper.from(emitter))
                 .take(5)
                 .collect();
         emitter.asFlow()

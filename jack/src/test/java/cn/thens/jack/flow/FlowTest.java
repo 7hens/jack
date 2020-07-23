@@ -323,16 +323,16 @@ public class FlowTest {
     public void sample() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
 //                .onCollect(TestX.collector("A"))
+                .take(20)
                 .sampleFirst(Flow.interval(500, TimeUnit.MILLISECONDS))
                 .onCollect(TestX.collector("B"))
-                .take(3)
                 .to(TestX.collect());
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
 //                .onCollect(TestX.collector("C"))
+                .take(20)
                 .sampleLast(Flow.interval(500, TimeUnit.MILLISECONDS))
                 .onCollect(TestX.collector("D"))
-                .take(3)
                 .to(TestX.collect());
     }
 }

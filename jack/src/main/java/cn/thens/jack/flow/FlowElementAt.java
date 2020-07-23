@@ -13,7 +13,7 @@ abstract class FlowElementAt<T> implements FlowOperator<T, T> {
     public Collector<T> apply(Emitter<? super T> emitter) {
         return reply -> {
             if (reply.isTerminal()) {
-                emitter.error(new NoSuchElementException());
+                emitter.emit(reply);
                 return;
             }
             try {
