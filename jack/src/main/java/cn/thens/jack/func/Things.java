@@ -2,6 +2,8 @@ package cn.thens.jack.func;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 /**
@@ -52,6 +54,25 @@ public final class Things {
     @SuppressWarnings("unchecked")
     public static <T> T safeCast(Object obj, Class<T> cls) {
         return is(obj, cls) ? (T) obj : null;
+    }
+
+    public static Type type(final Class<?> rawType, final Type... typeArgs) {
+        return new ParameterizedType() {
+            @Override
+            public Type getRawType() {
+                return rawType;
+            }
+
+            @Override
+            public Type[] getActualTypeArguments() {
+                return typeArgs;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
     }
 
     public static String toString(Object obj) {
