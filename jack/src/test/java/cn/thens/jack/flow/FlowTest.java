@@ -318,4 +318,21 @@ public class FlowTest {
                 .onCollect(TestX.collector("X"))
                 .to(TestX.collect());
     }
+
+    @Test
+    public void sample() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+//                .onCollect(TestX.collector("A"))
+                .sampleFirst(Flow.interval(500, TimeUnit.MILLISECONDS))
+                .onCollect(TestX.collector("B"))
+                .take(3)
+                .to(TestX.collect());
+
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+//                .onCollect(TestX.collector("C"))
+                .sampleLast(Flow.interval(500, TimeUnit.MILLISECONDS))
+                .onCollect(TestX.collector("D"))
+                .take(3)
+                .to(TestX.collect());
+    }
 }

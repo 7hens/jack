@@ -200,6 +200,14 @@ public abstract class Flow<T> implements IFlow<T> {
         return transform(FlowThrottleLast.throttleLast(flow));
     }
 
+    public Flow<T> sampleFirst(IFlow<?> windowFlow) {
+        return window(windowFlow).mapToFlow(it -> it.asFlow().first()).flatMerge();
+    }
+
+    public Flow<T> sampleLast(IFlow<?> windowFlow) {
+        return window(windowFlow).mapToFlow(it -> it.asFlow().last()).flatMerge();
+    }
+
     public Flow<T> take(int count) {
         return transform(FlowTakeUntil.take(count));
     }
