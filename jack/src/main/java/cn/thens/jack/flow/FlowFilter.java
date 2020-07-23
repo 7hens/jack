@@ -1,7 +1,6 @@
 package cn.thens.jack.flow;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,11 +17,11 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
         return new Collector<T>() {
             @Override
             public void onCollect(Reply<? extends T> reply) {
-                if (reply.isTerminal()) {
-                    onTerminated(emitter, reply.error());
-                    return;
-                }
                 try {
+                    if (reply.isTerminal()) {
+                        onTerminated(emitter, reply.error());
+                        return;
+                    }
                     T data = reply.data();
                     if (test(data)) {
                         emitter.data(data);
@@ -36,7 +35,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
 
     protected abstract boolean test(T data) throws Throwable;
 
-    void onTerminated(Emitter<? super T> emitter, Throwable error) {
+    void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
         emitter.error(error);
     }
 
@@ -64,7 +63,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
             }
 
             @Override
-            protected void onTerminated(Emitter<? super T> emitter, Throwable error) {
+            protected void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 super.onTerminated(emitter, error);
                 collectedKeys.clear();
             }
@@ -90,7 +89,7 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
             }
 
             @Override
-            protected void onTerminated(Emitter<? super T> emitter, Throwable error) {
+            protected void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 super.onTerminated(emitter, error);
                 lastKey = null;
             }
@@ -107,36 +106,26 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
 
     static <T> FlowFilter<T> last(Predicate<? super T> predicate) {
         return new FlowFilter<T>() {
-            AtomicBoolean hasValue = new AtomicBoolean(false);
+            AtomicBoolean hasLast = new AtomicBoolean(false);
             T lastValue;
 
             @Override
             protected boolean test(T data) throws Throwable {
                 if (predicate.test(data)) {
                     lastValue = data;
-                    hasValue.set(true);
+                    hasLast.set(true);
                 }
                 return false;
             }
 
             @Override
-            void onTerminated(Emitter<? super T> emitter, Throwable error) {
-                if (error == null) {
-                    if (hasValue.get()) {
-                        emitter.data(lastValue);
-                        emitter.complete();
-                    } else {
-                        emitter.error(new NoSuchElementException());
-                    }
-                } else {
-                    super.onTerminated(emitter, error);
+            void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
+                if (hasLast.get()) {
+                    emitter.data(lastValue);
                 }
+                super.onTerminated(emitter, error);
             }
         };
-    }
-
-    static <T> FlowFilter<T> last() {
-        return last(Predicate.X.alwaysTrue());
     }
 
     static <T> FlowFilter<T> ignoreElements() {

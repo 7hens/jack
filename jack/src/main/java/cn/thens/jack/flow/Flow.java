@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -201,11 +202,15 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> sampleFirst(IFlow<?> windowFlow) {
-        return window(windowFlow).mapToFlow(it -> it.asFlow().first()).flatMerge();
+        return window(windowFlow)
+                .mapToFlow(it -> it.asFlow().first())
+                .flatMerge();
     }
 
     public Flow<T> sampleLast(IFlow<?> windowFlow) {
-        return window(windowFlow).mapToFlow(it -> it.asFlow().last()).flatMerge();
+        return window(windowFlow)
+                .mapToFlow(it -> it.asFlow().last())
+                .flatMerge();
     }
 
     public Flow<T> take(int count) {
@@ -228,12 +233,12 @@ public abstract class Flow<T> implements IFlow<T> {
         return transform(FlowTakeUntil.takeUntil(data));
     }
 
-    public Flow<T> first() {
-        return transform(FlowElementAt.first());
-    }
-
     public Flow<T> first(Predicate<? super T> predicate) {
         return transform(FlowElementAt.first(predicate));
+    }
+
+    public Flow<T> first() {
+        return transform(FlowElementAt.first());
     }
 
     public Flow<T> elementAt(int index) {
@@ -241,12 +246,12 @@ public abstract class Flow<T> implements IFlow<T> {
         return transform(FlowElementAt.elementAt(index));
     }
 
-    public Flow<T> last() {
-        return transform(FlowFilter.last());
-    }
-
     public Flow<T> last(Predicate<? super T> predicate) {
         return transform(FlowFilter.last(predicate));
+    }
+
+    public Flow<T> last() {
+        return last(Predicate.X.alwaysTrue());
     }
 
     public Flow<T> repeat() {
@@ -408,6 +413,10 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public static <T> Flow<T> error(Throwable e) {
         return FlowCreate.error(e);
+    }
+
+    public static <T> Flow<T> noSuchElement() {
+        return error(new NoSuchElementException());
     }
 
     public static <T> Flow<T> never() {
