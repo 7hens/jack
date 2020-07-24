@@ -111,15 +111,28 @@ public class FlowTest {
 
     @Test
     public void retry() {
-        Flow.range(1, 10)
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .take(3)
                 .map(it -> {
                     if (it > 1) throw new Exception();
                     return it;
                 })
                 .onCollect(TestX.collector("A"))
-                .retry(3)
+                .retry(4)
                 .onCollect(TestX.collector("B"))
                 .to(TestX.collect());
+
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .take(10)
+                .map(it -> {
+                    if (it > 1) throw new Exception();
+                    return it;
+                })
+                .onCollect(TestX.collector("C"))
+                .retry(Flow.timer(400, TimeUnit.MILLISECONDS))
+                .onCollect(TestX.collector("D"))
+                .to(TestX.collect());
+
     }
 
     @Test
@@ -333,6 +346,21 @@ public class FlowTest {
                 .take(20)
                 .sampleLast(Flow.interval(500, TimeUnit.MILLISECONDS))
                 .onCollect(TestX.collector("D"))
+                .to(TestX.collect());
+    }
+
+    @Test
+    public void ifEmpty() {
+        Flow.empty().ifEmpty(Flow.just(100))
+                .onCollect(TestX.collector("A"))
+                .to(TestX.collect());
+
+        Flow.error(new NullPointerException()).ifEmpty(Flow.just(0))
+                .onCollect(TestX.collector("B"))
+                .to(TestX.collect());
+
+        Flow.just(0).ifEmpty(Flow.just(100))
+                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 }

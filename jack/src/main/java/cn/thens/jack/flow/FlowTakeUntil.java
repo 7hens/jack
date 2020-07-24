@@ -55,6 +55,19 @@ abstract class FlowTakeUntil<T> implements FlowOperator<T, T> {
                 return CollectorHelper.from(emitter);
             };
         }
-        return takeUntil(Predicate.X.skip(count - 1));
+        return new FlowTakeUntil<T>() {
+            private Predicate.X<T> predicate;
+
+            @Override
+            public Collector<T> apply(Emitter<? super T> emitter) {
+                predicate = Predicate.X.skip(count - 1);
+                return super.apply(emitter);
+            }
+
+            @Override
+            protected boolean test(T data) throws Throwable {
+                return predicate.test(data);
+            }
+        };
     }
 }

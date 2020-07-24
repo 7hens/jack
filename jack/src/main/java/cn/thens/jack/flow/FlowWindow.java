@@ -5,22 +5,23 @@ package cn.thens.jack.flow;
  */
 class FlowWindow<T> extends AbstractPolyFlow<T> {
     private final Flow<T> upFlow;
-    private final IFlow<?> windowFlowable;
+    private final IFlow<?> windowFlow;
     private Emitter<? super T> currentEmitter;
 
-    private FlowWindow(Flow<T> upFlow, IFlow<?> windowFlowable) {
+    private FlowWindow(Flow<T> upFlow, IFlow<?> windowFlow) {
         this.upFlow = upFlow;
-        this.windowFlowable = windowFlowable;
+        this.windowFlow = windowFlow;
     }
 
     @Override
     protected void onStart(CollectorEmitter<? super IFlow<T>> emitter) throws Throwable {
         emitNewFlow(emitter);
-        windowFlowable.asFlow().collect(emitter, reply -> {
-            emitNewFlow(emitter);
+        windowFlow.asFlow().collect(emitter, reply -> {
             if (reply.isTerminal()) {
-                emitReply(reply.newReply(null));
-                emitter.error(reply.error());
+                emitter.cancel();
+                emitReply(Reply.complete());
+            } else {
+                emitNewFlow(emitter);
             }
         });
         upFlow.collect(emitter, reply -> {

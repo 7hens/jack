@@ -131,4 +131,25 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
     static <T> FlowFilter<T> ignoreElements() {
         return FlowFilter.filter(Predicate.X.alwaysFalse());
     }
+
+    static <T> FlowFilter<T> ifEmpty(IFlow<T> fallback) {
+        return new FlowFilter<T>() {
+            boolean isEmpty = true;
+
+            @Override
+            protected boolean test(T data) {
+                isEmpty = false;
+                return true;
+            }
+
+            @Override
+            void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
+                if (error == null && isEmpty) {
+                    fallback.asFlow().collect(emitter);
+                    return;
+                }
+                super.onTerminated(emitter, error);
+            }
+        };
+    }
 }

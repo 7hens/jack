@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -254,6 +253,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return last(Predicate.X.alwaysTrue());
     }
 
+    public Flow<T> ifEmpty(IFlow<T> fallback) {
+        return transform(FlowFilter.ifEmpty(fallback));
+    }
+
     public Flow<T> repeat() {
         return FlowRepeat.repeat(this);
     }
@@ -334,12 +337,16 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCatch.retry(this);
     }
 
+    public Flow<T> retry(Predicate<? super Throwable> predicate) {
+        return FlowCatch.retry(this, predicate);
+    }
+
     public Flow<T> retry(int count) {
         return FlowCatch.retry(this, count);
     }
 
-    public Flow<T> retry(Predicate<? super Throwable> predicate) {
-        return FlowCatch.retry(this, predicate);
+    public Flow<T> retry(IFlow<?> timeoutFlow) {
+        return FlowCatch.retry(this, timeoutFlow);
     }
 
     public PolyFlow<T> window(IFlow<?> windowFlow) {
@@ -413,10 +420,6 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public static <T> Flow<T> error(Throwable e) {
         return FlowCreate.error(e);
-    }
-
-    public static <T> Flow<T> noSuchElement() {
-        return error(new NoSuchElementException());
     }
 
     public static <T> Flow<T> never() {
