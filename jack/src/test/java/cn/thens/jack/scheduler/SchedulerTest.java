@@ -28,14 +28,16 @@ public class SchedulerTest {
         logger.log("C");
 
         scheduler.schedule(() -> {
-            logger.log("D");
+            logger.log("D (cancel B)");
             cancellable.cancel();
         }, 100, TimeUnit.MILLISECONDS);
 
         scheduler.schedulePeriodically(() -> {
             logger.log("E: " + System.currentTimeMillis());
-        }, 2, 1, TimeUnit.SECONDS);
+        }, 200, 100, TimeUnit.MILLISECONDS);
         logger.log("F");
+
+        TestX.delay(2000);
     }
 
     @Test

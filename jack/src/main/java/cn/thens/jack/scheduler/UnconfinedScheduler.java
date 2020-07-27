@@ -1,7 +1,6 @@
 package cn.thens.jack.scheduler;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author 7hens
@@ -24,21 +23,12 @@ class UnconfinedScheduler extends Scheduler {
         if (delay == 0) {
             return schedule(runnable);
         }
-        Thread thread = Thread.currentThread();
-        CompositeCancellable cancellable = new CompositeCancellable() {
-            @Override
-            protected void onCancel() {
-                LockSupport.unpark(thread);
-            }
-        };
-        cancellable.addCancellable(scheduledHelper.schedule(() -> {
-            LockSupport.unpark(thread);
-        }, delay, unit));
-        LockSupport.park();
-        if (!cancellable.isCancelled()) {
-            runnable.run();
-        }
-        return cancellable;
+        return scheduledHelper.schedule(runnable, delay, unit);
+    }
+
+    @Override
+    public Cancellable schedulePeriodically(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
+        return scheduledHelper.schedulePeriodically(runnable, initialDelay, period, unit);
     }
 
     @Override

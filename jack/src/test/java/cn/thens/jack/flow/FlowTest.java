@@ -21,11 +21,11 @@ public class FlowTest {
     public void take() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .flowOn(TestX.scheduler("a"))
+//                .flowOn(TestX.scheduler("a"))
                 .take(3)
-                .map(it -> it + "..")
+                .map(it -> it + 100)
                 .onCollect(TestX.collector("B"))
-                .flowOn(TestX.scheduler("b"))
+//                .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
     }
 
