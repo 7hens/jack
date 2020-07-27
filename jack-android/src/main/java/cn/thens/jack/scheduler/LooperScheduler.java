@@ -28,12 +28,8 @@ class LooperScheduler extends Scheduler {
     }
 
     private Cancellable cancellableOf(Runnable runnable) {
-        return new CompositeCancellable() {
-            @Override
-            protected void onCancel() {
-                super.onCancel();
-                handler.removeCallbacks(runnable);
-            }
-        };
+        return Cancellables.of(() -> {
+            handler.removeCallbacks(runnable);
+        });
     }
 }

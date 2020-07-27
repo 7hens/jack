@@ -50,7 +50,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
     }
 
     @Override
-    public Ref<Chain<T>> asRef() throws Throwable {
+    public Ref<Chain<T>> asRef() {
         return Ref.of(this);
     }
 

@@ -41,7 +41,7 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
                 @Override
                 public void onCollect(Reply<? extends T> reply) {
                     helper.onInnerCollect(reply);
-                    if (emitter.isTerminated()) {
+                    if (emitter.isCancelled()) {
                         flowQueue.clear();
                         return;
                     }

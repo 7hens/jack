@@ -17,7 +17,7 @@ class ExecutorScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        CompositeCancellable cancellable = new CompositeCancellable();
+        Cancellable cancellable = Cancellables.create();
         executor.execute(() -> {
             if (!cancellable.isCancelled()) {
                 runnable.run();

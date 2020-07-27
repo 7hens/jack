@@ -3,7 +3,7 @@ package cn.thens.jack.flow;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.CompositeCancellable;
+import cn.thens.jack.scheduler.Cancellables;
 
 /**
  * @author 7hens
@@ -12,8 +12,8 @@ class FlowTimeout<T> extends AbstractFlow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> timeoutFlow;
     private final IFlow<T> fallback;
-    private CompositeCancellable upFlowCancellable = new CompositeCancellable();
-    private Cancellable timeoutCancellable = new CompositeCancellable();
+    private Cancellable upFlowCancellable = Cancellables.create();
+    private Cancellable timeoutCancellable = Cancellables.create();
     private final AtomicBoolean isTransferred = new AtomicBoolean(false);
 
     FlowTimeout(Flow<T> upFlow, IFlow<?> timeoutFlow, IFlow<T> fallback) {
@@ -29,7 +29,7 @@ class FlowTimeout<T> extends AbstractFlow<T> {
             if (isTransferred.get()) return;
             emitter.emit(reply);
             timeoutCancellable.cancel();
-            if (reply.isTerminal() || emitter.isTerminated()) {
+            if (reply.isTerminal() || emitter.isCancelled()) {
                 return;
             }
             try {
@@ -42,7 +42,7 @@ class FlowTimeout<T> extends AbstractFlow<T> {
 
     private Cancellable startTimeoutFlow(CollectorEmitter<? super T> emitter) throws Throwable {
         return timeoutFlow.asFlow().collect(emitter, reply -> {
-            if (reply.isTerminal() && !emitter.isTerminated()) {
+            if (reply.isTerminal() && !emitter.isCancelled()) {
                 upFlowCancellable.cancel();
                 if (isTransferred.compareAndSet(false, true)) {
                     try {

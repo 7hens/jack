@@ -160,12 +160,22 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowFilter.ignoreElements(this);
     }
 
+    @Deprecated
+    public <K> Flow<T> distinct(Func1<? super T, ? extends K> keySelector) {
+        return distinctBy(keySelector);
+    }
+
     public <K> Flow<T> distinctBy(Func1<? super T, ? extends K> keySelector) {
         return FlowFilter.distinctBy(this, keySelector);
     }
 
     public Flow<T> distinct() {
         return FlowFilter.distinct(this);
+    }
+
+    @Deprecated
+    public <K> Flow<T> distinctUntilChanged(Func1<? super T, ? extends K> keySelector) {
+        return distinctUntilChangedBy(keySelector);
     }
 
     public <K> Flow<T> distinctUntilChangedBy(Func1<? super T, ? extends K> keySelector) {

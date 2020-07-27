@@ -7,7 +7,7 @@ import cn.thens.jack.scheduler.Scheduler;
 /**
  * @author 7hens
  */
-public interface Emitter<T> {
+public interface Emitter<T> extends Cancellable {
     void emit(Reply<? extends T> reply);
 
     void data(T data);
@@ -17,10 +17,6 @@ public interface Emitter<T> {
     void cancel();
 
     void complete();
-
-    boolean isTerminated();
-
-    void addCancellable(Cancellable cancellable);
 
     Scheduler scheduler();
 }

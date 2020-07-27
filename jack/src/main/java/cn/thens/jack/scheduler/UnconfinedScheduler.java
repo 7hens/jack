@@ -15,7 +15,7 @@ class UnconfinedScheduler extends Scheduler {
     @Override
     public Cancellable schedule(Runnable runnable) {
         runnable.run();
-        return CompositeCancellable.cancelled();
+        return Cancellables.cancelled();
     }
 
     @Override

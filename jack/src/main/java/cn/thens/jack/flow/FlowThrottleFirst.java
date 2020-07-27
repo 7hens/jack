@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.CompositeCancellable;
+import cn.thens.jack.scheduler.Cancellables;
 
 /**
  * @author 7hens
@@ -15,7 +15,7 @@ import cn.thens.jack.scheduler.CompositeCancellable;
 class FlowThrottleFirst<T> implements FlowOperator<T, T> {
     private final Func1<? super T, ? extends IFlow<?>> flowFactory;
     private final AtomicBoolean couldEmit = new AtomicBoolean(true);
-    private Cancellable lastFlow = CompositeCancellable.cancelled();
+    private Cancellable lastFlow = Cancellables.cancelled();
 
     private FlowThrottleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
         this.flowFactory = flowFactory;

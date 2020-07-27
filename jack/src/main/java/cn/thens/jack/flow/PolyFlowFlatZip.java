@@ -30,7 +30,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
                     tryZip();
                 }
                 helper.onOuterCollect(reply);
-                if (emitter.isTerminated()) {
+                if (emitter.isCancelled()) {
                     cachedDataQueue.clear();
                     return;
                 }
@@ -50,7 +50,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
                     @Override
                     public void onCollect(Reply<? extends T> reply) {
                         helper.onInnerCollect(reply);
-                        if (emitter.isTerminated()) {
+                        if (emitter.isCancelled()) {
                             cachedDataQueue.clear();
                             return;
                         }

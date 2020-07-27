@@ -14,7 +14,7 @@ public abstract class Scheduler {
 
     public Cancellable schedulePeriodically(final Runnable runnable, final long initialDelay,
                                             final long period, final TimeUnit unit) {
-        final CompositeCancellable cancellable = new CompositeCancellable();
+        final Cancellable cancellable = Cancellables.create();
         cancellable.addCancellable(schedule(new Runnable() {
             @Override
             public void run() {

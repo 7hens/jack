@@ -3,8 +3,8 @@ package cn.thens.jack.scheduler;
 /**
  * @author 7hens
  */
-public interface Cancellable {
-    void cancel();
-
+public interface Cancellable extends ICancellable {
     boolean isCancelled();
+
+    void addCancellable(ICancellable onCancel);
 }

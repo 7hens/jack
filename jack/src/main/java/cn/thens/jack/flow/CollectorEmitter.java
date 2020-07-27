@@ -6,13 +6,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.scheduler.CancellableScheduler;
-import cn.thens.jack.scheduler.CompositeCancellable;
+import cn.thens.jack.scheduler.ICancellable;
 import cn.thens.jack.scheduler.Scheduler;
 
 /**
  * @author 7hens
  */
-class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Collector<T> {
+class CollectorEmitter<T> implements Emitter<T>, Collector<T> {
     private final AtomicBoolean isCollecting = new AtomicBoolean(false);
     private final AtomicBoolean isCollectorTerminated = new AtomicBoolean(false);
     private final AtomicBoolean isEmitterTerminated = new AtomicBoolean(false);
@@ -80,7 +80,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
                     collector.onCollect(reply);
                     if (reply.isTerminal()) {
                         clearBuffer();
-                        CollectorEmitter.super.cancel();
+                        scheduler.cancel();
                         return;
                     }
                     if (!buffer.isEmpty()) {
@@ -116,7 +116,7 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
     }
 
     @Override
-    public boolean isTerminated() {
+    public boolean isCancelled() {
         return isEmitterTerminated.get();
     }
 
@@ -126,9 +126,8 @@ class CollectorEmitter<T> extends CompositeCancellable implements Emitter<T>, Co
     }
 
     @Override
-    protected void onCancel() {
-        super.onCancel();
-        scheduler.cancel();
+    public void addCancellable(ICancellable onCancel) {
+        scheduler.addCancellable(onCancel);
     }
 
     static <T> CollectorEmitter<T> create(Scheduler scheduler, Collector<? super T> collector, Backpressure<T> backpressure) {

@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  * @author 7hens
  */
 public class CancellableScheduler extends Scheduler implements Cancellable {
-    private CompositeCancellable compositeCancellable = new CompositeCancellable();
+    private Cancellable cancellable = Cancellables.create();
     private final Scheduler parent;
 
     CancellableScheduler(Scheduler parent) {
@@ -21,33 +21,38 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     @Override
     public Cancellable schedule(Runnable runnable) {
         if (isCancelled()) return this;
-        return addCancellable(parent.schedule(runnable));
+        return cancellableOf(parent.schedule(runnable));
     }
 
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
         if (isCancelled()) return this;
-        return addCancellable(parent.schedule(runnable, delay, unit));
+        return cancellableOf(parent.schedule(runnable, delay, unit));
     }
 
     @Override
     public Cancellable schedulePeriodically(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
         if (isCancelled()) return this;
-        return addCancellable(parent.schedulePeriodically(runnable, initialDelay, period, unit));
+        return cancellableOf(parent.schedulePeriodically(runnable, initialDelay, period, unit));
     }
 
-    private Cancellable addCancellable(Cancellable cancellable) {
-        compositeCancellable.addCancellable(cancellable);
+    private Cancellable cancellableOf(Cancellable cancellable) {
+        addCancellable(cancellable);
         return cancellable;
     }
 
     @Override
+    public void addCancellable(ICancellable onCancel) {
+        cancellable.addCancellable(onCancel);
+    }
+
+    @Override
     public void cancel() {
-        compositeCancellable.cancel();
+        cancellable.cancel();
     }
 
     @Override
     public boolean isCancelled() {
-        return compositeCancellable.isCancelled();
+        return cancellable.isCancelled();
     }
 }

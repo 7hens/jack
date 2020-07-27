@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import cn.thens.jack.flow.Flow;
-import cn.thens.jack.scheduler.CompositeCancellable;
 
 /**
  * @author 7hens
@@ -27,13 +26,7 @@ public final class LifecycleFlow {
                 }
             };
             lifecycleOwner.getLifecycle().addObserver(observer);
-            emitter.addCancellable(new CompositeCancellable() {
-                @Override
-                protected void onCancel() {
-                    super.onCancel();
-                    lifecycleOwner.getLifecycle().removeObserver(observer);
-                }
-            });
+            emitter.addCancellable(() -> lifecycleOwner.getLifecycle().removeObserver(observer));
         });
     }
 
@@ -64,13 +57,7 @@ public final class LifecycleFlow {
                 }
             };
             view.addOnAttachStateChangeListener(listener);
-            emitter.addCancellable(new CompositeCancellable() {
-                @Override
-                protected void onCancel() {
-                    super.onCancel();
-                    view.removeOnAttachStateChangeListener(listener);
-                }
-            });
+            emitter.addCancellable(() -> view.removeOnAttachStateChangeListener(listener));
         });
     }
 }

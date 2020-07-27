@@ -73,7 +73,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             @Override
             void handleError(CollectorEmitter<? super T> emitter, Throwable error) throws Throwable {
                 boolean shouldRetry = predicate.test(error);
-                if (shouldRetry && !emitter.isTerminated()) {
+                if (shouldRetry && !emitter.isCancelled()) {
                     collect(emitter);
                 } else {
                     emitter.error(error);
@@ -111,7 +111,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             @Override
             void handleError(CollectorEmitter<? super T> emitter, Throwable error) throws Throwable {
                 lastError.set(error);
-                if (!emitter.isTerminated()) {
+                if (!emitter.isCancelled()) {
                     collect(emitter);
                 }
             }

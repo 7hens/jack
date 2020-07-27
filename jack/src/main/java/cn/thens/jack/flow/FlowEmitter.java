@@ -5,8 +5,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.CompositeCancellable;
+import cn.thens.jack.scheduler.ICancellable;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
 
@@ -55,13 +54,13 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
-    public boolean isTerminated() {
-        return collectorEmitter.isTerminated();
+    public boolean isCancelled() {
+        return collectorEmitter.isCancelled();
     }
 
     @Override
-    public void addCancellable(Cancellable cancellable) {
-        collectorEmitter.addCancellable(cancellable);
+    public void addCancellable(ICancellable onCancel) {
+        collectorEmitter.addCancellable(onCancel);
     }
 
     @Override
@@ -78,13 +77,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
                 return;
             }
             emitters.add(emitter);
-            emitter.addCancellable(new CompositeCancellable() {
-                @Override
-                protected void onCancel() {
-                    super.onCancel();
-                    emitters.remove(emitter);
-                }
-            });
+            emitter.addCancellable(() -> emitters.remove(emitter));
         });
     }
 
