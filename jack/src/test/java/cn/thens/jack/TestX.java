@@ -71,6 +71,12 @@ public class TestX {
 //                e.printStackTrace();
             }
 
+            @Override
+            protected void onCancel() throws Throwable {
+                super.onCancel();
+                log("onCancel");
+            }
+
             private void log(String message) {
                 logger.log("[" + name + "] " + message);
             }

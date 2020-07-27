@@ -23,16 +23,13 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         upFlow.collect(emitter, new Collector<T>() {
             @Override
             public void onCollect(Reply<? extends T> reply) {
-                if (reply.isTerminal()) {
-                    Throwable error = reply.error();
-                    if (error != null) {
-                        try {
-                            handleError(emitter, error);
-                        } catch (Throwable e) {
-                            emitter.error(e);
-                        }
-                        return;
+                if (reply.isError()) {
+                    try {
+                        handleError(emitter, reply.error());
+                    } catch (Throwable e) {
+                        emitter.error(e);
                     }
+                    return;
                 }
                 emitter.emit(reply);
             }
@@ -99,11 +96,13 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
                 super.onStart(emitter);
                 timeoutFlow.asFlow().collect(emitter, reply -> {
-                    Throwable error = lastError.get();
-                    if (error != null) {
-                        emitter.error(error);
-                    } else {
-                        fallbackFlow.collect(emitter);
+                    if (reply.isTerminal() && !emitter.isCancelled()) {
+                        Throwable error = lastError.get();
+                        if (error != null) {
+                            emitter.error(error);
+                        } else {
+                            fallbackFlow.collect(emitter);
+                        }
                     }
                 });
             }

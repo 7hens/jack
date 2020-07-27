@@ -19,14 +19,15 @@ public abstract class CollectorHelper<T> implements Collector<T> {
             }
             Throwable error = reply.error();
             onTerminate(error);
-            if (error != null) {
-                onError(error);
-                if (error instanceof CancellationException) {
-                    onCancel();
-                }
-            } else {
+            if (error == null) {
                 onComplete();
+                return;
             }
+            if (error instanceof CancellationException){
+                onCancel();
+                return;
+            }
+            onError(error);
         } catch (Throwable e) {
             throw Things.wrap(e);
         }

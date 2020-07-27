@@ -19,7 +19,8 @@ public abstract class Reply<T> {
     }
 
     public final boolean isError() {
-        return isTerminal() && error() != null;
+        Throwable error = error();
+        return isTerminal() && error != null && !(error instanceof CancellationException);
     }
 
     public final boolean isCancel() {
