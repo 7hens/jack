@@ -31,10 +31,10 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
             public void onCollect(Reply<? extends T> reply) {
                 try {
                     collector.onCollect(reply);
+                    emitter.emit(reply);
                 } catch (Throwable e) {
                     emitter.error(e);
                 }
-                emitter.emit(reply);
             }
         });
     }

@@ -2,6 +2,7 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.func.Things;
 
 /**
  * @author 7hens
@@ -43,7 +44,7 @@ abstract class FlowTakeUntil<T> implements FlowOperator<T, T> {
         return new FlowTakeUntil<T>() {
             @Override
             protected boolean test(T data) throws Throwable {
-                return data == t;
+                return Things.equals(data, t);
             }
         };
     }
