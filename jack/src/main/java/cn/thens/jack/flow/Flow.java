@@ -212,6 +212,10 @@ public abstract class Flow<T> implements IFlow<T> {
                 .flatMerge();
     }
 
+    public Flow<T> take(IFlow<?> timeoutFlow) {
+        return autoSwitch(timeoutFlow, Flow.empty());
+    }
+
     public Flow<T> take(int count) {
         return FlowTakeUntil.take(this, count);
     }
@@ -313,8 +317,8 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowAutoSwitch.autoCancel(this, cancelFlow);
     }
 
-    public Flow<T> autoSwitch(IFlow<?> cancelFlow, IFlow<T> fallback) {
-        return FlowAutoSwitch.autoSwitch(this, cancelFlow, fallback);
+    public Flow<T> autoSwitch(IFlow<?> timeoutFlow, IFlow<T> fallback) {
+        return FlowAutoSwitch.autoSwitch(this, timeoutFlow, fallback);
     }
 
     public Flow<T> catchError(Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
