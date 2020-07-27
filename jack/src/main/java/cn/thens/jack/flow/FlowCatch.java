@@ -91,6 +91,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     }
 
     static <T> Flow<T> retry(Flow<T> upFlow, IFlow<?> timeoutFlow) {
+        final Flow<T> fallbackFlow = Flow.error(new TimeoutException());
         return new FlowCatch<T>(upFlow) {
             private AtomicReference<Throwable> lastError = new AtomicReference<>();
 
@@ -102,7 +103,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
                     if (error != null) {
                         emitter.error(error);
                     } else {
-                        emitter.error(new TimeoutException());
+                        fallbackFlow.collect(emitter);
                     }
                 });
             }
