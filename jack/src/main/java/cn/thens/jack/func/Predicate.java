@@ -74,7 +74,7 @@ public interface Predicate<T> {
         }
 
         public static <T> X<T> eq(T value) {
-            return of(it -> Ref.of(it).equals(value));
+            return of(it -> Things.equals(it, value));
         }
 
         public static <T> X<T> take(int count) {

@@ -2,15 +2,22 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Things;
 
 /**
  * @author 7hens
  */
-abstract class FlowTakeUntil<T> implements FlowOperator<T, T> {
+class FlowTakeUntil<T> extends AbstractFlow<T> {
+    private final Flow<T> upFlow;
+    private final Predicate<? super T> predicate;
+
+    private FlowTakeUntil(Flow<T> upFlow, Predicate<? super T> predicate) {
+        this.upFlow = upFlow;
+        this.predicate = predicate;
+    }
+
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return new Collector<T>() {
+    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+        upFlow.collect(emitter, new Collector<T>() {
             @Override
             public void onCollect(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
@@ -19,56 +26,31 @@ abstract class FlowTakeUntil<T> implements FlowOperator<T, T> {
                 }
                 try {
                     emitter.emit(reply);
-                    if (test(reply.data())) {
+                    if (predicate.test(reply.data())) {
                         emitter.complete();
                     }
                 } catch (Throwable e) {
                     emitter.error(e);
                 }
             }
-        };
+        });
     }
 
-    protected abstract boolean test(T data) throws Throwable;
-
-    static <T> FlowTakeUntil<T> takeUntil(Predicate<? super T> predicate) {
-        return new FlowTakeUntil<T>() {
-            @Override
-            protected boolean test(T data) throws Throwable {
-                return predicate.test(data);
-            }
-        };
+    static <T> FlowTakeUntil<T> takeUntil(Flow<T> upFlow, Predicate<? super T> predicate) {
+        return new FlowTakeUntil<T>(upFlow, predicate);
     }
 
-    static <T> FlowTakeUntil<T> takeUntil(T t) {
-        return new FlowTakeUntil<T>() {
-            @Override
-            protected boolean test(T data) throws Throwable {
-                return Things.equals(data, t);
-            }
-        };
+    static <T> FlowTakeUntil<T> takeUntil(Flow<T> upFlow, T t) {
+        return takeUntil(upFlow, Predicate.X.eq(t));
     }
 
-    static <T> FlowOperator<T, T> take(int count) {
-        if (count <= 0) {
-            return emitter -> {
-                emitter.complete();
-                return CollectorHelper.from(emitter);
-            };
+    static <T> Flow<T> take(Flow<T> upFlow, int count) {
+        if (count < 0) {
+            return upFlow.takeLast(-count);
         }
-        return new FlowTakeUntil<T>() {
-            private Predicate.X<T> predicate;
-
-            @Override
-            public Collector<T> apply(Emitter<? super T> emitter) {
-                predicate = Predicate.X.skip(count - 1);
-                return super.apply(emitter);
-            }
-
-            @Override
-            protected boolean test(T data) throws Throwable {
-                return predicate.test(data);
-            }
-        };
+        if (count == 0) {
+            return Flow.empty();
+        }
+        return Flow.defer(() -> takeUntil(upFlow, Predicate.X.skip(count - 1)));
     }
 }

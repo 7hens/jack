@@ -153,31 +153,31 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> filter(Predicate<? super T> predicate) {
-        return transform(FlowFilter.filter(predicate));
+        return FlowFilter.filter(this, predicate);
     }
 
     public Flow<T> ignoreElements() {
-        return transform(FlowFilter.ignoreElements());
+        return FlowFilter.ignoreElements(this);
     }
 
-    public <K> Flow<T> distinct(Func1<? super T, ? extends K> keySelector) {
-        return transform(FlowFilter.distinct(keySelector));
+    public <K> Flow<T> distinctBy(Func1<? super T, ? extends K> keySelector) {
+        return FlowFilter.distinctBy(this, keySelector);
     }
 
     public Flow<T> distinct() {
-        return transform(FlowFilter.distinct());
+        return FlowFilter.distinct(this);
     }
 
-    public <K> Flow<T> distinctUntilChanged(Func1<? super T, ? extends K> keySelector) {
-        return transform(FlowFilter.distinctUntilChanged(keySelector));
+    public <K> Flow<T> distinctUntilChangedBy(Func1<? super T, ? extends K> keySelector) {
+        return FlowFilter.distinctUntilChangedBy(this, keySelector);
     }
 
     public Flow<T> distinctUntilChanged() {
-        return transform(FlowFilter.distinctUntilChanged());
+        return FlowFilter.distinctUntilChanged(this);
     }
 
     public Flow<T> skip(int count) {
-        return transform(FlowFilter.skip(count));
+        return FlowFilter.skip(this, count);
     }
 
     public Flow<T> skipLast(int count) {
@@ -213,7 +213,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> take(int count) {
-        return transform(FlowTakeUntil.take(count));
+        return FlowTakeUntil.take(this, count);
     }
 
     public Flow<T> takeLast(int count) {
@@ -225,28 +225,28 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> takeUntil(Predicate<? super T> predicate) {
-        return transform(FlowTakeUntil.takeUntil(predicate));
+        return FlowTakeUntil.takeUntil(this, predicate);
     }
 
     public Flow<T> takeUntil(T data) {
-        return transform(FlowTakeUntil.takeUntil(data));
+        return FlowTakeUntil.takeUntil(this, data);
     }
 
     public Flow<T> first(Predicate<? super T> predicate) {
-        return transform(FlowElementAt.first(predicate));
+        return FlowElementAt.first(this, predicate);
     }
 
     public Flow<T> first() {
-        return transform(FlowElementAt.first());
+        return FlowElementAt.first(this);
     }
 
     public Flow<T> elementAt(int index) {
         if (index < 0) return transform(FlowBuffer.lastElement(-index));
-        return transform(FlowElementAt.elementAt(index));
+        return FlowElementAt.elementAt(this, index);
     }
 
     public Flow<T> last(Predicate<? super T> predicate) {
-        return transform(FlowFilter.last(predicate));
+        return FlowFilter.last(this, predicate);
     }
 
     public Flow<T> last() {
@@ -254,7 +254,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> ifEmpty(IFlow<T> fallback) {
-        return transform(FlowFilter.ifEmpty(fallback));
+        return FlowFilter.ifEmpty(this, fallback);
     }
 
     public Flow<T> repeat() {

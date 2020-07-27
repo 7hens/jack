@@ -1,48 +1,47 @@
 package cn.thens.jack.flow;
 
 
-import java.util.NoSuchElementException;
-
 import cn.thens.jack.func.Predicate;
 
 /**
  * @author 7hens
  */
-abstract class FlowElementAt<T> implements FlowOperator<T, T> {
+class FlowElementAt<T> extends AbstractFlow<T> {
+    private final Flow<T> upFlow;
+    private final Predicate<? super T> predicate;
+
+    private FlowElementAt(Flow<T> upFlow, Predicate<? super T> predicate) {
+        this.upFlow = upFlow;
+        this.predicate = predicate;
+    }
+
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return reply -> {
+    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+        upFlow.collect(emitter, reply -> {
             if (reply.isTerminal()) {
                 emitter.emit(reply);
                 return;
             }
             try {
-                if (test(reply.data())) {
+                if (predicate.test(reply.data())) {
                     emitter.emit(reply);
                     emitter.complete();
                 }
             } catch (Throwable e) {
                 emitter.error(e);
             }
-        };
+        });
     }
 
-    abstract boolean test(T data) throws Throwable;
-
-    static <T> FlowElementAt<T> first(final Predicate<? super T> predicate) {
-        return new FlowElementAt<T>() {
-            @Override
-            boolean test(T data) throws Throwable {
-                return predicate.test(data);
-            }
-        };
+    static <T> FlowElementAt<T> first(Flow<T> upFlow, final Predicate<? super T> predicate) {
+        return new FlowElementAt<T>(upFlow, predicate);
     }
 
-    static <T> FlowElementAt<T> first() {
-        return first(Predicate.X.alwaysTrue());
+    static <T> FlowElementAt<T> first(Flow<T> upFlow) {
+        return first(upFlow, Predicate.X.alwaysTrue());
     }
 
-    static <T> FlowElementAt<T> elementAt(int index) {
-        return first(Predicate.X.skip(index));
+    static <T> Flow<T> elementAt(final Flow<T> upFlow, final int index) {
+        return defer(() -> first(upFlow, Predicate.X.skip(index)));
     }
 }

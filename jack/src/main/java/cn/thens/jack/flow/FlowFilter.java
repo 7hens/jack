@@ -11,10 +11,16 @@ import cn.thens.jack.func.Predicate;
 /**
  * @author 7hens
  */
-abstract class FlowFilter<T> implements FlowOperator<T, T> {
+abstract class FlowFilter<T> extends AbstractFlow<T> {
+    private final Flow<T> upFlow;
+
+    private FlowFilter(Flow<T> upFlow) {
+        this.upFlow = upFlow;
+    }
+
     @Override
-    public Collector<T> apply(final Emitter<? super T> emitter) {
-        return new Collector<T>() {
+    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+        upFlow.collect(emitter, new Collector<T>() {
             @Override
             public void onCollect(Reply<? extends T> reply) {
                 try {
@@ -30,26 +36,27 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
                     emitter.error(e);
                 }
             }
-        };
+        });
     }
 
-    protected abstract boolean test(T data) throws Throwable;
+    abstract boolean test(T data) throws Throwable;
 
     void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
         emitter.error(error);
     }
 
-    static <T> FlowFilter<T> filter(Predicate<? super T> predicate) {
-        return new FlowFilter<T>() {
+    static <T> FlowFilter<T> filter(Flow<T> upFlow, Predicate<? super T> predicate) {
+        return new FlowFilter<T>(upFlow) {
+
             @Override
-            protected boolean test(T data) throws Throwable {
+            boolean test(T data) throws Throwable {
                 return predicate.test(data);
             }
         };
     }
 
-    static <T, K> FlowFilter<T> distinct(final Func1<? super T, ? extends K> keySelector) {
-        return new FlowFilter<T>() {
+    static <T, K> Flow<T> distinctBy(final Flow<T> upFlow, final Func1<? super T, ? extends K> keySelector) {
+        return defer(() -> new FlowFilter<T>(upFlow) {
             private Set<K> collectedKeys = new HashSet<>();
 
             @Override
@@ -67,15 +74,15 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
                 super.onTerminated(emitter, error);
                 collectedKeys.clear();
             }
-        };
+        });
     }
 
-    static <T> FlowFilter<T> distinct() {
-        return distinct(Funcs.self());
+    static <T> Flow<T> distinct(Flow<T> upFlow) {
+        return distinctBy(upFlow, Funcs.self());
     }
 
-    static <T, K> FlowFilter<T> distinctUntilChanged(final Func1<? super T, ? extends K> keySelector) {
-        return new FlowFilter<T>() {
+    static <T, K> Flow<T> distinctUntilChangedBy(Flow<T> upFlow, final Func1<? super T, ? extends K> keySelector) {
+        return defer(() -> new FlowFilter<T>(upFlow) {
             private K lastKey = null;
 
             @Override
@@ -93,19 +100,19 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
                 super.onTerminated(emitter, error);
                 lastKey = null;
             }
-        };
+        });
     }
 
-    static <T> FlowFilter<T> distinctUntilChanged() {
-        return distinctUntilChanged(Funcs.self());
+    static <T> Flow<T> distinctUntilChanged(Flow<T> upFlow) {
+        return distinctUntilChangedBy(upFlow, Funcs.self());
     }
 
-    static <T> FlowFilter<T> skip(int count) {
-        return FlowFilter.filter(Predicate.X.skip(count));
+    static <T> Flow<T> skip(Flow<T> upFlow, int count) {
+        return Flow.defer(() -> FlowFilter.filter(upFlow, Predicate.X.skip(count)));
     }
 
-    static <T> FlowFilter<T> last(Predicate<? super T> predicate) {
-        return new FlowFilter<T>() {
+    static <T> Flow<T> last(Flow<T> upFlow, Predicate<? super T> predicate) {
+        return defer(() -> new FlowFilter<T>(upFlow) {
             AtomicBoolean hasLast = new AtomicBoolean(false);
             T lastValue;
 
@@ -125,15 +132,15 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
                 }
                 super.onTerminated(emitter, error);
             }
-        };
+        });
     }
 
-    static <T> FlowFilter<T> ignoreElements() {
-        return FlowFilter.filter(Predicate.X.alwaysFalse());
+    static <T> Flow<T> ignoreElements(Flow<T> upFlow) {
+        return FlowFilter.filter(upFlow, Predicate.X.alwaysFalse());
     }
 
-    static <T> FlowFilter<T> ifEmpty(IFlow<T> fallback) {
-        return new FlowFilter<T>() {
+    static <T> Flow<T> ifEmpty(Flow<T> upFlow, IFlow<T> fallback) {
+        return Flow.defer(() -> new FlowFilter<T>(upFlow) {
             boolean isEmpty = true;
 
             @Override
@@ -150,6 +157,6 @@ abstract class FlowFilter<T> implements FlowOperator<T, T> {
                 }
                 super.onTerminated(emitter, error);
             }
-        };
+        });
     }
 }

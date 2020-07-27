@@ -87,7 +87,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     }
 
     static <T> Flow<T> retry(Flow<T> upFlow, int count) {
-        return retry(upFlow, Predicate.X.take(count));
+        return Flow.defer(() -> retry(upFlow, Predicate.X.take(count)));
     }
 
     static <T> Flow<T> retry(Flow<T> upFlow, IFlow<?> timeoutFlow) {
