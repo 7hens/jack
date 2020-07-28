@@ -299,10 +299,12 @@ public abstract class Flow<T> implements IFlow<T> {
         return timeout(timeoutFlow, Flow.error(new TimeoutException()));
     }
 
+    @Deprecated
     public Flow<T> timeout(long timeout, TimeUnit unit, IFlow<T> fallback) {
         return timeout(Flow.timer(timeout, unit), fallback);
     }
 
+    @Deprecated
     public Flow<T> timeout(long timeout, TimeUnit unit) {
         return timeout(Flow.timer(timeout, unit));
     }
@@ -412,7 +414,7 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCreate.fromFuture(future);
     }
 
-    public static <T> Flow<T> single(Func0<? extends T> func) {
+    public static <T> Flow<T> get(Func0<? extends T> func) {
         return FlowCreate.fromFunc(func);
     }
 

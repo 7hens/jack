@@ -22,7 +22,6 @@ public final class Schedulers {
 
     private static Ref<Scheduler> UNCONFINED = Ref.lazy(() -> new UnconfinedScheduler(single()));
 
-    @ApiStatus.Experimental
     public static Scheduler unconfined() {
         return UNCONFINED.get();
     }

@@ -19,7 +19,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     private final CollectorEmitter<T> collectorEmitter;
 
     private FlowEmitter() {
-        Scheduler scheduler = Schedulers.core();
+        Scheduler scheduler = Schedulers.unconfined();
         Collector<T> collector = this::onCollect;
         collectorEmitter = CollectorEmitter.create(scheduler, collector);
     }
