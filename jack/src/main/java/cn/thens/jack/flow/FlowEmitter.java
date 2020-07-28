@@ -1,7 +1,6 @@
 package cn.thens.jack.flow;
 
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,7 +44,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     @Override
     public void cancel() {
-        error(new CancellationException());
+        emit(Reply.cancel());
     }
 
     @Override

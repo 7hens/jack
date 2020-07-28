@@ -86,6 +86,10 @@ public abstract class Reply<T> {
         };
     }
 
+    public static <T> Reply<T> cancel() {
+        return error(new CancellationException());
+    }
+
     private static final Reply COMPLETE = error(null);
 
     @SuppressWarnings("unchecked")
