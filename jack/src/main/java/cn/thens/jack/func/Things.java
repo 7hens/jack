@@ -35,6 +35,11 @@ public final class Things {
         throw new IllegalArgumentException(toString(message));
     }
 
+    public static void require(boolean value, Func0<?> message) {
+        if (value) return;
+        require(false, Funcs.of(message).call());
+    }
+
     public static void require(boolean value) {
         require(value, "Failed requirement");
     }
