@@ -219,6 +219,18 @@ public class FlowTest {
     }
 
     @Test
+    public void groupBy() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .groupBy(it -> it % 3)
+                .map(it -> it.onCollect(TestX.collector("A:" + it.getKey())))
+                .to(FlowX.poly())
+                .flatMerge()
+                .onCollect(TestX.collector("B"))
+                .take(10)
+                .to(TestX.collect());
+    }
+
+    @Test
     public void buffer() {
         Flow.interval(1, TimeUnit.SECONDS)
                 .buffer(Flow.interval(2, TimeUnit.SECONDS))
@@ -363,15 +375,15 @@ public class FlowTest {
     @Test
     public void ifEmpty() {
         Flow.empty().ifEmpty(Flow.just(100))
-                .onCollect(TestX.collector("A"))
+                .onCollect(TestX.collector("empty"))
                 .to(TestX.collect());
 
         Flow.error(new NullPointerException()).ifEmpty(Flow.just(0))
-                .onCollect(TestX.collector("B"))
+                .onCollect(TestX.collector("error"))
                 .to(TestX.collect());
 
         Flow.just(0).ifEmpty(Flow.just(100))
-                .onCollect(TestX.collector("C"))
+                .onCollect(TestX.collector("just"))
                 .to(TestX.collect());
     }
 }

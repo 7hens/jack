@@ -1,5 +1,6 @@
 package cn.thens.jack.flow;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
@@ -150,6 +151,11 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<List<T>> toList() {
         return toCollection(new ArrayList<>());
+    }
+
+    @ApiStatus.Experimental
+    public <K> MapFlow<K, T> groupBy(Func1<? super T, ? extends K> keySelector) {
+        return new FlowGroupBy<>(this, keySelector);
     }
 
     public Flow<T> filter(Predicate<? super T> predicate) {
