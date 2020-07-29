@@ -14,7 +14,7 @@ final class CancellableFuture<V> extends CancellableImpl implements Future<V> {
     private final Future<V> future;
 
     CancellableFuture(Future<V> future) {
-        super(false);
+        super(future.isCancelled() || future.isDone());
         this.future = future;
     }
 

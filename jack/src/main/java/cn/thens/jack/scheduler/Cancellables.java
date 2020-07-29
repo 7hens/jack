@@ -1,5 +1,7 @@
 package cn.thens.jack.scheduler;
 
+import java.util.concurrent.Future;
+
 /**
  * @author 7hens
  */
@@ -47,5 +49,12 @@ public final class Cancellables {
                 lastCancellable.cancel();
             }
         };
+    }
+
+    public static Cancellable from(Future<?> future) {
+        if (future instanceof Cancellable) {
+            return (Cancellable) future;
+        }
+        return new CancellableFuture<>(future);
     }
 }
