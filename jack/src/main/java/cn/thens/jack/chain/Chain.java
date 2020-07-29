@@ -212,7 +212,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
     }
 
     public Chain<T> add(Iterable<T> elements) {
-        return of(this, of(elements)).flatten(Iterable::iterator);
+        return just(this, of(elements)).flatten(Iterable::iterator);
     }
 
     public Chain<T> add(T... elements) {
@@ -239,8 +239,8 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
         return remove(of(element));
     }
 
-    public Chain<T> ifEmpty(Func0<? extends Chain<T>> defaultValue) {
-        return isEmpty() ? Func0.X.of(defaultValue).call() : this;
+    public Chain<T> ifEmpty(IChain<T> defaultValue) {
+        return isEmpty() ? defer(defaultValue) : this;
     }
 
     public <U> U call(Func1<Chain<T>, U> func) {
@@ -948,9 +948,21 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T>, IFlow<T>, IRef
         return ChainCreate.from(iterable);
     }
 
-    @SafeVarargs
-    public static <T> Chain<T> of(T... elements) {
+    public static <T> Chain<T> of(T[] elements) {
         return ChainCreate.from(elements);
+    }
+
+    @SafeVarargs
+    public static <T> Chain<T> just(T... elements) {
+        return of(elements);
+    }
+
+    public static <T> Chain<T> defer(IChain<T> chain) {
+        try {
+            return chain.asChain();
+        } catch (Throwable e) {
+            throw Things.wrap(e);
+        }
     }
 
     public static <T> Chain<T> empty() {

@@ -458,7 +458,7 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCreate.empty();
     }
 
-    public static <T> Flow<T> data(Func0<? extends T> func) {
+    public static <T> Flow<T> single(Func0<? extends T> func) {
         return FlowCreate.fromFunc(func);
     }
 
