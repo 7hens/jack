@@ -48,6 +48,17 @@ public class FlowTest {
     }
 
     @Test
+    public void skipTimeout() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .onCollect(TestX.collector("Before"))
+                .skip(Flow.timer(3, TimeUnit.SECONDS))
+                .onCollect(TestX.collector("After"))
+                .take(3)
+                .flowOn(TestX.scheduler("a"))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void skipLast() {
         Flow.interval(1, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("A"))

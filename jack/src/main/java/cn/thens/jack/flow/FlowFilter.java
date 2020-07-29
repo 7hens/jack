@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.scheduler.Cancellable;
 
 /**
  * @author 7hens
@@ -107,10 +108,6 @@ abstract class FlowFilter<T> extends AbstractFlow<T> {
         return distinctUntilChangedBy(upFlow, Funcs.self());
     }
 
-    static <T> Flow<T> skip(Flow<T> upFlow, int count) {
-        return Flow.defer(() -> FlowFilter.filter(upFlow, Predicate.X.skip(count)));
-    }
-
     static <T> Flow<T> last(Flow<T> upFlow, Predicate<? super T> predicate) {
         return defer(() -> new FlowFilter<T>(upFlow) {
             AtomicBoolean hasLast = new AtomicBoolean(false);
@@ -135,7 +132,18 @@ abstract class FlowFilter<T> extends AbstractFlow<T> {
         });
     }
 
-    static <T> Flow<T> ignoreElements(Flow<T> upFlow) {
+    static <T> Flow<T> skip(Flow<T> upFlow, IFlow<?> timeoutFlow) {
+        return create(emitter -> {
+            Cancellable cancellable = timeoutFlow.asFlow().collect(emitter, CollectorHelper.get());
+            upFlow.filter(it -> cancellable.isCancelled()).collect(emitter);
+        });
+    }
+
+    static <T> Flow<T> skip(Flow<T> upFlow, int count) {
+        return Flow.defer(() -> FlowFilter.filter(upFlow, Predicate.X.skip(count)));
+    }
+
+    static <T> Flow<T> skipAll(Flow<T> upFlow) {
         return FlowFilter.filter(upFlow, Predicate.X.alwaysFalse());
     }
 

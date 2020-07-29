@@ -156,10 +156,6 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowFilter.filter(this, predicate);
     }
 
-    public Flow<T> ignoreElements() {
-        return FlowFilter.ignoreElements(this);
-    }
-
     @Deprecated
     public <K> Flow<T> distinct(Func1<? super T, ? extends K> keySelector) {
         return distinctBy(keySelector);
@@ -184,14 +180,6 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<T> distinctUntilChanged() {
         return FlowFilter.distinctUntilChanged(this);
-    }
-
-    public Flow<T> skip(int count) {
-        return FlowFilter.skip(this, count);
-    }
-
-    public Flow<T> skipLast(int count) {
-        return transform(FlowBuffer.skipLast(count));
     }
 
     public Flow<T> throttleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
@@ -246,6 +234,27 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowTakeUntil.takeUntil(this, data);
     }
 
+    public Flow<T> skip(IFlow<?> timeoutFlow) {
+        return FlowFilter.skip(this, timeoutFlow);
+    }
+
+    public Flow<T> skip(int count) {
+        return FlowFilter.skip(this, count);
+    }
+
+    public Flow<T> skipLast(int count) {
+        return transform(FlowBuffer.skipLast(count));
+    }
+
+    public Flow<T> skipAll() {
+        return FlowFilter.skipAll(this);
+    }
+
+    @Deprecated
+    public Flow<T> ignoreElements() {
+        return skipAll();
+    }
+
     public Flow<T> first(Predicate<? super T> predicate) {
         return FlowElementAt.first(this, predicate);
     }
@@ -254,17 +263,17 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowElementAt.first(this);
     }
 
-    public Flow<T> elementAt(int index) {
-        if (index < 0) return transform(FlowBuffer.lastElement(-index));
-        return FlowElementAt.elementAt(this, index);
-    }
-
     public Flow<T> last(Predicate<? super T> predicate) {
         return FlowFilter.last(this, predicate);
     }
 
     public Flow<T> last() {
         return last(Predicate.X.alwaysTrue());
+    }
+
+    public Flow<T> elementAt(int index) {
+        if (index < 0) return transform(FlowBuffer.lastElement(-index));
+        return FlowElementAt.elementAt(this, index);
     }
 
     public Flow<T> ifEmpty(IFlow<T> fallback) {

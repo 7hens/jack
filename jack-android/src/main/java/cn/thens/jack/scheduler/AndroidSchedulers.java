@@ -2,6 +2,8 @@ package cn.thens.jack.scheduler;
 
 import android.os.Looper;
 
+import cn.thens.jack.ref.Ref;
+
 /**
  * @author 7hens
  */
@@ -11,10 +13,10 @@ public final class AndroidSchedulers {
         return new LooperScheduler(looper);
     }
 
-    private static final Scheduler MAIN_THREAD = from(Looper.getMainLooper());
+    private static final Ref<Scheduler> MAIN_THREAD = Ref.lazy(() -> from(Looper.getMainLooper()));
 
     public static Scheduler mainThread() {
-        return MAIN_THREAD;
+        return MAIN_THREAD.get();
     }
 
     public static Scheduler myThread() {
