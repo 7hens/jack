@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -19,6 +21,7 @@ import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
@@ -56,11 +59,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public <R> R to(Func1<? super Flow<T>, ? extends R> converter) {
-        try {
-            return converter.call(this);
-        } catch (Throwable e) {
-            throw Things.wrap(e);
-        }
+        return Funcs.of(converter).call(this);
     }
 
     public <R> Flow<R> transform(FlowOperator<? super T, ? extends R> operator) {
@@ -150,7 +149,11 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<List<T>> toList() {
-        return toCollection(new ArrayList<>());
+        return defer(() -> toCollection(new ArrayList<>()));
+    }
+
+    public Flow<Set<T>> toSet() {
+        return defer(() -> toCollection(new LinkedHashSet<>()));
     }
 
     @ApiStatus.Experimental
@@ -160,6 +163,19 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<T> filter(Predicate<? super T> predicate) {
         return FlowFilter.filter(this, predicate);
+    }
+
+    public Flow<T> filterNot(Predicate<? super T> predicate) {
+        return filter(it -> !predicate.test(it));
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    public Flow<T> filterNotNull() {
+        return filter(it -> it != null);
+    }
+
+    public <R> Flow<R> filterIsInstance(Class<R> cls) {
+        return filter(it -> Things.is(it, cls)).cast(cls);
     }
 
     @Deprecated
@@ -352,8 +368,9 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCatch.catchError(this, resumeFunc);
     }
 
-    public Flow<T> catchError(Action2<? super Throwable, ? super Emitter<? super T>> resumeAction1) {
-        return FlowCatch.catchError(this, resumeAction1);
+    @Deprecated
+    public Flow<T> catchError(Action2<? super Throwable, ? super Emitter<? super T>> resumeAction) {
+        return FlowCatch.catchError(this, resumeAction);
     }
 
     public Flow<T> catchError(IFlow<T> resumeFlow) {
@@ -429,14 +446,6 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCreate.fromFuture(future);
     }
 
-    public static <T> Flow<T> get(Func0<? extends T> func) {
-        return FlowCreate.fromFunc(func);
-    }
-
-    public static <T> Flow<T> complete(Action0 action) {
-        return FlowCreate.fromAction(action);
-    }
-
     public static Flow<Integer> range(int start, int end, int step) {
         return FlowCreate.range(start, end, step);
     }
@@ -447,6 +456,14 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public static <T> Flow<T> empty() {
         return FlowCreate.empty();
+    }
+
+    public static <T> Flow<T> data(Func0<? extends T> func) {
+        return FlowCreate.fromFunc(func);
+    }
+
+    public static <T> Flow<T> complete(Action0 action) {
+        return FlowCreate.fromAction(action);
     }
 
     public static <T> Flow<T> error(Throwable e) {

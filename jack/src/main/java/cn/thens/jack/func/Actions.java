@@ -128,6 +128,9 @@ public class Actions<P1, P2, P3, P4, P5, P6, P7, P8, P9> implements
         return Action9.X.of(this);
     }
 
+    private Actions() {
+    }
+
     @Override
     public void run() {
         run(null);

@@ -27,12 +27,12 @@ public interface Codec<P, Q> {
             return new PackConverter<P, Q>() {
                 @Override
                 public Flow<Q> convert(P p) {
-                    return Flow.get(() -> self.encode(p));
+                    return Flow.data(() -> self.encode(p));
                 }
 
                 @Override
                 public Flow<P> invert(Q q) {
-                    return Flow.get(() -> self.decode(q));
+                    return Flow.data(() -> self.decode(q));
                 }
             };
         }
