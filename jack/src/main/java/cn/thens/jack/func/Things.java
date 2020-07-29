@@ -9,6 +9,7 @@ import java.util.Arrays;
 /**
  * @author 7hens
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class Things {
     @SuppressWarnings("EqualsReplaceableByObjectsCall")
     public static boolean equals(Object a, Object b) {
@@ -38,6 +39,7 @@ public final class Things {
         require(value, "Failed requirement");
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static <T> T requireNotNull(T value) {
         require(value != null, new NullPointerException());
         return value;
@@ -78,7 +80,6 @@ public final class Things {
     public static String toString(Object obj) {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
-        if (obj instanceof Func0) return toString(Funcs.of((Func0<?>) obj).call());
         if (obj instanceof Throwable) return getStackTraceString((Throwable) obj);
         if (!obj.getClass().isArray()) return obj.toString();
         if (obj instanceof boolean[]) return Arrays.toString((boolean[]) obj);

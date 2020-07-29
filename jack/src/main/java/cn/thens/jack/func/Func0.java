@@ -33,6 +33,11 @@ public interface Func0<R> {
             });
         }
 
+        @Override
+        public String toString() {
+            return Things.toString(call());
+        }
+
         public static <R> X<R> of(Func0<? extends R> func) {
             return new X<R>() {
                 @Override

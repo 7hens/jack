@@ -6,19 +6,6 @@ import java.util.concurrent.Future;
  * @author 7hens
  */
 public final class Cancellables {
-    public static Cancellable of(final ICancellable cancellable) {
-        if (cancellable instanceof Cancellable) {
-            return (Cancellable) cancellable;
-        }
-        return new CancellableImpl(false) {
-            @Override
-            protected void onCancel() {
-                super.onCancel();
-                cancellable.cancel();
-            }
-        };
-    }
-
     public static Cancellable create() {
         return new CancellableImpl(false);
     }
@@ -47,6 +34,19 @@ public final class Cancellables {
             @Override
             public void cancel() {
                 lastCancellable.cancel();
+            }
+        };
+    }
+
+    public static Cancellable of(final ICancellable cancellable) {
+        if (cancellable instanceof Cancellable) {
+            return (Cancellable) cancellable;
+        }
+        return new CancellableImpl(false) {
+            @Override
+            protected void onCancel() {
+                super.onCancel();
+                cancellable.cancel();
             }
         };
     }
