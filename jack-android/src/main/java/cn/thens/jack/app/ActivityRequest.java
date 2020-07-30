@@ -37,7 +37,7 @@ public final class ActivityRequest {
 
     private <T> Flow<T> request(Request request) {
         return Flow.create(emitter -> {
-            new Contract(emitter, request).launch(context, ViewCompat.generateViewId());
+            new Contract(emitter, request).launch(context);
         });
     }
 
@@ -50,14 +50,20 @@ public final class ActivityRequest {
         return startForResult(intent, null);
     }
 
-    public Flow<Result> startForResult(IntentSender intent, Intent fillInIntent, int flagsMask,
-                                       int flagsValues, int extraFlags, Bundle options) {
+    public Flow<Result> startForResult(
+            IntentSender intent, Intent fillInIntent, int flagsMask,
+            int flagsValues, int extraFlags, Bundle options) {
+
         return request((fragment, requestCode) ->
-                fragment.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options));
+                fragment.startIntentSenderForResult(
+                        intent, requestCode, fillInIntent, flagsMask,
+                        flagsValues, extraFlags, options));
     }
 
-    public Flow<Result> startForResult(IntentSender intent, Intent fillInIntent, int flagsMask,
-                                       int flagsValues, int extraFlags) {
+    public Flow<Result> startForResult(
+            IntentSender intent, Intent fillInIntent, int flagsMask,
+            int flagsValues, int extraFlags) {
+
         return startForResult(intent, fillInIntent, flagsMask, flagsValues, extraFlags, null);
     }
 
@@ -91,22 +97,26 @@ public final class ActivityRequest {
 
     private static SparseArray<Contract> contracts = new SparseArray<>();
     private static final String FRAGMENT_TAG = "jack.ActivityRequest";
-    private static final String REQUEST_CODE = "REQUEST_CODE";
+    private static final String REQUEST_CODE = "jack.REQUEST_CODE";
 
     private static class Contract {
         private final Emitter emitter;
         private final Request request;
+        private final int requestCode;
         private boolean isRequested = false;
 
         private Contract(Emitter emitter, Request request) {
             this.emitter = emitter;
             this.request = request;
+            this.requestCode = ViewCompat.generateViewId();
+
+            contracts.put(requestCode, this);
+            emitter.addCancellable(() -> contracts.remove(requestCode));
         }
 
-        public void launch(Context context, int requestCode) {
+        public void launch(Context context) {
             if (isRequested) return;
             try {
-                contracts.put(requestCode, this);
                 if (context instanceof FragmentActivity) {
                     isRequested = true;
                     FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
@@ -123,7 +133,6 @@ public final class ActivityRequest {
                     );
                 }
             } catch (Throwable e) {
-                contracts.remove(requestCode);
                 emitter.error(e);
             }
         }
@@ -162,7 +171,7 @@ public final class ActivityRequest {
             int requestCode = intent.getIntExtra(REQUEST_CODE, 0);
             Contract contract = contracts.get(requestCode);
             if (contract != null) {
-                contract.launch(this, requestCode);
+                contract.launch(this);
             }
         }
     }
@@ -191,7 +200,6 @@ public final class ActivityRequest {
                 emitter.data(result);
                 emitter.complete();
             }
-            contracts.remove(requestCode);
         }
     }
 }
