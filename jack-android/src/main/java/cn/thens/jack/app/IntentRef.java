@@ -64,7 +64,7 @@ public abstract class IntentRef extends Ref<Intent> {
         return get().getAction();
     }
 
-    public Flow<Intent> startActivityForResult(Context context, Bundle options) {
+    public Flow<Ref<Intent>> startActivityForResult(Context context, Bundle options) {
         return ActivityRequest.with(context)
                 .startForResult(get(), options)
                 .map(result -> {
@@ -73,14 +73,14 @@ public abstract class IntentRef extends Ref<Intent> {
                         case Activity.RESULT_CANCELED:
                             throw new CancellationException();
                         case Activity.RESULT_OK:
-                            return result.getData();
+                            return IntentRef.of(result.getData());
                         default:
                             throw new IllegalArgumentException("unsupported result code: " + code);
                     }
                 });
     }
 
-    public Flow<Intent> startActivityForResult(Context context) {
+    public Flow<Ref<Intent>> startActivityForResult(Context context) {
         return startActivityForResult(context, null);
     }
 

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                     .put(TITLE, "Hello, Jack")
                     .startActivityForResult(this)
                     .onEach(data -> {
-
+                        data.get(TITLE);
                     })
                     .flowOn(AndroidSchedulers.mainThread())
                     .collect();
