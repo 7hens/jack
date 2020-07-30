@@ -10,23 +10,19 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author 7hens
  */
-final class CancellableFuture<V> extends CancellableImpl implements Future<V> {
+final class CancellableFuture<V> implements Future<V>, Cancellable {
     private final Future<V> future;
+    private final Cancellable cancellable;
 
     CancellableFuture(Future<V> future) {
-        super(future.isCancelled() || future.isDone());
         this.future = future;
+        this.cancellable = new CancellableImpl(future.isCancelled() || future.isDone());
     }
 
     @Override
     public boolean cancel(boolean b) {
+        cancellable.cancel();
         return future.cancel(b);
-    }
-
-    @Override
-    protected void onCancel() {
-        super.onCancel();
-        cancel(false);
     }
 
     @Override
@@ -40,7 +36,23 @@ final class CancellableFuture<V> extends CancellableImpl implements Future<V> {
     }
 
     @Override
-    public V get(long l, @NotNull TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-        return future.get(l, timeUnit);
+    public V get(long timeout, @NotNull TimeUnit timeUnit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        return future.get(timeout, timeUnit);
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancellable.isCancelled();
+    }
+
+    @Override
+    public void addCancellable(ICancellable onCancel) {
+        cancellable.addCancellable(onCancel);
+    }
+
+    @Override
+    public void cancel() {
+        cancel(false);
     }
 }

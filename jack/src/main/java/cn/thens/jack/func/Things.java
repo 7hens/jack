@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * @author 7hens
  */
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess", "UnusedReturnValue"})
 public final class Things {
     @SuppressWarnings("EqualsReplaceableByObjectsCall")
     public static boolean equals(Object a, Object b) {
@@ -24,43 +24,16 @@ public final class Things {
         return value != null ? value : fallback;
     }
 
-    public static void require(boolean value, Object message) {
-        if (value) return;
-        if (message instanceof RuntimeException) {
-            throw (RuntimeException) message;
-        }
-        if (message instanceof Throwable) {
-            throw wrap((Throwable) message);
-        }
-        throw new IllegalArgumentException(toString(message));
-    }
-
-    public static void require(boolean value, Func0<?> message) {
-        if (value) return;
-        require(false, Funcs.of(message).call());
-    }
-
-    public static void require(boolean value) {
-        require(value, "Failed requirement");
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public static <T> T requireNotNull(T value) {
-        require(value != null, new NullPointerException());
-        return value;
-    }
-
     public static <T> int compare(T a, T b, Comparator<? super T> comparator) {
         return a == b ? 0 : Comparator.X.of(comparator).compare(a, b);
     }
 
     public static boolean is(Object obj, Class<?> cls) {
-        return obj != null && cls.isAssignableFrom(obj.getClass());
+        return cls.isInstance(obj);
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T safeCast(Object obj, Class<T> cls) {
-        return is(obj, cls) ? (T) obj : null;
+        return is(obj, cls) ? cls.cast(obj) : null;
     }
 
     public static Type type(final Class<?> rawType, final Type... typeArgs) {
@@ -80,6 +53,31 @@ public final class Things {
                 return null;
             }
         };
+    }
+
+    public static boolean require(boolean value, Object message) {
+        if (value) return true;
+        if (message instanceof RuntimeException) {
+            throw (RuntimeException) message;
+        }
+        if (message instanceof Throwable) {
+            throw wrap((Throwable) message);
+        }
+        throw new IllegalArgumentException(toString(message));
+    }
+
+    public static boolean require(boolean value, Func0<?> message) {
+        if (value) return true;
+        return require(false, Funcs.of(message).call());
+    }
+
+    public static boolean require(boolean value) {
+        return require(value, "Failed requirement");
+    }
+
+    public static <T> T requireNotNull(T value) {
+        require(value != null, new NullPointerException());
+        return value;
     }
 
     public static String toString(Object obj) {
