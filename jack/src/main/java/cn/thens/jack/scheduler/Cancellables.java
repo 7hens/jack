@@ -6,6 +6,9 @@ import java.util.concurrent.Future;
  * @author 7hens
  */
 public final class Cancellables {
+    private Cancellables() {
+    }
+
     public static Cancellable create() {
         return new CancellableImpl(false);
     }
@@ -16,26 +19,14 @@ public final class Cancellables {
         return CANCELLED;
     }
 
+    private static Cancellable EMPTY = new CancellableEmpty();
+
+    public static Cancellable empty() {
+        return EMPTY;
+    }
+
     public static Cancellable single() {
-        return new Cancellable() {
-            private Cancellable lastCancellable = cancelled();
-
-            @Override
-            public void addCancellable(ICancellable onCancel) {
-                lastCancellable.cancel();
-                lastCancellable = of(onCancel);
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return lastCancellable.isCancelled();
-            }
-
-            @Override
-            public void cancel() {
-                lastCancellable.cancel();
-            }
-        };
+        return new CancellableSingle();
     }
 
     public static Cancellable of(final ICancellable cancellable) {
@@ -57,4 +48,5 @@ public final class Cancellables {
         }
         return new CancellableFuture<>(future);
     }
+
 }
