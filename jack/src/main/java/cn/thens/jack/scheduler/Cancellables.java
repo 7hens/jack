@@ -19,10 +19,10 @@ public final class Cancellables {
         return CANCELLED;
     }
 
-    private static Cancellable EMPTY = new CancellableEmpty();
+    private static Cancellable NEVER = new CancellableNever();
 
-    public static Cancellable empty() {
-        return EMPTY;
+    public static Cancellable never() {
+        return NEVER;
     }
 
     public static Cancellable single() {
