@@ -7,12 +7,12 @@ import java.util.concurrent.TimeUnit;
  * @author 7hens
  */
 class ExecutorScheduler extends Scheduler {
-    private final Scheduler scheduledHelper;
     private final Executor executor;
+    private final Scheduler timerScheduler;
 
-    ExecutorScheduler(Scheduler scheduledHelper, Executor executor) {
-        this.scheduledHelper = scheduledHelper;
+    ExecutorScheduler(Executor executor, Scheduler timerScheduler) {
         this.executor = executor;
+        this.timerScheduler = timerScheduler;
     }
 
     @Override
@@ -28,12 +28,15 @@ class ExecutorScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
-        return scheduledHelper.schedule(executorRunnable(runnable), delay, unit);
+        if (delay == 0) {
+            return schedule(runnable);
+        }
+        return timerScheduler.schedule(executorRunnable(runnable), delay, unit);
     }
 
     @Override
     public Cancellable schedulePeriodically(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
-        return scheduledHelper.schedulePeriodically(executorRunnable(runnable), initialDelay, period, unit);
+        return timerScheduler.schedulePeriodically(executorRunnable(runnable), initialDelay, period, unit);
     }
 
     private Runnable executorRunnable(final Runnable runnable) {

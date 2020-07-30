@@ -18,7 +18,7 @@ public final class Schedulers {
     private Schedulers() {
     }
 
-    private static Ref<Scheduler> UNCONFINED = Ref.lazy(() -> new UnconfinedScheduler(single()));
+    private static Ref<Scheduler> UNCONFINED = Ref.lazy(() -> from(Runnable::run));
 
     public static Scheduler unconfined() {
         return UNCONFINED.get();
@@ -28,13 +28,14 @@ public final class Schedulers {
         if (executor instanceof ScheduledExecutorService) {
             return new ScheduledExecutorScheduler((ScheduledExecutorService) executor);
         }
-        return new ExecutorScheduler(single(), executor);
+        return new ExecutorScheduler(executor, timer());
     }
 
-    private static Ref<Scheduler> SINGLE = Ref.lazy(Schedulers::singleScheduler);
+    private static Ref<Scheduler> TIMER = Ref.lazy(() ->
+            from(Executors.newScheduledThreadPool(1, threadFactory("timer", true))));
 
-    public static Scheduler single() {
-        return SINGLE.get();
+    private static Scheduler timer() {
+        return TIMER.get();
     }
 
     private static Ref<Scheduler> IO = Ref.lazy(() -> executorScheduler("io", 64));
@@ -55,10 +56,6 @@ public final class Schedulers {
         return from(new ThreadPoolExecutor(processorCount, maxThreadCount,
                 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
                 threadFactory(name, false)));
-    }
-
-    private static Scheduler singleScheduler() {
-        return from(Executors.newScheduledThreadPool(1, threadFactory("single", true)));
     }
 
     private static ThreadFactory threadFactory(String name, boolean isSingle) {
