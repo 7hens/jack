@@ -9,12 +9,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * @author 7hens
  */
-abstract class FlowBuffer<T> implements FlowOperator<T, T> {
+abstract class FlowBuffer<T> extends Flow<T> {
+    private final Flow<T> upFlow;
     private final List<T> buffer = new CopyOnWriteArrayList<>();
 
+    FlowBuffer(Flow<T> upFlow) {
+        this.upFlow = upFlow;
+    }
+
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return reply -> {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, reply -> {
             if (reply.isTerminal()) {
                 if (reply.error() == null) {
                     onComplete(emitter, buffer);
@@ -25,15 +30,15 @@ abstract class FlowBuffer<T> implements FlowOperator<T, T> {
             }
             buffer.add(reply.data());
             onBuffer(emitter, buffer);
-        };
+        });
     }
 
     abstract void onBuffer(Emitter<? super T> emitter, List<T> buffer);
 
     abstract void onComplete(Emitter<? super T> emitter, List<T> buffer);
 
-    static <T> FlowBuffer<T> takeLast(int count) {
-        return new FlowBuffer<T>() {
+    static <T> Flow<T> takeLast(Flow<T> upFlow, int count) {
+        return new FlowBuffer<T>(upFlow) {
             @Override
             void onBuffer(Emitter<? super T> emitter, List<T> buffer) {
                 if (buffer.size() > count) {
@@ -52,12 +57,12 @@ abstract class FlowBuffer<T> implements FlowOperator<T, T> {
         };
     }
 
-    static <T> FlowBuffer<T> lastElement(int number) {
+    static <T> Flow<T> lastElement(Flow<T> upFlow, int number) {
         if (number <= 0) {
             throw new IllegalArgumentException("number should be greater than 0, " +
                     "but actual value is " + number);
         }
-        return new FlowBuffer<T>() {
+        return new FlowBuffer<T>(upFlow) {
             @Override
             void onBuffer(Emitter<? super T> emitter, List<T> buffer) {
                 if (buffer.size() > number) {
@@ -76,8 +81,8 @@ abstract class FlowBuffer<T> implements FlowOperator<T, T> {
         };
     }
 
-    static <T> FlowBuffer<T> skipLast(int count) {
-        return new FlowBuffer<T>() {
+    static <T> Flow<T> skipLast(Flow<T> upFlow, int count) {
+        return new FlowBuffer<T>(upFlow) {
             @Override
             void onBuffer(Emitter<? super T> emitter, List<T> buffer) {
                 if (buffer.size() > count) {

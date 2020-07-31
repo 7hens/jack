@@ -14,6 +14,6 @@ class FlowTransform<T, R> extends Flow<R> {
 
     @Override
     protected void onStartCollect(Emitter<? super R> emitter) throws Throwable {
-        upFlow.collectWith(CollectorEmitter.create(emitter, operator.apply(emitter)));
+        upFlow.onStartCollect(CollectorEmitter.create(emitter, operator.apply(emitter)));
     }
 }

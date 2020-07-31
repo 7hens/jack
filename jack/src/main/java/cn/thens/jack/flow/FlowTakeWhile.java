@@ -6,10 +6,18 @@ import cn.thens.jack.func.Predicate;
 /**
  * @author 7hens
  */
-abstract class FlowTakeWhile<T> implements FlowOperator<T, T> {
+class FlowTakeWhile<T> extends Flow<T> {
+    private final Flow<T> upFlow;
+    private final Predicate<? super T> predicate;
+
+    FlowTakeWhile(Flow<T> upFlow, Predicate<? super T> predicate) {
+        this.upFlow = upFlow;
+        this.predicate = predicate;
+    }
+
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
@@ -17,7 +25,7 @@ abstract class FlowTakeWhile<T> implements FlowOperator<T, T> {
                     return;
                 }
                 try {
-                    if (test(reply.data())) {
+                    if (predicate.test(reply.data())) {
                         emitter.post(reply);
                     } else {
                         emitter.complete();
@@ -26,17 +34,6 @@ abstract class FlowTakeWhile<T> implements FlowOperator<T, T> {
                     emitter.error(e);
                 }
             }
-        };
-    }
-
-    protected abstract boolean test(T data) throws Throwable;
-
-    static <T> FlowTakeWhile<T> takeWhile(Predicate<? super T> predicate) {
-        return new FlowTakeWhile<T>() {
-            @Override
-            protected boolean test(T data) throws Throwable {
-                return predicate.test(data);
-            }
-        };
+        });
     }
 }

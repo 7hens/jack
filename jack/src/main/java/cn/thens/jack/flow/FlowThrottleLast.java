@@ -4,24 +4,25 @@ package cn.thens.jack.flow;
 import java.util.concurrent.CancellationException;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Funcs;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
 
 /**
  * @author 7hens
  */
-class FlowThrottleLast<T> implements FlowOperator<T, T> {
+class FlowThrottleLast<T> extends Flow<T> {
+    private final Flow<T> upFlow;
     private final Func1<? super T, ? extends IFlow<?>> flowFactory;
     private Cancellable lastFlow = Cancellables.cancelled();
 
-    private FlowThrottleLast(Func1<? super T, ? extends IFlow<?>> flowFactory) {
+    FlowThrottleLast(Flow<T> upFlow, Func1<? super T, ? extends IFlow<?>> flowFactory) {
+        this.upFlow = upFlow;
         this.flowFactory = flowFactory;
     }
 
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @SuppressWarnings("unchecked")
             @Override
             public void post(Reply<? extends T> reply) {
@@ -46,14 +47,6 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
                     emitter.error(e);
                 }
             }
-        };
-    }
-
-    static <T> FlowOperator<T, T> throttleLast(Func1<? super T, ? extends IFlow<?>> flowFactory) {
-        return new FlowThrottleLast<T>(flowFactory);
-    }
-
-    static <T> FlowOperator<T, T> throttleLast(IFlow<?> flow) {
-        return new FlowThrottleLast<T>(Funcs.always(flow));
+        });
     }
 }

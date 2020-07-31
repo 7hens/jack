@@ -6,16 +6,18 @@ import cn.thens.jack.func.Func1;
 /**
  * @author 7hens
  */
-class FlowMap<T, R> implements FlowOperator<T, R> {
+class FlowMap<T, R> extends Flow<R> {
+    private final Flow<T> upFlow;
     private final Func1<? super T, ? extends R> mapper;
 
-    FlowMap(Func1<? super T, ? extends R> mapper) {
+    FlowMap(Flow<T> upFlow, Func1<? super T, ? extends R> mapper) {
+        this.upFlow = upFlow;
         this.mapper = mapper;
     }
 
     @Override
-    public Collector<? super T> apply(final Emitter<? super R> emitter) {
-        return new Collector<T>() {
+    protected void onStartCollect(Emitter<? super R> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
@@ -28,6 +30,6 @@ class FlowMap<T, R> implements FlowOperator<T, R> {
                     emitter.error(e);
                 }
             }
-        };
+        });
     }
 }

@@ -5,25 +5,26 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Funcs;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
 
 /**
  * @author 7hens
  */
-class FlowThrottleFirst<T> implements FlowOperator<T, T> {
+class FlowThrottleFirst<T> extends Flow<T> {
+    private final Flow<T> upFlow;
     private final Func1<? super T, ? extends IFlow<?>> flowFactory;
     private final AtomicBoolean couldEmit = new AtomicBoolean(true);
     private Cancellable lastFlow = Cancellables.cancelled();
 
-    private FlowThrottleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
+    FlowThrottleFirst(Flow<T> upFlow, Func1<? super T, ? extends IFlow<?>> flowFactory) {
+        this.upFlow = upFlow;
         this.flowFactory = flowFactory;
     }
 
     @Override
-    public Collector<T> apply(Emitter<? super T> emitter) {
-        return new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @SuppressWarnings("unchecked")
             @Override
             public void post(Reply<? extends T> reply) {
@@ -50,14 +51,6 @@ class FlowThrottleFirst<T> implements FlowOperator<T, T> {
                     emitter.error(e);
                 }
             }
-        };
-    }
-
-    static <T> FlowOperator<T, T> throttleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
-        return new FlowThrottleFirst<>(flowFactory);
-    }
-
-    static <T> FlowOperator<T, T> throttleFirst(IFlow<?> flow) {
-        return new FlowThrottleFirst<>(Funcs.always(flow));
+        });
     }
 }

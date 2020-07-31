@@ -57,7 +57,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     Cancellable collectWith(Emitter<?> emitter, Collector<? super T> collector) {
-        Cancellable cancellable = collect((IScheduler) emitter, collector);
+        Cancellable cancellable = collect(emitter, collector);
         emitter.addCancellable(cancellable);
         return cancellable;
     }
@@ -136,7 +136,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public <R> Flow<R> map(Func1<? super T, ? extends R> mapper) {
-        return transform(new FlowMap<>(mapper));
+        return new FlowMap<>(this, mapper);
     }
 
     @Deprecated
@@ -157,7 +157,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public <C extends Collection<T>> Flow<C> toCollection(C collection) {
-        return transform(new FlowToCollection<>(collection));
+        return new FlowToCollection<>(this, collection);
     }
 
     public Flow<List<T>> toList() {
@@ -217,19 +217,19 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> throttleFirst(Func1<? super T, ? extends IFlow<?>> flowFactory) {
-        return transform(FlowThrottleFirst.throttleFirst(flowFactory));
+        return new FlowThrottleFirst<>(this, flowFactory);
     }
 
     public Flow<T> throttleFirst(IFlow<?> flow) {
-        return transform(FlowThrottleFirst.throttleFirst(flow));
+        return throttleFirst(Funcs.always(flow));
     }
 
     public Flow<T> throttleLast(Func1<? super T, ? extends IFlow<?>> flowFactory) {
-        return transform(FlowThrottleLast.throttleLast(flowFactory));
+        return new FlowThrottleLast<>(this, flowFactory);
     }
 
     public Flow<T> throttleLast(IFlow<?> flow) {
-        return transform(FlowThrottleLast.throttleLast(flow));
+        return throttleLast(Funcs.always(flow));
     }
 
     public Flow<T> sampleFirst(IFlow<?> windowFlow) {
@@ -253,11 +253,11 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> takeLast(int count) {
-        return transform(FlowBuffer.takeLast(count));
+        return FlowBuffer.takeLast(this, count);
     }
 
     public Flow<T> takeWhile(Predicate<? super T> predicate) {
-        return transform(FlowTakeWhile.takeWhile(predicate));
+        return new FlowTakeWhile<>(this, predicate);
     }
 
     public Flow<T> takeUntil(Predicate<? super T> predicate) {
@@ -277,7 +277,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> skipLast(int count) {
-        return transform(FlowBuffer.skipLast(count));
+        return FlowBuffer.skipLast(this, count);
     }
 
     public Flow<T> skipAll() {
@@ -306,7 +306,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> elementAt(int index) {
-        if (index < 0) return transform(FlowBuffer.lastElement(-index));
+        if (index < 0) return FlowBuffer.lastElement(this, -index);
         return FlowElementAt.elementAt(this, index);
     }
 

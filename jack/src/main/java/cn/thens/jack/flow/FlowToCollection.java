@@ -5,16 +5,18 @@ import java.util.Collection;
 /**
  * @author 7hens
  */
-class FlowToCollection<T, C extends Collection<T>> implements FlowOperator<T, C> {
+class FlowToCollection<T, C extends Collection<T>> extends Flow<C> {
+    private final Flow<T> upFlow;
     private final C list;
 
-    FlowToCollection(C collection) {
+    FlowToCollection(Flow<T> upFlow, C collection) {
+        this.upFlow = upFlow;
         this.list = collection;
     }
 
     @Override
-    public Collector<T> apply(final Emitter<? super C> emitter) {
-        return new Collector<T>() {
+    protected void onStartCollect(Emitter<? super C> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
@@ -24,6 +26,6 @@ class FlowToCollection<T, C extends Collection<T>> implements FlowOperator<T, C>
                 }
                 list.add(reply.data());
             }
-        };
+        });
     }
 }
