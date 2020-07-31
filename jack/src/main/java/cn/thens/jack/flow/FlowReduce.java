@@ -23,7 +23,7 @@ abstract class FlowReduce<T, R> extends AbstractFlow<R> {
             private AtomicBoolean hasValue = new AtomicBoolean(false);
 
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
                     Throwable error = reply.error();
                     if (error == null) {

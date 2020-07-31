@@ -11,14 +11,14 @@ abstract class FlowTakeWhile<T> implements FlowOperator<T, T> {
     public Collector<T> apply(Emitter<? super T> emitter) {
         return new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
-                    emitter.emit(reply);
+                    emitter.post(reply);
                     return;
                 }
                 try {
                     if (test(reply.data())) {
-                        emitter.emit(reply);
+                        emitter.post(reply);
                     } else {
                         emitter.complete();
                     }

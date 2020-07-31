@@ -22,7 +22,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isError()) {
                     try {
                         handleError(emitter, reply.error());
@@ -31,7 +31,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
                     }
                     return;
                 }
-                emitter.emit(reply);
+                emitter.post(reply);
             }
         });
     }

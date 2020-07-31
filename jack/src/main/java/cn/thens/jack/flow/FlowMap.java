@@ -17,7 +17,7 @@ class FlowMap<T, R> implements FlowOperator<T, R> {
     public Collector<? super T> apply(final Emitter<? super R> emitter) {
         return new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
                     emitter.error(reply.error());
                     return;

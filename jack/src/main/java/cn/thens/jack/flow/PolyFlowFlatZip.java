@@ -24,7 +24,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends IFlow<T>> reply) {
+            public void post(Reply<? extends IFlow<T>> reply) {
                 if (reply.isComplete()) {
                     isOuterFlowTerminated.set(true);
                     tryZip();
@@ -48,7 +48,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
             private Collector<T> newInnerCollector(Queue<T> dataQueue) {
                 return new Collector<T>() {
                     @Override
-                    public void onCollect(Reply<? extends T> reply) {
+                    public void post(Reply<? extends T> reply) {
                         helper.onInnerCollect(reply);
                         if (emitter.isCancelled()) {
                             cachedDataQueue.clear();

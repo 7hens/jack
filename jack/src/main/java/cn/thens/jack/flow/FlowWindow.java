@@ -27,7 +27,7 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
         upFlow.collect(emitter, reply -> {
             emitReply(reply);
             if (reply.isTerminal()) {
-                emitter.emit(reply.newReply(null));
+                emitter.post(reply.newReply(null));
             }
         });
     }
@@ -44,7 +44,7 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
 
     private void emitReply(Reply<? extends T> reply) {
         if (currentEmitter != null) {
-            currentEmitter.emit(reply);
+            currentEmitter.post(reply);
         }
     }
 

@@ -24,9 +24,9 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
         return new Collector<T>() {
             @SuppressWarnings("unchecked")
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
-                    emitter.emit(reply);
+                    emitter.post(reply);
                     return;
                 }
                 try {
@@ -38,7 +38,7 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
                                 protected void onTerminate(Throwable error) throws Throwable {
                                     super.onTerminate(error);
                                     if (!(error instanceof CancellationException)) {
-                                        emitter.emit(reply);
+                                        emitter.post(reply);
                                     }
                                 }
                             });

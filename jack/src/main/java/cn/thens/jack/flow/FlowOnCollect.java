@@ -28,10 +28,10 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
         }
         upFlow.collect(emitter, new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 try {
-                    collector.onCollect(reply);
-                    emitter.emit(reply);
+                    collector.post(reply);
+                    emitter.post(reply);
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

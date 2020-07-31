@@ -21,14 +21,14 @@ class FlowDelay<T> extends AbstractFlow<T> {
     protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 try {
                     delayFunc.call(reply).asFlow()
                             .collect(emitter, new CollectorHelper() {
                                 @Override
                                 protected void onTerminate(Throwable error) throws Throwable {
                                     super.onTerminate(error);
-                                    emitter.emit(reply);
+                                    emitter.post(reply);
                                 }
                             });
                 } catch (Throwable e) {

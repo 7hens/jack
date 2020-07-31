@@ -27,7 +27,7 @@ class FlowTimeout<T> extends AbstractFlow<T> {
         timeoutCancellable = startTimeoutFlow(emitter);
         upFlowCancellable.addCancellable(upFlow.collect(emitter, reply -> {
             if (isTransferred.get()) return;
-            emitter.emit(reply);
+            emitter.post(reply);
             timeoutCancellable.cancel();
             if (reply.isTerminal() || emitter.isCancelled()) {
                 return;

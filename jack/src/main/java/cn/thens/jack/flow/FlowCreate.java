@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Func0;
+import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.Schedulers;
 
 
 /**
@@ -140,17 +142,21 @@ final class FlowCreate {
         };
     }
 
+    private static Scheduler timerScheduler() {
+        return Schedulers.timer();
+    }
+
     static Flow<Long> timer(long delay, TimeUnit unit) {
         return new AbstractFlow<Long>() {
             @Override
             protected void onStart(Emitter<? super Long> emitter) throws Throwable {
-                emitter.scheduler().schedule(new Runnable() {
+                emitter.addCancellable(timerScheduler().schedule(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(0L);
                         emitter.complete();
                     }
-                }, delay, unit);
+                }, delay, unit));
             }
         };
     }
@@ -160,12 +166,12 @@ final class FlowCreate {
             @Override
             protected void onStart(Emitter<? super Long> emitter) throws Throwable {
                 final AtomicLong count = new AtomicLong(0);
-                emitter.scheduler().schedulePeriodically(new Runnable() {
+                emitter.addCancellable(timerScheduler().schedulePeriodically(new Runnable() {
                     @Override
                     public void run() {
                         emitter.data(count.getAndIncrement());
                     }
-                }, initialDelay, period, unit);
+                }, initialDelay, period, unit));
             }
         };
     }

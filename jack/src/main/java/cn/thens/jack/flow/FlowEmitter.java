@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.ICancellable;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
@@ -25,31 +26,31 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
-    public void emit(Reply<? extends T> reply) {
+    public void post(Reply<? extends T> reply) {
         if (reply.isTerminal()) {
             terminalReplyRef.compareAndSet(null, reply);
         }
-        collectorEmitter.emit(reply);
+        collectorEmitter.post(reply);
     }
 
     @Override
     public void data(T data) {
-        emit(Reply.data(data));
+        post(Reply.data(data));
     }
 
     @Override
     public void error(Throwable error) {
-        emit(Reply.error(error));
+        post(Reply.error(error));
     }
 
     @Override
     public void cancel() {
-        emit(Reply.cancel());
+        post(Reply.cancel());
     }
 
     @Override
     public void complete() {
-        emit(Reply.complete());
+        post(Reply.complete());
     }
 
     @Override
@@ -63,8 +64,8 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
-    public Scheduler scheduler() {
-        return collectorEmitter.scheduler();
+    public Cancellable schedule(Runnable runnable) {
+        return collectorEmitter.schedule(runnable);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
         return Flow.create(emitter -> {
             Reply<? extends T> terminalReply = terminalReplyRef.get();
             if (terminalReply != null) {
-                emitter.emit(terminalReply);
+                emitter.post(terminalReply);
                 return;
             }
             emitters.add(emitter);
@@ -82,7 +83,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     protected void onCollect(Reply<? extends T> reply) {
         for (Emitter<? super T> emitter : emitters) {
-            emitter.emit(reply);
+            emitter.post(reply);
         }
         if (reply.isTerminal()) {
             emitters.clear();
@@ -109,7 +110,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
             public Flow<T> asFlow() {
                 return Flow.<T>create(emitter -> {
                     if (lastReply != null) {
-                        emitter.emit(lastReply);
+                        emitter.post(lastReply);
                     }
                     emitter.complete();
                 }) ////////////////
@@ -141,7 +142,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
             public Flow<T> asFlow() {
                 return Flow.<T>create(emitter -> {
                     for (Reply<? extends T> reply : replyBuffer) {
-                        emitter.emit(reply);
+                        emitter.post(reply);
                     }
                     emitter.complete();
                 }).polyWith(super.asFlow()).flatConcat();

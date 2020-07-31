@@ -2,6 +2,7 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.scheduler.Cancellable;
+import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Scheduler;
 
 /**
@@ -9,9 +10,9 @@ import cn.thens.jack.scheduler.Scheduler;
  */
 abstract class AbstractFlow<T> extends Flow<T> {
     @Override
-    protected Cancellable collect(Scheduler scheduler, Collector<? super T> collector) {
+    protected Cancellable collect(IScheduler scheduler, Collector<? super T> collector) {
         CollectorEmitter<? super T> emitter = CollectorEmitter.create(scheduler, collector);
-        emitter.scheduler().schedule(new Runnable() {
+        emitter.schedule(new Runnable() {
             @Override
             public void run() {
                 try {

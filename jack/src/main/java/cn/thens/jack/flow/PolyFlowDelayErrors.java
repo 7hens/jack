@@ -21,7 +21,7 @@ class PolyFlowDelayErrors<T> extends AbstractPolyFlow<T> {
             final AtomicInteger restFlowCount = new AtomicInteger(1);
 
             @Override
-            public void onCollect(Reply<? extends IFlow<T>> reply) {
+            public void post(Reply<? extends IFlow<T>> reply) {
                 if (reply.isTerminal()) {
                     Throwable error = reply.error();
                     if (error == null) {

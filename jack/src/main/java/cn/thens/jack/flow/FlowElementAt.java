@@ -19,12 +19,12 @@ class FlowElementAt<T> extends AbstractFlow<T> {
     protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, reply -> {
             if (reply.isTerminal()) {
-                emitter.emit(reply);
+                emitter.post(reply);
                 return;
             }
             try {
                 if (predicate.test(reply.data())) {
-                    emitter.emit(reply);
+                    emitter.post(reply);
                     emitter.complete();
                 }
             } catch (Throwable e) {

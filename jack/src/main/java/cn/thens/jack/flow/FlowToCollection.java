@@ -16,7 +16,7 @@ class FlowToCollection<T, C extends Collection<T>> implements FlowOperator<T, C>
     public Collector<T> apply(final Emitter<? super C> emitter) {
         return new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
                     emitter.data(list);
                     emitter.error(reply.error());

@@ -53,7 +53,7 @@ abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
 
     private void emitInner(Reply<? extends T> reply) {
         if (currentEmitter != null) {
-            currentEmitter.emit(reply);
+            currentEmitter.post(reply);
         }
     }
 

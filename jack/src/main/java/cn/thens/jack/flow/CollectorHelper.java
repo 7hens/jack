@@ -11,7 +11,7 @@ import cn.thens.jack.scheduler.Cancellable;
  */
 public abstract class CollectorHelper<T> implements Collector<T> {
     @Override
-    public void onCollect(Reply<? extends T> reply) {
+    public void post(Reply<? extends T> reply) {
         try {
             if (!reply.isTerminal()) {
                 onEach(reply.data());
@@ -23,7 +23,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
                 onComplete();
                 return;
             }
-            if (error instanceof CancellationException){
+            if (error instanceof CancellationException) {
                 onCancel();
                 return;
             }
@@ -51,26 +51,16 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     protected void onCancel() throws Throwable {
     }
 
-    public static <T> CollectorHelper<T> from(final Emitter<? super T> emitter) {
-        return new CollectorHelper<T>() {
-            @Override
-            public void onCollect(Reply<? extends T> reply) {
-                super.onCollect(reply);
-                emitter.emit(reply);
-            }
-        };
-    }
-
     @SuppressWarnings("unchecked")
-    public static <T> CollectorHelper<T> wrap(final Collector<? super T> collector) {
+    public static <T> CollectorHelper<T> from(final Collector<? super T> collector) {
         if (collector instanceof CollectorHelper) {
             return (CollectorHelper) collector;
         }
         return new CollectorHelper<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
-                super.onCollect(reply);
-                collector.onCollect(reply);
+            public void post(Reply<? extends T> reply) {
+                super.post(reply);
+                collector.post(reply);
             }
         };
     }

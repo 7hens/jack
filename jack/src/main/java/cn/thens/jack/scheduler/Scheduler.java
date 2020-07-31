@@ -5,9 +5,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author 7hens
  */
-public abstract class Scheduler {
+public abstract class Scheduler implements IScheduler {
     public abstract Cancellable schedule(Runnable runnable, long delay, TimeUnit unit);
 
+    @Override
     public Cancellable schedule(Runnable runnable) {
         return schedule(runnable, 0L, TimeUnit.NANOSECONDS);
     }

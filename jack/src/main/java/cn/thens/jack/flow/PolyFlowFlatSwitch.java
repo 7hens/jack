@@ -21,7 +21,7 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
-            public void onCollect(Reply<? extends IFlow<T>> reply) {
+            public void post(Reply<? extends IFlow<T>> reply) {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
                 Cancellable cancellable = lastCancellable.get();
@@ -38,14 +38,14 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
 
             private final Collector<T> innerCollector = new Collector<T>() {
                 @Override
-                public void onCollect(Reply<? extends T> reply) {
+                public void post(Reply<? extends T> reply) {
                     if (reply.isCancel()) {
                         helper.onInnerCollect(Reply.complete());
                         return;
                     }
                     helper.onInnerCollect(reply);
                     if (reply.isTerminal()) return;
-                    emitter.emit(reply);
+                    emitter.post(reply);
                 }
             };
         });

@@ -25,7 +25,7 @@ import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -38,23 +38,23 @@ public abstract class Flow<T> implements IFlow<T> {
         return this;
     }
 
-    protected abstract Cancellable collect(Scheduler scheduler, Collector<? super T> collector);
+    protected abstract Cancellable collect(IScheduler scheduler, Collector<? super T> collector);
 
     public Cancellable collect() {
         return collect(Schedulers.unconfined(), CollectorHelper.get());
     }
 
     Cancellable collect(Emitter<?> emitter, Collector<? super T> collector) {
-        Cancellable cancellable = collect(emitter.scheduler(), collector);
+        Cancellable cancellable = collect((IScheduler) emitter, collector);
         emitter.addCancellable(cancellable);
         return cancellable;
     }
 
     Cancellable collect(Emitter<? super T> emitter) {
-        return collect(emitter, CollectorHelper.from(emitter));
+        return collect(emitter, emitter);
     }
 
-    public Flow<T> flowOn(Scheduler upScheduler) {
+    public Flow<T> flowOn(IScheduler upScheduler) {
         return new FlowFlowOn<>(this, upScheduler);
     }
 

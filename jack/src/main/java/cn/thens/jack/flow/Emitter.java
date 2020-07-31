@@ -2,21 +2,15 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.IScheduler;
 
 /**
  * @author 7hens
  */
-public interface Emitter<T> extends Cancellable {
-    void emit(Reply<? extends T> reply);
-
+public interface Emitter<T> extends Collector<T>, Cancellable, IScheduler {
     void data(T data);
 
     void error(Throwable error);
 
-    void cancel();
-
     void complete();
-
-    Scheduler scheduler();
 }

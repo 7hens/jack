@@ -2,16 +2,16 @@ package cn.thens.jack.flow;
 
 
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.IScheduler;
 
 /**
  * @author 7hens
  */
 abstract class AbstractPolyFlow<T> extends PolyFlow<T> {
     @Override
-    protected Cancellable collect(Scheduler scheduler, Collector<? super IFlow<T>> collector) {
+    protected Cancellable collect(IScheduler scheduler, Collector<? super IFlow<T>> collector) {
         CollectorEmitter<? super IFlow<T>> emitter = CollectorEmitter.create(scheduler, collector);
-        emitter.scheduler().schedule(new Runnable() {
+        emitter.schedule(new Runnable() {
             @Override
             public void run() {
                 try {

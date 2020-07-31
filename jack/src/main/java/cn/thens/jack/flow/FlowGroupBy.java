@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.IScheduler;
 
 /**
  * @author 7hens
@@ -20,9 +20,9 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
     }
 
     @Override
-    protected Cancellable collect(Scheduler scheduler, Collector<? super Entry<K, V>> collector) {
+    protected Cancellable collect(IScheduler scheduler, Collector<? super Entry<K, V>> collector) {
         CollectorEmitter<? super Entry<K, V>> emitter = CollectorEmitter.create(scheduler, collector);
-        emitter.scheduler().schedule(new Runnable() {
+        emitter.schedule(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -41,9 +41,9 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
             if (reply.isTerminal()) {
                 Reply<V> entryReply = reply.newReply(null);
                 for (FlowEmitter<? super V> entryEmitter : map.values()) {
-                    entryEmitter.emit(entryReply);
+                    entryEmitter.post(entryReply);
                 }
-                emitter.emit(reply.newReply(null));
+                emitter.post(reply.newReply(null));
                 return;
             }
             try {
@@ -65,7 +65,7 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
     private Entry<K, V> newEntry(K key, FlowEmitter<V> emitter) {
         return new Entry<K, V>(key) {
             @Override
-            protected Cancellable collect(Scheduler scheduler, Collector<? super V> collector) {
+            protected Cancellable collect(IScheduler scheduler, Collector<? super V> collector) {
                 return emitter.asFlow().collect(scheduler, collector);
             }
         };

@@ -19,13 +19,13 @@ class FlowTakeUntil<T> extends AbstractFlow<T> {
     protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
-                    emitter.emit(reply);
+                    emitter.post(reply);
                     return;
                 }
                 try {
-                    emitter.emit(reply);
+                    emitter.post(reply);
                     if (predicate.test(reply.data())) {
                         emitter.complete();
                     }

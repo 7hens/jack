@@ -34,7 +34,7 @@ public final class Schedulers {
     private static Ref<Scheduler> TIMER = Ref.lazy(() ->
             from(Executors.newScheduledThreadPool(1, threadFactory("timer", true))));
 
-    private static Scheduler timer() {
+    public static Scheduler timer() {
         return TIMER.get();
     }
 

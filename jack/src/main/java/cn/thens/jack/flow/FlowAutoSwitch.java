@@ -23,9 +23,9 @@ class FlowAutoSwitch<T> extends AbstractFlow<T> {
     protected void onStart(Emitter<? super T> emitter) throws Throwable {
         Cancellable cancellable = upFlow.collect(emitter, new Collector<T>() {
             @Override
-            public void onCollect(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) {
                 if (reply.isCancel()) return;
-                emitter.emit(reply);
+                emitter.post(reply);
             }
         });
         switchFlow.asFlow().collect(emitter, new CollectorHelper() {

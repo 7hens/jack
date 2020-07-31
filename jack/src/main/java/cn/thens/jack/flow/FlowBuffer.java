@@ -20,7 +20,7 @@ abstract class FlowBuffer<T> implements FlowOperator<T, T> {
                     onComplete(emitter, buffer);
                 }
                 buffer.clear();
-                emitter.emit(reply);
+                emitter.post(reply);
                 return;
             }
             buffer.add(reply.data());

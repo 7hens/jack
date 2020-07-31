@@ -1,7 +1,7 @@
 package cn.thens.jack.flow;
 
 import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.Scheduler;
+import cn.thens.jack.scheduler.IScheduler;
 
 /**
  * @author 7hens
@@ -16,12 +16,12 @@ class FlowTransform<T, R> extends Flow<R> {
     }
 
     @Override
-    protected Cancellable collect(Scheduler scheduler, Collector<? super R> collector) {
+    protected Cancellable collect(IScheduler scheduler, Collector<? super R> collector) {
         CollectorEmitter<? super R> emitter = CollectorEmitter.create(scheduler, collector);
         try {
             upFlow.collect(emitter, operator.apply(emitter));
         } catch (Throwable e) {
-            collector.onCollect(Reply.error(e));
+            collector.post(Reply.error(e));
         }
         return emitter;
     }
