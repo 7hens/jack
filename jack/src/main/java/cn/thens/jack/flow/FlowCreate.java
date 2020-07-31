@@ -21,7 +21,7 @@ final class FlowCreate {
     static <T> Flow<T> create(Action1<? super Emitter<? super T>> onStart) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 onStart.run(emitter);
             }
         };
@@ -30,7 +30,7 @@ final class FlowCreate {
     static <T> Flow<T> empty() {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) {
+            protected void onStart(Emitter<? super T> emitter) {
                 emitter.complete();
             }
         };
@@ -39,7 +39,7 @@ final class FlowCreate {
     static <T> Flow<T> never() {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) {
+            protected void onStart(Emitter<? super T> emitter) {
             }
         };
     }
@@ -47,7 +47,7 @@ final class FlowCreate {
     static <T> Flow<T> error(final Throwable e) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) {
+            protected void onStart(Emitter<? super T> emitter) {
                 emitter.error(e);
             }
         };
@@ -56,7 +56,7 @@ final class FlowCreate {
     static <T> Flow<T> defer(final IFlow<T> flowFactory) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 flowFactory.asFlow().collect(emitter);
             }
         };
@@ -65,7 +65,7 @@ final class FlowCreate {
     static <T> Flow<T> fromArray(T[] elements) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 for (T item : elements) {
                     emitter.data(item);
                 }
@@ -77,7 +77,7 @@ final class FlowCreate {
     static <T> Flow<T> fromIterable(Iterable<T> iterable) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 for (T item : iterable) {
                     emitter.data(item);
                 }
@@ -89,7 +89,7 @@ final class FlowCreate {
     static <T> Flow<T> fromFuture(Future<? extends T> future) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 emitter.data(future.get());
                 emitter.complete();
             }
@@ -99,7 +99,7 @@ final class FlowCreate {
     static <T> Flow<T> fromFunc(Func0<? extends T> func) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 emitter.data(func.call());
                 emitter.complete();
             }
@@ -109,7 +109,7 @@ final class FlowCreate {
     static <T> Flow<T> fromAction(Action0 action) {
         return new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+            protected void onStart(Emitter<? super T> emitter) throws Throwable {
                 action.run();
                 emitter.complete();
             }
@@ -125,7 +125,7 @@ final class FlowCreate {
         }
         return new AbstractFlow<Integer>() {
             @Override
-            protected void onStart(CollectorEmitter<? super Integer> emitter) throws Throwable {
+            protected void onStart(Emitter<? super Integer> emitter) throws Throwable {
                 if (end > start) {
                     for (int i = start; i <= end; i += step) {
                         emitter.data(i);
@@ -143,7 +143,7 @@ final class FlowCreate {
     static Flow<Long> timer(long delay, TimeUnit unit) {
         return new AbstractFlow<Long>() {
             @Override
-            protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
+            protected void onStart(Emitter<? super Long> emitter) throws Throwable {
                 emitter.scheduler().schedule(new Runnable() {
                     @Override
                     public void run() {
@@ -158,7 +158,7 @@ final class FlowCreate {
     static Flow<Long> interval(long initialDelay, long period, TimeUnit unit) {
         return new AbstractFlow<Long>() {
             @Override
-            protected void onStart(CollectorEmitter<? super Long> emitter) throws Throwable {
+            protected void onStart(Emitter<? super Long> emitter) throws Throwable {
                 final AtomicLong count = new AtomicLong(0);
                 emitter.scheduler().schedulePeriodically(new Runnable() {
                     @Override

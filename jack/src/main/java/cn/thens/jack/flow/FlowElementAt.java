@@ -16,7 +16,7 @@ class FlowElementAt<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, reply -> {
             if (reply.isTerminal()) {
                 emitter.emit(reply);

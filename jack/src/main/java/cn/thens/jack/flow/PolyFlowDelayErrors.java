@@ -15,7 +15,7 @@ class PolyFlowDelayErrors<T> extends AbstractPolyFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super IFlow<T>> emitter) throws Throwable {
+    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final List<Throwable> errors = new ArrayList<>();
             final AtomicInteger restFlowCount = new AtomicInteger(1);

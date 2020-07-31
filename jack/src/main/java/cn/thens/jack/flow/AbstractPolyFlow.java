@@ -24,5 +24,5 @@ abstract class AbstractPolyFlow<T> extends PolyFlow<T> {
         return emitter;
     }
 
-    protected abstract void onStart(CollectorEmitter<? super IFlow<T>> emitter) throws Throwable;
+    protected abstract void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable;
 }

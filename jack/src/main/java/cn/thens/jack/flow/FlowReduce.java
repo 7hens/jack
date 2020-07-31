@@ -18,7 +18,7 @@ abstract class FlowReduce<T, R> extends AbstractFlow<R> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super R> emitter) {
+    protected void onStart(Emitter<? super R> emitter) {
         upFlow.collect(emitter, new Collector<T>() {
             private AtomicBoolean hasValue = new AtomicBoolean(false);
 
@@ -52,7 +52,7 @@ abstract class FlowReduce<T, R> extends AbstractFlow<R> {
     reduce(Flow<T> upFlow, R initialValue, Func2<? super R, ? super T, ? extends R> accumulator) {
         return new FlowReduce<T, R>(upFlow) {
             @Override
-            protected void onStart(CollectorEmitter<? super R> emitter) {
+            protected void onStart(Emitter<? super R> emitter) {
                 value.set(initialValue);
                 super.onStart(emitter);
             }

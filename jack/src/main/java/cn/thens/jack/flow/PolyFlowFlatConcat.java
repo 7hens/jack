@@ -15,7 +15,7 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final Queue<IFlow<T>> flowQueue = new LinkedList<>();
             final AtomicBoolean isCollecting = new AtomicBoolean(false);

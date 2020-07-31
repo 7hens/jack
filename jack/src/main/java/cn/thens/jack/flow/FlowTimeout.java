@@ -23,7 +23,7 @@ class FlowTimeout<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         timeoutCancellable = startTimeoutFlow(emitter);
         upFlowCancellable.addCancellable(upFlow.collect(emitter, reply -> {
             if (isTransferred.get()) return;
@@ -40,7 +40,7 @@ class FlowTimeout<T> extends AbstractFlow<T> {
         }));
     }
 
-    private Cancellable startTimeoutFlow(CollectorEmitter<? super T> emitter) throws Throwable {
+    private Cancellable startTimeoutFlow(Emitter<? super T> emitter) throws Throwable {
         return timeoutFlow.asFlow().collect(emitter, reply -> {
             if (reply.isTerminal() && !emitter.isCancelled()) {
                 upFlowCancellable.cancel();

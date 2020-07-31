@@ -18,7 +18,7 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         if (collector instanceof CollectorHelper) {
             try {
                 ((CollectorHelper) collector).onStart(emitter);

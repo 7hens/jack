@@ -20,7 +20,7 @@ class FlowAutoSwitch<T> extends AbstractFlow<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         Cancellable cancellable = upFlow.collect(emitter, new Collector<T>() {
             @Override
             public void onCollect(Reply<? extends T> reply) {

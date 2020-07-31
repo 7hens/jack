@@ -24,5 +24,5 @@ abstract class AbstractFlow<T> extends Flow<T> {
         return emitter;
     }
 
-    protected abstract void onStart(CollectorEmitter<? super T> emitter) throws Throwable;
+    protected abstract void onStart(Emitter<? super T> emitter) throws Throwable;
 }

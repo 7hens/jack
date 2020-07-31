@@ -17,7 +17,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super List<T>> emitter) throws Throwable {
+    protected void onStart(Emitter<? super List<T>> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final Queue<Queue<T>> cachedDataQueue = new LinkedList<>();
             final AtomicBoolean isOuterFlowTerminated = new AtomicBoolean(false);

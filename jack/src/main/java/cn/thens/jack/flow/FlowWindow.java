@@ -14,7 +14,7 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super IFlow<T>> emitter) throws Throwable {
+    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
         emitNewFlow(emitter);
         windowFlow.asFlow().collect(emitter, reply -> {
             if (reply.isTerminal()) {
@@ -32,10 +32,10 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
         });
     }
 
-    private void emitNewFlow(CollectorEmitter<? super IFlow<T>> emitter) {
+    private void emitNewFlow(Emitter<? super IFlow<T>> emitter) {
         emitter.data(new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> innerEmitter) throws Throwable {
+            protected void onStart(Emitter<? super T> innerEmitter) throws Throwable {
                 emitReply(Reply.complete());
                 currentEmitter = innerEmitter;
             }

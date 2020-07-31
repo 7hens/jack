@@ -18,7 +18,7 @@ abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
     abstract boolean shouldClose(T data) throws Throwable;
 
     @Override
-    protected void onStart(CollectorEmitter<? super IFlow<T>> emitter) throws Throwable {
+    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
         emitNewFlow(emitter);
         upFlow.collect(emitter, reply -> {
             if (reply.isTerminal()) {
@@ -41,11 +41,11 @@ abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
         });
     }
 
-    private void emitNewFlow(CollectorEmitter<? super Flow<T>> emitter) {
+    private void emitNewFlow(Emitter<? super Flow<T>> emitter) {
         emitInner(Reply.complete());
         emitter.data(new AbstractFlow<T>() {
             @Override
-            protected void onStart(CollectorEmitter<? super T> innerEmitter) throws Throwable {
+            protected void onStart(Emitter<? super T> innerEmitter) throws Throwable {
                 currentEmitter = innerEmitter;
             }
         });

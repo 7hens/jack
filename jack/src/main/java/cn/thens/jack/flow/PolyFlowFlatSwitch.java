@@ -15,7 +15,7 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(CollectorEmitter<? super T> emitter) throws Throwable {
+    protected void onStart(Emitter<? super T> emitter) throws Throwable {
         upFlow.collect(emitter, new Collector<IFlow<T>>() {
             final AtomicReference<Cancellable> lastCancellable = new AtomicReference<>(null);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
