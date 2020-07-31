@@ -38,20 +38,32 @@ public abstract class Flow<T> implements IFlow<T> {
         return this;
     }
 
-    protected abstract Cancellable collect(IScheduler scheduler, Collector<? super T> collector);
+    protected abstract void onStartCollect(Emitter<? super T> emitter) throws Throwable;
+
+    protected Cancellable collect(IScheduler scheduler, Collector<? super T> collector) {
+        CollectorEmitter<? super T> emitter = CollectorEmitter.create(scheduler, collector);
+        emitter.schedule(() -> {
+            try {
+                onStartCollect(emitter);
+            } catch (Throwable e) {
+                emitter.error(e);
+            }
+        });
+        return emitter;
+    }
 
     public Cancellable collect() {
         return collect(Schedulers.unconfined(), CollectorHelper.get());
     }
 
-    Cancellable collect(Emitter<?> emitter, Collector<? super T> collector) {
+    Cancellable collectWith(Emitter<?> emitter, Collector<? super T> collector) {
         Cancellable cancellable = collect((IScheduler) emitter, collector);
         emitter.addCancellable(cancellable);
         return cancellable;
     }
 
-    Cancellable collect(Emitter<? super T> emitter) {
-        return collect(emitter, emitter);
+    Cancellable collectWith(Emitter<? super T> emitter) {
+        return collectWith(emitter, emitter);
     }
 
     public Flow<T> flowOn(IScheduler upScheduler) {

@@ -7,7 +7,7 @@ import cn.thens.jack.scheduler.Cancellable;
 /**
  * @author 7hens
  */
-class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
+class PolyFlowFlatSwitch<T> extends Flow<T> {
     private final PolyFlow<T> upFlow;
 
     PolyFlowFlatSwitch(PolyFlow<T> upFlow) {
@@ -15,8 +15,8 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<IFlow<T>>() {
             final AtomicReference<Cancellable> lastCancellable = new AtomicReference<>(null);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
@@ -30,7 +30,7 @@ class PolyFlowFlatSwitch<T> extends AbstractFlow<T> {
                 }
                 IFlow<T> flow = reply.data();
                 try {
-                    lastCancellable.set(flow.asFlow().collect(emitter, innerCollector));
+                    lastCancellable.set(flow.asFlow().collectWith(emitter, innerCollector));
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

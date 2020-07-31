@@ -7,7 +7,7 @@ import cn.thens.jack.func.Funcs;
 /**
  * @author 7hens
  */
-class FlowDelay<T> extends AbstractFlow<T> {
+class FlowDelay<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final Func1<? super Reply<? extends T>, ? extends IFlow<?>> delayFunc;
 
@@ -18,13 +18,13 @@ class FlowDelay<T> extends AbstractFlow<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 try {
                     delayFunc.call(reply).asFlow()
-                            .collect(emitter, new CollectorHelper() {
+                            .collectWith(emitter, new CollectorHelper() {
                                 @Override
                                 protected void onTerminate(Throwable error) throws Throwable {
                                     super.onTerminate(error);

@@ -11,7 +11,7 @@ import cn.thens.jack.func.Predicate;
 /**
  * @author 7hens
  */
-abstract class FlowCatch<T> extends AbstractFlow<T> {
+abstract class FlowCatch<T> extends Flow<T> {
     private final Flow<T> upFlow;
 
     private FlowCatch(Flow<T> upFlow) {
@@ -19,8 +19,8 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isError()) {
@@ -42,7 +42,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
-                resumeFunc.call(error).asFlow().collect(emitter);
+                resumeFunc.call(error).asFlow().collectWith(emitter);
             }
         };
     }
@@ -60,7 +60,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
-                resumeFlow.asFlow().collect(emitter);
+                resumeFlow.asFlow().collectWith(emitter);
             }
         };
     }
@@ -71,7 +71,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 boolean shouldRetry = predicate.test(error);
                 if (shouldRetry && !emitter.isCancelled()) {
-                    collect(emitter);
+                    collectWith(emitter);
                 } else {
                     emitter.error(error);
                 }
@@ -93,15 +93,15 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             private AtomicReference<Throwable> lastError = new AtomicReference<>();
 
             @Override
-            protected void onStart(Emitter<? super T> emitter) throws Throwable {
-                super.onStart(emitter);
-                timeoutFlow.asFlow().collect(emitter, reply -> {
+            protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+                super.onStartCollect(emitter);
+                timeoutFlow.asFlow().collectWith(emitter, reply -> {
                     if (reply.isTerminal() && !emitter.isCancelled()) {
                         Throwable error = lastError.get();
                         if (error != null) {
                             emitter.error(error);
                         } else {
-                            fallbackFlow.collect(emitter);
+                            fallbackFlow.collectWith(emitter);
                         }
                     }
                 });
@@ -111,7 +111,7 @@ abstract class FlowCatch<T> extends AbstractFlow<T> {
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 lastError.set(error);
                 if (!emitter.isCancelled()) {
-                    collect(emitter);
+                    collectWith(emitter);
                 }
             }
         };

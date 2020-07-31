@@ -33,7 +33,7 @@ class FlowThrottleLast<T> implements FlowOperator<T, T> {
                     lastFlow.cancel();
                     lastFlow = flowFactory.call(reply.data())
                             .asFlow()
-                            .collect(emitter, new CollectorHelper() {
+                            .collectWith(emitter, new CollectorHelper() {
                                 @Override
                                 protected void onTerminate(Throwable error) throws Throwable {
                                     super.onTerminate(error);

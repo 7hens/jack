@@ -7,7 +7,7 @@ import cn.thens.jack.scheduler.Cancellable;
 /**
  * @author 7hens
  */
-class FlowAutoSwitch<T> extends AbstractFlow<T> {
+class FlowAutoSwitch<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> switchFlow;
     private final IFlow<T> fallback;
@@ -20,19 +20,19 @@ class FlowAutoSwitch<T> extends AbstractFlow<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        Cancellable cancellable = upFlow.collect(emitter, new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        Cancellable cancellable = upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isCancel()) return;
                 emitter.post(reply);
             }
         });
-        switchFlow.asFlow().collect(emitter, new CollectorHelper() {
+        switchFlow.asFlow().collectWith(emitter, new CollectorHelper() {
             @Override
             protected void onTerminate(Throwable error) throws Throwable {
                 cancellable.cancel();
-                fallback.asFlow().collect(emitter);
+                fallback.asFlow().collectWith(emitter);
             }
         });
     }

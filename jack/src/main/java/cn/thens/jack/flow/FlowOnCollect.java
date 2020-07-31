@@ -8,7 +8,7 @@ import cn.thens.jack.scheduler.Cancellable;
 /**
  * @author 7hens
  */
-class FlowOnCollect<T> extends AbstractFlow<T> {
+class FlowOnCollect<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final Collector<? super T> collector;
 
@@ -18,7 +18,7 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         if (collector instanceof CollectorHelper) {
             try {
                 ((CollectorHelper) collector).onStart(emitter);
@@ -26,7 +26,7 @@ class FlowOnCollect<T> extends AbstractFlow<T> {
                 emitter.error(e);
             }
         }
-        upFlow.collect(emitter, new Collector<T>() {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 try {

@@ -24,6 +24,7 @@ public class PolyFlowTest {
                         }))
                 .polyTo(converter)
                 .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
     }
 

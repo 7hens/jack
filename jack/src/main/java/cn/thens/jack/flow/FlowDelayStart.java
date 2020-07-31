@@ -4,7 +4,7 @@ package cn.thens.jack.flow;
 /**
  * @author 7hens
  */
-class FlowDelayStart<T> extends AbstractFlow<T> {
+class FlowDelayStart<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> delayFlow;
 
@@ -15,13 +15,13 @@ class FlowDelayStart<T> extends AbstractFlow<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void onStart(Emitter<? super T> emitter) {
+    protected void onStartCollect(Emitter<? super T> emitter) {
         try {
-            delayFlow.asFlow().collect(emitter, new CollectorHelper() {
+            delayFlow.asFlow().collectWith(emitter, new CollectorHelper() {
                 @Override
                 protected void onTerminate(Throwable error) throws Throwable {
                     super.onTerminate(error);
-                    upFlow.collect(emitter);
+                    upFlow.collectWith(emitter);
                 }
             });
         } catch (Throwable e) {

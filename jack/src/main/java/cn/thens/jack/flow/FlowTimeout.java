@@ -8,7 +8,7 @@ import cn.thens.jack.scheduler.Cancellables;
 /**
  * @author 7hens
  */
-class FlowTimeout<T> extends AbstractFlow<T> {
+class FlowTimeout<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> timeoutFlow;
     private final IFlow<T> fallback;
@@ -23,9 +23,9 @@ class FlowTimeout<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         timeoutCancellable = startTimeoutFlow(emitter);
-        upFlowCancellable.addCancellable(upFlow.collect(emitter, reply -> {
+        upFlowCancellable.addCancellable(upFlow.collectWith(emitter, reply -> {
             if (isTransferred.get()) return;
             emitter.post(reply);
             timeoutCancellable.cancel();
@@ -41,12 +41,12 @@ class FlowTimeout<T> extends AbstractFlow<T> {
     }
 
     private Cancellable startTimeoutFlow(Emitter<? super T> emitter) throws Throwable {
-        return timeoutFlow.asFlow().collect(emitter, reply -> {
+        return timeoutFlow.asFlow().collectWith(emitter, reply -> {
             if (reply.isTerminal() && !emitter.isCancelled()) {
                 upFlowCancellable.cancel();
                 if (isTransferred.compareAndSet(false, true)) {
                     try {
-                        fallback.asFlow().collect(emitter);
+                        fallback.asFlow().collectWith(emitter);
                     } catch (Throwable e) {
                         emitter.error(e);
                     }

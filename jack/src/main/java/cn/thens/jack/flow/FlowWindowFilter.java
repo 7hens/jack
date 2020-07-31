@@ -7,7 +7,7 @@ import cn.thens.jack.func.Predicate;
 /**
  * @author 7hens
  */
-abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
+abstract class FlowWindowFilter<T> extends PolyFlow<T> {
     private final Flow<T> upFlow;
     private Emitter<? super T> currentEmitter;
 
@@ -18,9 +18,9 @@ abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
     abstract boolean shouldClose(T data) throws Throwable;
 
     @Override
-    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
+    protected void onStartCollect(Emitter<? super IFlow<T>> emitter) throws Throwable {
         emitNewFlow(emitter);
-        upFlow.collect(emitter, reply -> {
+        upFlow.collectWith(emitter, reply -> {
             if (reply.isTerminal()) {
                 Throwable error = reply.error();
                 if (currentEmitter != null) {
@@ -43,9 +43,9 @@ abstract class FlowWindowFilter<T> extends AbstractPolyFlow<T> {
 
     private void emitNewFlow(Emitter<? super Flow<T>> emitter) {
         emitInner(Reply.complete());
-        emitter.data(new AbstractFlow<T>() {
+        emitter.data(new Flow<T>() {
             @Override
-            protected void onStart(Emitter<? super T> innerEmitter) throws Throwable {
+            protected void onStartCollect(Emitter<? super T> innerEmitter) throws Throwable {
                 currentEmitter = innerEmitter;
             }
         });

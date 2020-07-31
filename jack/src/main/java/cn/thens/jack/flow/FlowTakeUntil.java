@@ -6,7 +6,7 @@ import cn.thens.jack.func.Predicate;
 /**
  * @author 7hens
  */
-class FlowTakeUntil<T> extends AbstractFlow<T> {
+class FlowTakeUntil<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final Predicate<? super T> predicate;
 
@@ -16,8 +16,8 @@ class FlowTakeUntil<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {

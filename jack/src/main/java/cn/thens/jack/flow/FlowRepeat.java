@@ -7,7 +7,7 @@ import cn.thens.jack.func.Func0;
 /**
  * @author 7hens
  */
-abstract class FlowRepeat<T> extends AbstractFlow<T> {
+abstract class FlowRepeat<T> extends Flow<T> {
     private final Flow<T> upFlow;
 
     FlowRepeat(Flow<T> upFlow) {
@@ -15,8 +15,8 @@ abstract class FlowRepeat<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new CollectorHelper<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new CollectorHelper<T>() {
             @Override
             protected void onEach(T data) throws Throwable {
                 super.onEach(data);
@@ -41,7 +41,7 @@ abstract class FlowRepeat<T> extends AbstractFlow<T> {
         return new FlowRepeat<T>(upFlow) {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
-                collect(emitter);
+                collectWith(emitter);
             }
         };
     }
@@ -51,7 +51,7 @@ abstract class FlowRepeat<T> extends AbstractFlow<T> {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
                 if (shouldRepeat.call()) {
-                    collect(emitter);
+                    collectWith(emitter);
                 }
             }
         };
@@ -64,7 +64,7 @@ abstract class FlowRepeat<T> extends AbstractFlow<T> {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
                 if (resetCount.decrementAndGet() >= 0) {
-                    collect(emitter);
+                    collectWith(emitter);
                 }
             }
         };

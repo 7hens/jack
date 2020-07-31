@@ -3,8 +3,6 @@ package cn.thens.jack.flow;
 import java.util.concurrent.atomic.AtomicReference;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.IScheduler;
 
 
 /**
@@ -18,8 +16,8 @@ public final class FlowX {
     public static <T> Func1<Flow<? extends IFlow<T>>, PolyFlow<T>> poly() {
         return flow -> new PolyFlow<T>() {
             @Override
-            protected Cancellable collect(IScheduler scheduler, Collector<? super IFlow<T>> collector) {
-                return flow.collect(scheduler, collector);
+            protected void onStartCollect(Emitter<? super IFlow<T>> emitter) throws Throwable {
+                flow.onStartCollect(emitter);
             }
         };
     }
@@ -36,7 +34,7 @@ public final class FlowX {
             @Override
             public Collector<? super Up> apply(Emitter<? super Dn> emitter) throws Throwable {
                 AtomicReference<Emitter<? super Up>> upEmitterRef = new AtomicReference<>();
-                Flow.<Up>create(upEmitterRef::set).to(action).asFlow().collect(emitter);
+                Flow.<Up>create(upEmitterRef::set).to(action).asFlow().collectWith(emitter);
                 return reply -> upEmitterRef.get().post(reply);
             }
         };

@@ -1,9 +1,6 @@
 package cn.thens.jack.flow;
 
 
-import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.IScheduler;
-
 class FlowOnBackpressure<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final Backpressure<T> backpressure;
@@ -14,9 +11,7 @@ class FlowOnBackpressure<T> extends Flow<T> {
     }
 
     @Override
-    protected Cancellable collect(IScheduler scheduler, Collector<? super T> collector) {
-        CollectorEmitter<T> emitter = CollectorEmitter.create(scheduler, collector, backpressure);
-        upFlow.collect(emitter);
-        return emitter;
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.onStartCollect(CollectorEmitter.create(emitter, emitter, backpressure));
     }
 }

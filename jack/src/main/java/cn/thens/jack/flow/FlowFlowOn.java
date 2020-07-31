@@ -1,7 +1,6 @@
 package cn.thens.jack.flow;
 
 
-import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.IScheduler;
 
 /**
@@ -17,10 +16,15 @@ class FlowFlowOn<T> extends Flow<T> {
     }
 
     @Override
-    protected Cancellable collect(IScheduler scheduler, Collector<? super T> collector) {
-        if (scheduler == upScheduler) {
-            return upFlow.collect(scheduler, collector);
-        }
-        return upFlow.collect(upScheduler, CollectorEmitter.create(scheduler, collector));
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        CollectorEmitter<T> upEmitter = CollectorEmitter.create(upScheduler, emitter);
+        emitter.addCancellable(upEmitter);
+        upEmitter.schedule(() -> {
+            try {
+                upFlow.onStartCollect(upEmitter);
+            } catch (Throwable e) {
+                emitter.error(e);
+            }
+        });
     }
 }

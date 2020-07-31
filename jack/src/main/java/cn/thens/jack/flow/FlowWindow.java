@@ -3,7 +3,7 @@ package cn.thens.jack.flow;
 /**
  * @author 7hens
  */
-class FlowWindow<T> extends AbstractPolyFlow<T> {
+class FlowWindow<T> extends PolyFlow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> windowFlow;
     private Emitter<? super T> currentEmitter;
@@ -14,9 +14,9 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
+    protected void onStartCollect(Emitter<? super IFlow<T>> emitter) throws Throwable {
         emitNewFlow(emitter);
-        windowFlow.asFlow().collect(emitter, reply -> {
+        windowFlow.asFlow().collectWith(emitter, reply -> {
             if (reply.isTerminal()) {
                 emitter.cancel();
                 emitReply(Reply.complete());
@@ -24,7 +24,7 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
                 emitNewFlow(emitter);
             }
         });
-        upFlow.collect(emitter, reply -> {
+        upFlow.collectWith(emitter, reply -> {
             emitReply(reply);
             if (reply.isTerminal()) {
                 emitter.post(reply.newReply(null));
@@ -33,9 +33,9 @@ class FlowWindow<T> extends AbstractPolyFlow<T> {
     }
 
     private void emitNewFlow(Emitter<? super IFlow<T>> emitter) {
-        emitter.data(new AbstractFlow<T>() {
+        emitter.data(new Flow<T>() {
             @Override
-            protected void onStart(Emitter<? super T> innerEmitter) throws Throwable {
+            protected void onStartCollect(Emitter<? super T> innerEmitter) throws Throwable {
                 emitReply(Reply.complete());
                 currentEmitter = innerEmitter;
             }

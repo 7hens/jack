@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author 7hens
  */
-class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
+class PolyFlowFlatZip<T> extends Flow<List<T>> {
     private final PolyFlow<T> upFlow;
 
     PolyFlowFlatZip(PolyFlow<T> upFlow) {
@@ -17,8 +17,8 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
     }
 
     @Override
-    protected void onStart(Emitter<? super List<T>> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+    protected void onStartCollect(Emitter<? super List<T>> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<IFlow<T>>() {
             final Queue<Queue<T>> cachedDataQueue = new LinkedList<>();
             final AtomicBoolean isOuterFlowTerminated = new AtomicBoolean(false);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
@@ -39,7 +39,7 @@ class PolyFlowFlatZip<T> extends AbstractFlow<List<T>> {
                 Queue<T> dataQueue = new LinkedList<>();
                 cachedDataQueue.add(dataQueue);
                 try {
-                    flow.asFlow().collect(emitter, newInnerCollector(dataQueue));
+                    flow.asFlow().collectWith(emitter, newInnerCollector(dataQueue));
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

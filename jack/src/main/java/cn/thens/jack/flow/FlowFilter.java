@@ -12,7 +12,7 @@ import cn.thens.jack.scheduler.Cancellable;
 /**
  * @author 7hens
  */
-abstract class FlowFilter<T> extends AbstractFlow<T> {
+abstract class FlowFilter<T> extends Flow<T> {
     private final Flow<T> upFlow;
 
     private FlowFilter(Flow<T> upFlow) {
@@ -20,8 +20,8 @@ abstract class FlowFilter<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<T>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) {
                 try {
@@ -134,8 +134,8 @@ abstract class FlowFilter<T> extends AbstractFlow<T> {
 
     static <T> Flow<T> skip(Flow<T> upFlow, IFlow<?> timeoutFlow) {
         return create(emitter -> {
-            Cancellable cancellable = timeoutFlow.asFlow().collect(emitter, CollectorHelper.get());
-            upFlow.filter(it -> cancellable.isCancelled()).collect(emitter);
+            Cancellable cancellable = timeoutFlow.asFlow().collectWith(emitter, CollectorHelper.get());
+            upFlow.filter(it -> cancellable.isCancelled()).collectWith(emitter);
         });
     }
 
@@ -160,7 +160,7 @@ abstract class FlowFilter<T> extends AbstractFlow<T> {
             @Override
             void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 if (error == null && isEmpty) {
-                    fallback.asFlow().collect(emitter);
+                    fallback.asFlow().collectWith(emitter);
                     return;
                 }
                 super.onTerminated(emitter, error);

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author 7hens
  */
-class PolyFlowDelayErrors<T> extends AbstractPolyFlow<T> {
+class PolyFlowDelayErrors<T> extends PolyFlow<T> {
     private final PolyFlow<T> upFlow;
 
     PolyFlowDelayErrors(PolyFlow<T> upFlow) {
@@ -15,8 +15,8 @@ class PolyFlowDelayErrors<T> extends AbstractPolyFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super IFlow<T>> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+    protected void onStartCollect(Emitter<? super IFlow<T>> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<IFlow<T>>() {
             final List<Throwable> errors = new ArrayList<>();
             final AtomicInteger restFlowCount = new AtomicInteger(1);
 

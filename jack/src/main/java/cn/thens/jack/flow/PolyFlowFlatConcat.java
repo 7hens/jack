@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author 7hens
  */
-class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
+class PolyFlowFlatConcat<T> extends Flow<T> {
     private final PolyFlow<T> upFlow;
 
     PolyFlowFlatConcat(PolyFlow<T> upFlow) {
@@ -15,8 +15,8 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<IFlow<T>>() {
             final Queue<IFlow<T>> flowQueue = new LinkedList<>();
             final AtomicBoolean isCollecting = new AtomicBoolean(false);
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
@@ -28,7 +28,7 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
                 IFlow<T> flowable = reply.data();
                 if (isCollecting.compareAndSet(false, true)) {
                     try {
-                        flowable.asFlow().collect(emitter, innerCollector);
+                        flowable.asFlow().collectWith(emitter, innerCollector);
                     } catch (Throwable e) {
                         emitter.error(e);
                     }
@@ -49,7 +49,7 @@ class PolyFlowFlatConcat<T> extends AbstractFlow<T> {
                     if (reply.isTerminal()) {
                         if (!flowQueue.isEmpty()) {
                             try {
-                                flowQueue.poll().asFlow().collect(emitter, this);
+                                flowQueue.poll().asFlow().collectWith(emitter, this);
                             } catch (Throwable e) {
                                 emitter.error(e);
                             }

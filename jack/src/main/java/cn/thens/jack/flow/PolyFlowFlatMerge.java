@@ -3,7 +3,7 @@ package cn.thens.jack.flow;
 /**
  * @author 7hens
  */
-class PolyFlowFlatMerge<T> extends AbstractFlow<T> {
+class PolyFlowFlatMerge<T> extends Flow<T> {
     private final PolyFlow<T> upFlow;
 
     PolyFlowFlatMerge(PolyFlow<T> upFlow) {
@@ -11,8 +11,8 @@ class PolyFlowFlatMerge<T> extends AbstractFlow<T> {
     }
 
     @Override
-    protected void onStart(Emitter<? super T> emitter) throws Throwable {
-        upFlow.collect(emitter, new Collector<IFlow<T>>() {
+    protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        upFlow.collectWith(emitter, new Collector<IFlow<T>>() {
             final PolyFlowFlatHelper helper = PolyFlowFlatHelper.create(emitter);
 
             @Override
@@ -20,7 +20,7 @@ class PolyFlowFlatMerge<T> extends AbstractFlow<T> {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
                 try {
-                    reply.data().asFlow().collect(emitter, innerCollector);
+                    reply.data().asFlow().collectWith(emitter, innerCollector);
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

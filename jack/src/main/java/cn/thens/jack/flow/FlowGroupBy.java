@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.scheduler.Cancellable;
-import cn.thens.jack.scheduler.IScheduler;
 
 /**
  * @author 7hens
@@ -19,25 +17,9 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
         this.keySelector = keySelector;
     }
 
-    @Override
-    protected Cancellable collect(IScheduler scheduler, Collector<? super Entry<K, V>> collector) {
-        CollectorEmitter<? super Entry<K, V>> emitter = CollectorEmitter.create(scheduler, collector);
-        emitter.schedule(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    onStart(emitter);
-                } catch (Throwable e) {
-                    emitter.error(e);
-                }
-            }
-        });
-        return emitter;
-    }
-
-    protected void onStart(CollectorEmitter<? super Entry<K, V>> emitter) throws Throwable {
+    protected void onStartCollect(Emitter<? super Entry<K, V>> emitter) throws Throwable {
         final Map<K, FlowEmitter<V>> map = new ConcurrentHashMap<>();
-        upFlow.collect(emitter, reply -> {
+        upFlow.collectWith(emitter, reply -> {
             if (reply.isTerminal()) {
                 Reply<V> entryReply = reply.newReply(null);
                 for (FlowEmitter<? super V> entryEmitter : map.values()) {
@@ -62,11 +44,11 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
         });
     }
 
-    private Entry<K, V> newEntry(K key, FlowEmitter<V> emitter) {
+    private Entry<K, V> newEntry(K key, FlowEmitter<V> flowEmitter) {
         return new Entry<K, V>(key) {
             @Override
-            protected Cancellable collect(IScheduler scheduler, Collector<? super V> collector) {
-                return emitter.asFlow().collect(scheduler, collector);
+            protected void onStartCollect(Emitter<? super V> emitter) throws Throwable {
+                flowEmitter.asFlow().onStartCollect(emitter);
             }
         };
     }
