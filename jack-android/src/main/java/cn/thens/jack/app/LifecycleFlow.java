@@ -53,7 +53,6 @@ public final class LifecycleFlow {
                     emitter.data(Lifecycle.Event.ON_STOP);
                     emitter.data(Lifecycle.Event.ON_DESTROY);
                     emitter.complete();
-                    view.removeOnAttachStateChangeListener(this);
                 }
             };
             view.addOnAttachStateChangeListener(listener);
