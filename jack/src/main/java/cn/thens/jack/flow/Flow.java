@@ -44,6 +44,9 @@ public abstract class Flow<T> implements IFlow<T> {
         CollectorEmitter<? super T> emitter = CollectorEmitter.create(scheduler, collector);
         emitter.schedule(() -> {
             try {
+                if (collector instanceof CollectorHelper) {
+                    ((CollectorHelper) collector).onStart(emitter);
+                }
                 onStartCollect(emitter);
             } catch (Throwable e) {
                 emitter.error(e);
@@ -76,12 +79,8 @@ public abstract class Flow<T> implements IFlow<T> {
         return new FlowFlowOn<>(this, upScheduler);
     }
 
-    public interface Operator<T, R> {
-        R apply(Flow<T> flow);
-    }
-
-    public <R> R to(Operator<T, ? extends R> operator) {
-        return operator.apply(this);
+    public <R> R to(Func1<? super Flow<T>, ? extends R> operator) {
+        return Funcs.of(operator).call(this);
     }
 
     public Flow<T> onCollect(Collector<? super T> collector) {

@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import cn.thens.jack.flow.Collector;
 import cn.thens.jack.flow.CollectorHelper;
 import cn.thens.jack.flow.Flow;
+import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Scheduler;
@@ -103,7 +104,7 @@ public class TestX {
         }
     }
 
-    public static <T> Flow.Operator<T, Void> collect() {
+    public static <T> Func1<Flow<T>, Void> collect() {
         return flow -> {
             try {
                 CountDownLatch latch = new CountDownLatch(1);

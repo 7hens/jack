@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
+import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Schedulers;
 
@@ -258,7 +259,7 @@ public class FlowTest {
         throttle(it -> it.throttleLast(Flow.timer(2, TimeUnit.SECONDS)));
     }
 
-    private void throttle(Flow.Operator<String, Flow<String>> operator) {
+    private void throttle(Func1<Flow<String>, Flow<String>> operator) {
         AtomicLong count = new AtomicLong(0);
         final long startTime = System.currentTimeMillis();
         Flow.just(1, 1, 3)
@@ -273,6 +274,16 @@ public class FlowTest {
                 .to(operator)
                 .onCollect(TestX.collector("B"))
                 .take(3)
+                .to(TestX.collect());
+    }
+
+    @Test
+    public void lift() {
+        Collector<Long> collector = TestX.collector("Lift");
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .onCollect(TestX.collector("Before"))
+                .take(5)
+                .to(FlowX.lift(emitter -> collector))
                 .to(TestX.collect());
     }
 
