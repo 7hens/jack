@@ -76,12 +76,12 @@ public abstract class Flow<T> implements IFlow<T> {
         return new FlowFlowOn<>(this, upScheduler);
     }
 
-    public <R> R to(Func1<? super Flow<T>, ? extends R> converter) {
-        return Funcs.of(converter).call(this);
+    public interface Operator<T, R> {
+        R apply(Flow<T> flow);
     }
 
-    public <R> Flow<R> transform(FlowOperator<? super T, ? extends R> operator) {
-        return new FlowTransform<>(this, operator);
+    public <R> R to(Operator<T, ? extends R> operator) {
+        return operator.apply(this);
     }
 
     public Flow<T> onCollect(Collector<? super T> collector) {
