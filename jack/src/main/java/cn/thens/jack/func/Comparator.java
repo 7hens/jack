@@ -6,23 +6,28 @@ package cn.thens.jack.func;
 public interface Comparator<T> {
     int compare(T t1, T t2) throws Throwable;
 
-    abstract class X<T> implements Comparator<T> {
+    abstract class X<T> implements Comparator<T>, java.util.Comparator<T>, Func2<T, T, Integer> {
         @Override
         public abstract int compare(T t1, T t2);
 
-        public X<T> reversed() {
+        @Override
+        public Integer call(T t1, T t2) {
+            return compare(t1, t2);
+        }
+
+        public Comparator.X<T> reversed() {
             return of((a, b) -> this.compare(b, a));
         }
 
-        public X<T> then(java.util.Comparator<? super T> comparator) {
-            X<T> source = this;
+        public Comparator.X<T> then(Comparator<? super T> comparator) {
+            Comparator.X<T> source = this;
             return of((a, b) -> {
                 int result = source.compare(a, b);
                 return result != 0 ? result : comparator.compare(a, b);
             });
         }
 
-        public X<T> thenComparing(java.util.Comparator<? super T> comparator) {
+        public Comparator.X<T> thenComparing(Comparator<? super T> comparator) {
             return then(comparator);
         }
 
@@ -34,8 +39,8 @@ public interface Comparator<T> {
             return ((Comparable<Object>) a).compareTo(b);
         }
 
-        public static <T> X<T> of(Comparator<T> comparator) {
-            return new X<T>() {
+        public static <T> Comparator.X<T> of(Comparator<T> comparator) {
+            return new Comparator.X<T>() {
                 @Override
                 public int compare(T a, T b) {
                     try {
@@ -47,15 +52,15 @@ public interface Comparator<T> {
             };
         }
 
-        public static <T> X<T> by(Func1<? super T, ? extends Comparable<?>> selector) {
+        public static <T> Comparator.X<T> by(Func1<? super T, ? extends Comparable<?>> selector) {
             return of((a, b) -> compareValues(selector.call(a), selector.call(b)));
         }
 
-        public static <T, K> X<T> by(java.util.Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
+        public static <T, K> Comparator.X<T> by(Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
             return of((a, b) -> comparator.compare(selector.call(a), selector.call(b)));
         }
 
-        public static <T extends Comparable<T>> X<T> self() {
+        public static <T extends Comparable<T>> Comparator.X<T> self() {
             return of((a, b) -> {
                 if (a == b) return 0;
                 if (a == null) return -1;

@@ -12,23 +12,32 @@ public interface Predicate<T> {
     boolean test(T t) throws Throwable;
 
     @SuppressWarnings("rawtypes")
-    abstract class X<T> implements Predicate<T> {
+    abstract class X<T> implements Predicate<T>, Func1<T, Boolean> {
         @Override
         public abstract boolean test(T t);
 
-        public X<T> not() {
+        @Override
+        public Boolean call(T t) {
+            return test(t);
+        }
+
+        public Predicate.X<T> not() {
             return of(it -> !test(it));
         }
 
-        public X<T> and(Predicate<? super T> other) {
+        public Predicate.X<T> negate() {
+            return not();
+        }
+
+        public Predicate.X<T> and(Predicate<? super T> other) {
             return of(it -> test(it) && other.test(it));
         }
 
-        public X<T> or(Predicate<? super T> other) {
+        public Predicate.X<T> or(Predicate<? super T> other) {
             return of(it -> test(it) || other.test(it));
         }
 
-        public X<T> xor(Predicate<? super T> other) {
+        public Predicate.X<T> xor(Predicate<? super T> other) {
             return of(it -> {
                 boolean selfTest = test(it);
                 boolean otherTest = other.test(it);
@@ -36,14 +45,14 @@ public interface Predicate<T> {
             });
         }
 
-        private static final X ALWAYS_TRUE = new X() {
+        private static final Predicate.X ALWAYS_TRUE = new Predicate.X() {
             @Override
             public boolean test(Object o) {
                 return true;
             }
         };
 
-        private static final X ALWAYS_FALSE = new X() {
+        private static final Predicate.X ALWAYS_FALSE = new Predicate.X() {
             @Override
             public boolean test(Object o) {
                 return false;
@@ -51,17 +60,17 @@ public interface Predicate<T> {
         };
 
         @SuppressWarnings("unchecked")
-        public static <T> X<T> alwaysTrue() {
+        public static <T> Predicate.X<T> alwaysTrue() {
             return ALWAYS_TRUE;
         }
 
         @SuppressWarnings("unchecked")
-        public static <T> X<T> alwaysFalse() {
+        public static <T> Predicate.X<T> alwaysFalse() {
             return ALWAYS_FALSE;
         }
 
-        public static <T> X<T> of(Predicate<? super T> predicate) {
-            return new X<T>() {
+        public static <T> Predicate.X<T> of(Predicate<? super T> predicate) {
+            return new Predicate.X<T>() {
                 @Override
                 public boolean test(T t) {
                     try {
@@ -73,21 +82,22 @@ public interface Predicate<T> {
             };
         }
 
-        public static <T> X<T> eq(T value) {
+        public static <T> Predicate.X<T> eq(T value) {
             return of(it -> Things.equals(it, value));
         }
 
-        public static <T> X<T> take(int count) {
+        public static <T> Predicate.X<T> take(int count) {
             final AtomicInteger restCount = new AtomicInteger(count);
             return of(it -> restCount.decrementAndGet() >= 0);
         }
 
-        public static <T> X<T> skip(int count) {
+        public static <T> Predicate.X<T> skip(int count) {
             final AtomicInteger restCount = new AtomicInteger(count);
             return of(it -> restCount.decrementAndGet() < 0);
         }
 
-        public static <T, K> X<T> distinctBy(Func1<? super T, ? extends K> keySelector) {
+        @Deprecated
+        public static <T, K> Predicate.X<T> distinctBy(Func1<? super T, ? extends K> keySelector) {
             final HashSet<K> observed = new HashSet<>();
             return of(it -> {
                 K key = keySelector.call(it);
@@ -95,11 +105,13 @@ public interface Predicate<T> {
             });
         }
 
-        public static <T> X<T> distinct() {
+        @Deprecated
+        public static <T> Predicate.X<T> distinct() {
             return distinctBy(Funcs.self());
         }
 
-        public static <T, K> X<T> distinctUntilChangedBy(Func1<? super T, ? extends K> keySelector) {
+        @Deprecated
+        public static <T, K> Predicate.X<T> distinctUntilChangedBy(Func1<? super T, ? extends K> keySelector) {
             return of(new Predicate<T>() {
                 K lastKey = null;
 
@@ -113,7 +125,8 @@ public interface Predicate<T> {
             });
         }
 
-        public static <T> X<T> distinctUntilChanged() {
+        @Deprecated
+        public static <T> Predicate.X<T> distinctUntilChanged() {
             return distinctUntilChangedBy(Funcs.self());
         }
     }
