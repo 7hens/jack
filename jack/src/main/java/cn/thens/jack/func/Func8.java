@@ -4,8 +4,14 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
     R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) throws Throwable;
 
     abstract class X<P1, P2, P3, P4, P5, P6, P7, P8, R>
-            implements Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
+            implements Func8<P1, P2, P3, P4, P5, P6, P7, P8, R>, Action8<P1, P2, P3, P4, P5, P6, P7, P8> {
+        @Override
         public abstract R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8);
+
+        @Override
+        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+            call(p1, p2, p3, p4, p5, p6, p7, p8);
+        }
 
         private X() {
         }
@@ -15,14 +21,14 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
                     call(p1, p2, p3, p4, p5, p6, p7, p8));
         }
 
-        public X<P1, P2, P3, P4, P5, P6, P7, P8, R> once() {
+        public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R> once() {
             final Once<R> once = Once.create();
             return of((p1, p2, p3, p4, p5, p6, p7, p8) ->
                     once.call(() -> call(p1, p2, p3, p4, p5, p6, p7, p8)));
         }
 
         public Action8.X<P1, P2, P3, P4, P5, P6, P7, P8> action() {
-            return Action8.X.of(this::call);
+            return Action8.X.of(this);
         }
 
         public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>
@@ -43,7 +49,8 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
         }
 
         public <R2> Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R2> to(Func1<? super R, ? extends R2> func) {
-            return of((p1, p2, p3, p4, p5, p6, p7, p8) -> func.call(call(p1, p2, p3, p4, p5, p6, p7, p8)));
+            return of((p1, p2, p3, p4, p5, p6, p7, p8) ->
+                    func.call(call(p1, p2, p3, p4, p5, p6, p7, p8)));
         }
 
         public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R> run(Action1<? super R> action) {
@@ -53,11 +60,11 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
                 return result;
             });
         }
-        
+
         public static <P1, P2, P3, P4, P5, P6, P7, P8, R>
-        X<P1, P2, P3, P4, P5, P6, P7, P8, R>
+        Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>
         of(Func8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? extends R> func) {
-            return new X<P1, P2, P3, P4, P5, P6, P7, P8, R>() {
+            return new Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R>() {
                 @Override
                 public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
                     try {

@@ -15,6 +15,10 @@ public interface Comparator<T> {
             return compare(t1, t2);
         }
 
+        public Func2.X<T, T, Integer> func() {
+            return Func2.X.of(this);
+        }
+
         public Comparator.X<T> reversed() {
             return of((a, b) -> this.compare(b, a));
         }

@@ -3,8 +3,14 @@ package cn.thens.jack.func;
 public interface Func1<P1, R> {
     R call(P1 p1) throws Throwable;
 
-    abstract class X<P1, R> implements Func1<P1, R> {
+    abstract class X<P1, R> implements Func1<P1, R>, Action1<P1> {
+        @Override
         public abstract R call(P1 p1);
+
+        @Override
+        public void run(P1 p1) {
+            call(p1);
+        }
 
         private X() {
         }
@@ -14,13 +20,13 @@ public interface Func1<P1, R> {
                     call(p1));
         }
 
-        public X<P1, R> once() {
+        public Func1.X<P1, R> once() {
             final Once<R> once = Once.create();
             return of((p1) -> once.call(() -> call(p1)));
         }
 
         public Action1.X<P1> action() {
-            return Action1.X.of(this::call);
+            return Action1.X.of(this);
         }
 
         public Func1.X<P1, R> doFirst(Action1<P1> action) {
@@ -50,8 +56,8 @@ public interface Func1<P1, R> {
             } );
         }
 
-        public static <P1, R> X<P1, R> of(Func1<? super P1, ? extends R> func) {
-            return new X<P1, R>() {
+        public static <P1, R> Func1.X<P1, R> of(Func1<? super P1, ? extends R> func) {
+            return new Func1.X<P1, R>() {
                 @Override
                 public R call(P1 p1) {
                     try {

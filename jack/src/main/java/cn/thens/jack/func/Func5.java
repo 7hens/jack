@@ -3,8 +3,15 @@ package cn.thens.jack.func;
 public interface Func5<P1, P2, P3, P4, P5, R> {
     R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) throws Throwable;
 
-    abstract class X<P1, P2, P3, P4, P5, R> implements Func5<P1, P2, P3, P4, P5, R> {
+    abstract class X<P1, P2, P3, P4, P5, R>
+            implements Func5<P1, P2, P3, P4, P5, R>, Action5<P1, P2, P3, P4, P5> {
+        @Override
         public abstract R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5);
+
+        @Override
+        public void run(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+            call(p1, p2, p3, p4, p5);
+        }
 
         private X() {
         }
@@ -14,13 +21,13 @@ public interface Func5<P1, P2, P3, P4, P5, R> {
                     call(p1, p2, p3, p4, p5));
         }
 
-        public X<P1, P2, P3, P4, P5, R> once() {
+        public Func5.X<P1, P2, P3, P4, P5, R> once() {
             final Once<R> once = Once.create();
             return of((p1, p2, p3, p4, p5) -> once.call(() -> call(p1, p2, p3, p4, p5)));
         }
 
         public Action5.X<P1, P2, P3, P4, P5> action() {
-            return Action5.X.of(this::call);
+            return Action5.X.of(this);
         }
 
         public Func5.X<P1, P2, P3, P4, P5, R> doFirst(Action5<P1, P2, P3, P4, P5> action) {
@@ -50,9 +57,9 @@ public interface Func5<P1, P2, P3, P4, P5, R> {
             });
         }
 
-        public static <P1, P2, P3, P4, P5, R> X<P1, P2, P3, P4, P5, R>
+        public static <P1, P2, P3, P4, P5, R> Func5.X<P1, P2, P3, P4, P5, R>
         of(Func5<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? extends R> func) {
-            return new X<P1, P2, P3, P4, P5, R>() {
+            return new Func5.X<P1, P2, P3, P4, P5, R>() {
                 @Override
                 public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
                     try {

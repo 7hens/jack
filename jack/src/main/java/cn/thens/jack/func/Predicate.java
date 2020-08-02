@@ -21,6 +21,10 @@ public interface Predicate<T> {
             return test(t);
         }
 
+        public Func1.X<T, Boolean> func() {
+            return Func1.X.of(this);
+        }
+
         public Predicate.X<T> not() {
             return of(it -> !test(it));
         }
