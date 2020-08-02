@@ -41,7 +41,7 @@ abstract class FlowRepeat<T> extends Flow<T> {
         return new FlowRepeat<T>(upFlow) {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
-                collectWith(emitter);
+                onStartCollect(emitter);
             }
         };
     }
@@ -51,7 +51,7 @@ abstract class FlowRepeat<T> extends Flow<T> {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
                 if (shouldRepeat.call()) {
-                    collectWith(emitter);
+                    onStartCollect(emitter);
                 }
             }
         };
@@ -64,7 +64,7 @@ abstract class FlowRepeat<T> extends Flow<T> {
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
                 if (resetCount.decrementAndGet() >= 0) {
-                    collectWith(emitter);
+                    onStartCollect(emitter);
                 }
             }
         };

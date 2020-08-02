@@ -21,7 +21,7 @@ class FlowDelayStart<T> extends Flow<T> {
                 @Override
                 protected void onTerminate(Throwable error) throws Throwable {
                     super.onTerminate(error);
-                    upFlow.collectWith(emitter);
+                    upFlow.onStartCollect(emitter);
                 }
             });
         } catch (Throwable e) {

@@ -3,7 +3,6 @@ package cn.thens.jack.flow;
 
 import java.util.concurrent.CancellationException;
 
-import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -11,26 +10,22 @@ import cn.thens.jack.scheduler.Cancellable;
  */
 public abstract class CollectorHelper<T> implements Collector<T> {
     @Override
-    public void post(Reply<? extends T> reply) {
-        try {
-            if (!reply.isTerminal()) {
-                onEach(reply.data());
-                return;
-            }
-            Throwable error = reply.error();
-            onTerminate(error);
-            if (error == null) {
-                onComplete();
-                return;
-            }
-            if (error instanceof CancellationException) {
-                onCancel();
-                return;
-            }
-            onError(error);
-        } catch (Throwable e) {
-            throw Things.wrap(e);
+    public void post(Reply<? extends T> reply) throws Throwable {
+        if (!reply.isTerminal()) {
+            onEach(reply.data());
+            return;
         }
+        Throwable error = reply.error();
+        onTerminate(error);
+        if (error == null) {
+            onComplete();
+            return;
+        }
+        if (error instanceof CancellationException) {
+            onCancel();
+            return;
+        }
+        onError(error);
     }
 
     protected void onStart(Cancellable cancellable) throws Throwable {
@@ -58,7 +53,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
         }
         return new CollectorHelper<T>() {
             @Override
-            public void post(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) throws Throwable {
                 super.post(reply);
                 collector.post(reply);
             }

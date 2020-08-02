@@ -32,7 +32,7 @@ class FlowAutoSwitch<T> extends Flow<T> {
             @Override
             protected void onTerminate(Throwable error) throws Throwable {
                 cancellable.cancel();
-                fallback.asFlow().collectWith(emitter);
+                fallback.asFlow().onStartCollect(emitter);
             }
         });
     }

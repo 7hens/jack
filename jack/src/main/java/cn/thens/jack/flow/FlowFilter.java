@@ -135,7 +135,7 @@ abstract class FlowFilter<T> extends Flow<T> {
     static <T> Flow<T> skip(Flow<T> upFlow, IFlow<?> timeoutFlow) {
         return create(emitter -> {
             Cancellable cancellable = timeoutFlow.asFlow().collectWith(emitter, CollectorHelper.get());
-            upFlow.filter(it -> cancellable.isCancelled()).collectWith(emitter);
+            upFlow.filter(it -> cancellable.isCancelled()).onStartCollect(emitter);
         });
     }
 
@@ -160,7 +160,7 @@ abstract class FlowFilter<T> extends Flow<T> {
             @Override
             void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 if (error == null && isEmpty) {
-                    fallback.asFlow().collectWith(emitter);
+                    fallback.asFlow().onStartCollect(emitter);
                     return;
                 }
                 super.onTerminated(emitter, error);

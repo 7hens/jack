@@ -42,7 +42,7 @@ abstract class FlowCatch<T> extends Flow<T> {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
-                resumeFunc.call(error).asFlow().collectWith(emitter);
+                resumeFunc.call(error).asFlow().onStartCollect(emitter);
             }
         };
     }
@@ -60,7 +60,7 @@ abstract class FlowCatch<T> extends Flow<T> {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
-                resumeFlow.asFlow().collectWith(emitter);
+                resumeFlow.asFlow().onStartCollect(emitter);
             }
         };
     }
@@ -71,7 +71,7 @@ abstract class FlowCatch<T> extends Flow<T> {
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 boolean shouldRetry = predicate.test(error);
                 if (shouldRetry && !emitter.isCancelled()) {
-                    collectWith(emitter);
+                    onStartCollect(emitter);
                 } else {
                     emitter.error(error);
                 }
@@ -101,7 +101,7 @@ abstract class FlowCatch<T> extends Flow<T> {
                         if (error != null) {
                             emitter.error(error);
                         } else {
-                            fallbackFlow.collectWith(emitter);
+                            fallbackFlow.onStartCollect(emitter);
                         }
                     }
                 });
@@ -111,7 +111,7 @@ abstract class FlowCatch<T> extends Flow<T> {
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 lastError.set(error);
                 if (!emitter.isCancelled()) {
-                    collectWith(emitter);
+                    onStartCollect(emitter);
                 }
             }
         };

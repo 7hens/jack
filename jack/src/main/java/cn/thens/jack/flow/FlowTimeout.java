@@ -46,7 +46,7 @@ class FlowTimeout<T> extends Flow<T> {
                 upFlowCancellable.cancel();
                 if (isTransferred.compareAndSet(false, true)) {
                     try {
-                        fallback.asFlow().collectWith(emitter);
+                        fallback.asFlow().onStartCollect(emitter);
                     } catch (Throwable e) {
                         emitter.error(e);
                     }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
 import cn.thens.jack.scheduler.ICancellable;
@@ -64,13 +65,22 @@ class CollectorEmitter<T> implements Emitter<T> {
     }
 
     private void collectScheduled(Reply<? extends T> reply) {
-        schedule(() -> collector.post(reply));
+        schedule(() -> {
+            try {
+                collector.post(reply);
+            } catch (Throwable e) {
+                if (isCollectorTerminated.get()) {
+                    throw Things.wrap(e);
+                }
+                post(Reply.error(e));
+            }
+        });
     }
 
     private Collector<T> wrapCollector(Collector<? super T> collector) {
         return new Collector<T>() {
             @Override
-            public void post(Reply<? extends T> reply) {
+            public void post(Reply<? extends T> reply) throws Throwable {
                 isCollecting.set(true);
                 if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
                     collector.post(reply);

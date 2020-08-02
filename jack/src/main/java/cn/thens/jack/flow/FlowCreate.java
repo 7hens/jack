@@ -59,7 +59,7 @@ final class FlowCreate {
         return new Flow<T>() {
             @Override
             protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
-                flowFactory.asFlow().collectWith(emitter);
+                flowFactory.asFlow().onStartCollect(emitter);
             }
         };
     }

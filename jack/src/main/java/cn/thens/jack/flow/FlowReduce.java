@@ -65,7 +65,7 @@ abstract class FlowReduce<T, R> extends Flow<R> {
     }
 
     static <T> FlowReduce<T, T>
-    reduce(Flow<T> upFlow, Func2<? super T, ? super T, ? extends T> accumulator) {
+    reduceSelf(Flow<T> upFlow, Func2<? super T, ? super T, ? extends T> accumulator) {
         return new FlowReduce<T, T>(upFlow) {
             private AtomicBoolean hasValue = new AtomicBoolean(false);
 

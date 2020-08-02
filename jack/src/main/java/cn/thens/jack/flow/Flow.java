@@ -65,10 +65,6 @@ public abstract class Flow<T> implements IFlow<T> {
         return cancellable;
     }
 
-    Cancellable collectWith(Emitter<? super T> emitter) {
-        return collectWith(emitter, emitter);
-    }
-
     public Cancellable collectTo(Cancellable target) {
         Cancellable job = collect();
         target.addCancellable(job);
@@ -336,7 +332,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> reduce(Func2<? super T, ? super T, ? extends T> accumulator) {
-        return FlowReduce.reduce(this, accumulator);
+        return FlowReduce.reduceSelf(this, accumulator);
     }
 
     public Flow<T> timeout(IFlow<?> timeoutFlow, IFlow<T> fallback) {
