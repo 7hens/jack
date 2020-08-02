@@ -64,7 +64,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     };
 
     @SuppressWarnings("unchecked")
-    public static <T> CollectorHelper<T> get() {
+    public static <T> CollectorHelper<T> empty() {
         return INSTANCE;
     }
 }
