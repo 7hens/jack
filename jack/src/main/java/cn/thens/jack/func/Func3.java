@@ -38,6 +38,18 @@ public interface Func3<P1, P2, P3, R> {
             });
         }
 
+        public <R2> Func3.X<P1, P2, P3, R2> to(Func1<? super R, ? extends R2> func) {
+            return of((p1, p2, p3) -> func.call(call(p1, p2, p3)));
+        }
+
+        public Func3.X<P1, P2, P3, R> run(Action1<? super R> action) {
+            return of((p1, p2, p3) -> {
+                R result = call(p1, p2, p3);
+                action.run(result);
+                return result;
+            });
+        }
+
         public static <P1, P2, P3, R> X<P1, P2, P3, R>
         of(Func3<? super P1, ? super P2, ? super P3, ? extends R> func) {
             return new X<P1, P2, P3, R>() {

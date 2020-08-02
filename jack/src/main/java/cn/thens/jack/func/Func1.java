@@ -38,6 +38,18 @@ public interface Func1<P1, R> {
             });
         }
 
+        public <R2> Func1.X<P1, R2> to(Func1<? super R, ? extends R2> func) {
+            return of(p1 -> func.call(call(p1)));
+        }
+
+        public Func1.X<P1, R> run(Action1<? super R> action) {
+            return of(p1 -> {
+                R result = call(p1);
+                action.run(result);
+                return result;
+            } );
+        }
+
         public static <P1, R> X<P1, R> of(Func1<? super P1, ? extends R> func) {
             return new X<P1, R>() {
                 @Override

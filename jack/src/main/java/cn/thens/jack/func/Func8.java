@@ -42,6 +42,18 @@ public interface Func8<P1, P2, P3, P4, P5, P6, P7, P8, R> {
             });
         }
 
+        public <R2> Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R2> to(Func1<? super R, ? extends R2> func) {
+            return of((p1, p2, p3, p4, p5, p6, p7, p8) -> func.call(call(p1, p2, p3, p4, p5, p6, p7, p8)));
+        }
+
+        public Func8.X<P1, P2, P3, P4, P5, P6, P7, P8, R> run(Action1<? super R> action) {
+            return of((p1, p2, p3, p4, p5, p6, p7, p8) -> {
+                R result = call(p1, p2, p3, p4, p5, p6, p7, p8);
+                action.run(result);
+                return result;
+            });
+        }
+        
         public static <P1, P2, P3, P4, P5, P6, P7, P8, R>
         X<P1, P2, P3, P4, P5, P6, P7, P8, R>
         of(Func8<? super P1, ? super P2, ? super P3, ? super P4, ? super P5, ? super P6, ? super P7, ? super P8, ? extends R> func) {

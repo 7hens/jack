@@ -17,6 +17,14 @@ public abstract class Pack<V> {
         return new PackCache<>(this, cache);
     }
 
+    public Pack<V> weakCache() {
+        return cache(weakRef());
+    }
+
+    public Pack<V> cache() {
+        return cache(strongRef());
+    }
+
     public <V2> Pack<V2> transform(PackConverter<V, V2> converter) {
         Pack<V> upPack = this;
         return new Pack<V2>() {
