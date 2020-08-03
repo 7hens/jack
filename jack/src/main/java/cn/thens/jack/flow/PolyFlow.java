@@ -34,6 +34,10 @@ public abstract class PolyFlow<T> extends Flow<IFlow<T>> {
         return new PolyFlowFlatZip<>(this);
     }
 
+    public Flow<List<T>> flatJoin() {
+        return new PolyFlowFlatJoin<>(this);
+    }
+
     public Flow<List<T>> flatToList() {
         return flatMap(it -> it.asFlow().toList());
     }
