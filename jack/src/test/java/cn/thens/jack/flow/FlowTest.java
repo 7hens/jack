@@ -284,6 +284,7 @@ public class FlowTest {
                 .onCollect(TestX.collector("Before"))
                 .take(5)
                 .to(FlowX.lift(emitter -> collector))
+                .timeout(Flow.timer(1, TimeUnit.SECONDS))
                 .to(TestX.collect());
     }
 

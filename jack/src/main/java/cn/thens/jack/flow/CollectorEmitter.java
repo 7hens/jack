@@ -69,10 +69,7 @@ class CollectorEmitter<T> implements Emitter<T> {
             try {
                 collector.post(reply);
             } catch (Throwable e) {
-                if (isCollectorTerminated.get()) {
-                    throw Things.wrap(e);
-                }
-                post(Reply.error(e));
+                throw Things.wrap(e);
             }
         });
     }
@@ -146,5 +143,4 @@ class CollectorEmitter<T> implements Emitter<T> {
     static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector) {
         return create(scheduler, collector, DEFAULT_BACKPRESSURE);
     }
-
 }

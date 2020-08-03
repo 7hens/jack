@@ -40,29 +40,25 @@ public abstract class Flow<T> implements IFlow<T> {
 
     protected abstract void onStartCollect(Emitter<? super T> emitter) throws Throwable;
 
-    protected Cancellable collect(IScheduler scheduler, Collector<? super T> collector) {
-        CollectorEmitter<? super T> emitter = CollectorEmitter.create(scheduler, collector);
-        emitter.schedule(() -> {
+    Cancellable collectWith(Emitter<?> downEmitter, Collector<? super T> collector) throws Throwable {
+        CollectorEmitter<T> upEmitter = CollectorEmitter.create(downEmitter, collector);
+        downEmitter.addCancellable(upEmitter);
+        onStartCollect(upEmitter);
+        return upEmitter;
+    }
+
+    public Cancellable collect() {
+        IScheduler scheduler = Schedulers.unconfined();
+        Collector<T> collector = CollectorHelper.empty();
+        CollectorEmitter<T> emitter = CollectorEmitter.create(scheduler, collector);
+        emitter.addCancellable(emitter.schedule(() -> {
             try {
-                if (collector instanceof CollectorHelper) {
-                    ((CollectorHelper) collector).onStart(emitter);
-                }
                 onStartCollect(emitter);
             } catch (Throwable e) {
                 emitter.error(e);
             }
-        });
+        }));
         return emitter;
-    }
-
-    public Cancellable collect() {
-        return collect(Schedulers.unconfined(), CollectorHelper.empty());
-    }
-
-    Cancellable collectWith(Emitter<?> emitter, Collector<? super T> collector) {
-        Cancellable cancellable = collect(emitter, collector);
-        emitter.addCancellable(cancellable);
-        return cancellable;
     }
 
     public Cancellable collectTo(Cancellable target) {
