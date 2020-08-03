@@ -288,11 +288,11 @@ public class FlowTest {
                 .to(TestX.collect());
     }
 
-    private void backpressure(Backpressure<Long> backpressure) {
+    private void backPressure(BackPressure<Long> backpressure) {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .take(100)
 //                .onCollect(TestX.collector("A"))
-                .onBackpressure(backpressure)
+                .onBackPressure(backpressure)
                 .map(it -> {
                     TestX.delay(1000);
                     return it;
@@ -305,8 +305,9 @@ public class FlowTest {
 
     @Test
     public void rangeOnBackpressure() {
-        Flow.range(0, 100)
-//                .onCollect(TestX.collector("A"))
+        Flow.range(0, 20)
+                .onCollect(TestX.collector("A"))
+                .onBackPressure(BackPressures.<Integer>buffer(4).dropOldest())
                 .flowOn(TestX.scheduler("a"))
 //                .onBackpressure(Backpressure.buffer(16))
                 .onCollect(TestX.collector("B"))
@@ -316,22 +317,22 @@ public class FlowTest {
 
     @Test
     public void onBackpressureBuffer() {
-        backpressure(Backpressure.<Long>buffer(32));
+        backPressure(BackPressures.buffer(32));
     }
 
     @Test
     public void onBackpressureDropOldest() {
-        backpressure(Backpressure.<Long>buffer(2).dropOldest());
+        backPressure(BackPressures.<Long>buffer(2).dropOldest());
     }
 
     @Test
     public void onBackpressureDropLatest() {
-        backpressure(Backpressure.<Long>buffer(2).dropLatest());
+        backPressure(BackPressures.<Long>buffer(2).dropLatest());
     }
 
     @Test
     public void onBackpressureDropAll() {
-        backpressure(Backpressure.<Long>buffer(2).dropAll());
+        backPressure(BackPressures.<Long>buffer(2).dropAll());
     }
 
     @Test

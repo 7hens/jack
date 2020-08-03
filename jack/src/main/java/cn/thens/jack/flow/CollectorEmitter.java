@@ -22,10 +22,10 @@ class CollectorEmitter<T> implements Emitter<T> {
 
     private final IScheduler scheduler;
     private final Collector<? super T> collector;
-    private final Backpressure<T> backpressure;
+    private final BackPressure<T> backpressure;
     private final Cancellable cancellable = Cancellables.create();
 
-    private CollectorEmitter(IScheduler scheduler, Collector<? super T> collector, Backpressure<T> backpressure) {
+    private CollectorEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backpressure) {
         this.scheduler = scheduler;
         this.collector = wrapCollector(collector);
         this.backpressure = backpressure;
@@ -133,11 +133,11 @@ class CollectorEmitter<T> implements Emitter<T> {
         return scheduler.schedule(runnable);
     }
 
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, Backpressure<T> backpressure) {
+    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backpressure) {
         return new CollectorEmitter<>(scheduler, collector, backpressure);
     }
 
-    private static final Backpressure DEFAULT_BACKPRESSURE = Backpressure.success();
+    private static final BackPressure DEFAULT_BACKPRESSURE = BackPressures.success();
 
     @SuppressWarnings("unchecked")
     static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector) {

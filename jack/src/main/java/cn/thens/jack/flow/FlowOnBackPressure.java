@@ -1,11 +1,11 @@
 package cn.thens.jack.flow;
 
 
-class FlowOnBackpressure<T> extends Flow<T> {
+class FlowOnBackPressure<T> extends Flow<T> {
     private final Flow<T> upFlow;
-    private final Backpressure<T> backpressure;
+    private final BackPressure<T> backpressure;
 
-    FlowOnBackpressure(Flow<T> upFlow, Backpressure<T> backpressure) {
+    FlowOnBackPressure(Flow<T> upFlow, BackPressure<T> backpressure) {
         this.upFlow = upFlow;
         this.backpressure = backpressure;
     }

@@ -431,8 +431,8 @@ public abstract class Flow<T> implements IFlow<T> {
         return window(count).flatToList();
     }
 
-    public Flow<T> onBackpressure(Backpressure<T> backpressure) {
-        return new FlowOnBackpressure<>(this, backpressure);
+    public Flow<T> onBackPressure(BackPressure<T> backpressure) {
+        return new FlowOnBackPressure<>(this, backpressure);
     }
 
     public static <T> Flow<T> create(Action1<? super Emitter<? super T>> onStart) {
