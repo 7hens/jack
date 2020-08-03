@@ -9,7 +9,7 @@ import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
 import cn.thens.jack.func.Things;
 
-@SuppressWarnings({"WeakerAccess", "unused", "unchecked", "EqualsReplaceableByObjectsCall"})
+@SuppressWarnings({"WeakerAccess", "unused", "unchecked"})
 public abstract class Ref<T> implements IRef<T> {
     public abstract T get();
 
@@ -22,9 +22,7 @@ public abstract class Ref<T> implements IRef<T> {
     @Override
     public boolean equals(Object that) {
         if (this == that) return true;
-        Object a = valueOf(get());
-        Object b = valueOf(that);
-        return a == null ? b == null : a.equals(b);
+        return Things.equals(valueOf(get()), valueOf(that));
     }
 
     private static Object valueOf(Object value) {
@@ -36,7 +34,7 @@ public abstract class Ref<T> implements IRef<T> {
 
     @Override
     public int hashCode() {
-        return isNotNull() ? get().hashCode() : 0;
+        return Things.hash(get());
     }
 
     @Override
@@ -84,8 +82,7 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public boolean is(Class<?> clazz) {
-        if (isNull()) return false;
-        return clazz.isAssignableFrom(type());
+        return Things.is(get(), clazz);
     }
 
     public boolean isNot(Class<?> clazz) {
