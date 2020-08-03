@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
+import cn.thens.jack.func.Things;
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -84,12 +85,12 @@ abstract class FlowFilter<T> extends Flow<T> {
 
     static <T, K> Flow<T> distinctUntilChangedBy(Flow<T> upFlow, final Func1<? super T, ? extends K> keySelector) {
         return defer(() -> new FlowFilter<T>(upFlow) {
-            private K lastKey = null;
+            private Object lastKey = new Object();
 
             @Override
             public boolean test(T data) throws Throwable {
                 K key = keySelector.call(data);
-                if (key.equals(lastKey)) {
+                if (Things.equals(key, lastKey)) {
                     return false;
                 }
                 lastKey = key;
