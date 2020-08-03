@@ -132,6 +132,11 @@ public abstract class Flow<T> implements IFlow<T> {
         return polyWith(flow, moreFlows).flatZip();
     }
 
+    @SafeVarargs
+    public final Flow<List<T>> joinWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+        return polyWith(flow, moreFlows).flatJoin();
+    }
+
     public <R> Flow<R> map(Func1<? super T, ? extends R> mapper) {
         return new FlowMap<>(this, mapper);
     }
