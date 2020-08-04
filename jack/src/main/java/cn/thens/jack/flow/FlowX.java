@@ -1,6 +1,7 @@
 package cn.thens.jack.flow;
 
 import cn.thens.jack.func.Func1;
+import cn.thens.jack.func.Funcs;
 
 
 /**
@@ -11,25 +12,25 @@ public class FlowX {
     private FlowX() {
     }
 
-    public static <T> Func1<Flow<? extends IFlow<T>>, PolyFlow<T>> poly() {
-        return flow -> new PolyFlow<T>() {
+    public static <T> Func1.X<Flow<? extends IFlow<T>>, PolyFlow<T>> poly() {
+        return Funcs.of(flow -> new PolyFlow<T>() {
             @Override
             protected void onStartCollect(Emitter<? super IFlow<T>> emitter) throws Throwable {
                 flow.onStartCollect(emitter);
             }
-        };
+        });
     }
 
-    public static Func1<Flow<? extends IFlow<?>>, PolyFlow<Void>> terminalPoly() {
-        return flows -> {
+    public static Func1.X<Flow<? extends IFlow<?>>, PolyFlow<Void>> terminalPoly() {
+        return Funcs.of(flows -> {
             return flows.map(it -> it.asFlow().skipAll().cast(Void.class))
                     .to(FlowX.poly());
-        };
+        });
     }
 
-    public static <T, R> Func1<Flow<T>, Flow<R>>
+    public static <T, R> Func1.X<Flow<T>, Flow<R>>
     lift(Func1<? super Emitter<? super R>, ? extends Collector<? super T>> operator) {
-        return flow -> {
+        return Funcs.of(flow -> {
             return Flow.create(emitter -> {
                 Collector<? super T> collector = operator.call(emitter);
                 if (collector instanceof CollectorHelper) {
@@ -37,6 +38,6 @@ public class FlowX {
                 }
                 flow.collectWith(emitter, collector);
             });
-        };
+        });
     }
 }
