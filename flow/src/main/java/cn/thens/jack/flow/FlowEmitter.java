@@ -16,7 +16,7 @@ import cn.thens.jack.scheduler.Schedulers;
 @SuppressWarnings("WeakerAccess")
 public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     private final AtomicReference<Reply<? extends T>> terminalReplyRef = new AtomicReference<>();
-    private final List<Emitter<? super T>> emitters = new CopyOnWriteArrayList<>();
+    private final List<Collector<? super T>> collectors = new CopyOnWriteArrayList<>();
     private final CollectorEmitter<T> collectorEmitter;
 
     private FlowEmitter() {
@@ -76,17 +76,17 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
                 emitter.post(terminalReply);
                 return;
             }
-            emitters.add(emitter);
-            emitter.addCancellable(() -> emitters.remove(emitter));
+            collectors.add(emitter);
+            emitter.addCancellable(() -> collectors.remove(emitter));
         });
     }
 
-    protected void onCollect(Reply<? extends T> reply) {
-        for (Emitter<? super T> emitter : emitters) {
-            emitter.post(reply);
+    protected void onCollect(Reply<? extends T> reply) throws Throwable {
+        for (Collector<? super T> collector : collectors) {
+            collector.post(reply);
         }
         if (reply.isTerminal()) {
-            emitters.clear();
+            collectors.clear();
         }
     }
 
@@ -99,7 +99,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
             private Reply<? extends T> lastReply = initReply;
 
             @Override
-            protected void onCollect(Reply<? extends T> reply) {
+            protected void onCollect(Reply<? extends T> reply) throws Throwable {
                 if (!reply.isTerminal()) {
                     lastReply = reply;
                 }
@@ -133,7 +133,7 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
             private List<Reply<? extends T>> replyBuffer = new CopyOnWriteArrayList<>();
 
             @Override
-            protected void onCollect(Reply<? extends T> reply) {
+            protected void onCollect(Reply<? extends T> reply) throws Throwable {
                 replyBuffer.add(reply);
                 super.onCollect(reply);
             }
