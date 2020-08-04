@@ -1,5 +1,8 @@
 rootProject.name = 'Jack'
 
 include ':sample'
-include ':jack'
 include ':jack-android'
+include ':func'
+include ':ref'
+include ':flow'
+include ':chain'
