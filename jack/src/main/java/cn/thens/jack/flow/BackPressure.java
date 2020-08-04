@@ -66,16 +66,11 @@ public interface BackPressure<T> {
                     try {
                         backpressure.apply(buffer);
                     } catch (Throwable e) {
-                        throw new MissingException(e);
+                        throw new BackPressureException(e);
                     }
                 }
             };
         }
     }
 
-    class MissingException extends RuntimeException {
-        MissingException(Throwable cause) {
-            super(cause);
-        }
-    }
 }
