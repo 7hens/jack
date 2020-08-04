@@ -28,16 +28,16 @@ public abstract class Scheduler implements IScheduler {
         return cancellable;
     }
 
-    public IScheduler delay(long delay, TimeUnit unit) {
+    public IScheduler timer(long delay, TimeUnit unit) {
         return runnable -> schedule(runnable, delay, unit);
     }
 
-    public IScheduler repeat(long initialDelay, long period, TimeUnit unit) {
+    public IScheduler interval(long initialDelay, long period, TimeUnit unit) {
         return runnable -> schedulePeriodically(runnable, initialDelay, period, unit);
     }
 
-    public IScheduler repeat(long period, TimeUnit unit) {
-        return repeat(period, period, unit);
+    public IScheduler interval(long period, TimeUnit unit) {
+        return interval(period, period, unit);
     }
 
     public CancellableScheduler cancellable() {
