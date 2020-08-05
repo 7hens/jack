@@ -17,13 +17,9 @@ class ExecutorScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        Cancellable cancellable = Cancellables.create();
-        executor.execute(() -> {
-            if (!cancellable.isCancelled()) {
-                runnable.run();
-            }
-        });
-        return cancellable;
+        OneOffJob job = new OneOffJob(runnable);
+        executor.execute(job);
+        return job;
     }
 
     @Override

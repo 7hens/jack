@@ -17,19 +17,17 @@ class LooperScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        handler.post(runnable);
-        return cancellableOf(runnable);
+        OneOffJob job = new OneOffJob(runnable);
+        handler.post(job);
+        job.addCancellable(() -> handler.removeCallbacks(job));
+        return job;
     }
 
     @Override
     public Cancellable schedule(final Runnable runnable, long delay, TimeUnit unit) {
-        handler.postDelayed(runnable, unit.toMillis(delay));
-        return cancellableOf(runnable);
-    }
-
-    private Cancellable cancellableOf(Runnable runnable) {
-        return Cancellables.of(() -> {
-            handler.removeCallbacks(runnable);
-        });
+        OneOffJob job = new OneOffJob(runnable);
+        handler.postDelayed(job, unit.toMillis(delay));
+        job.addCancellable(() -> handler.removeCallbacks(job));
+        return job;
     }
 }

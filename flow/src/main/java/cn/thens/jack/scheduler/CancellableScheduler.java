@@ -21,45 +21,30 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     @Override
     public Cancellable schedule(Runnable runnable) {
         if (isCancelled()) return this;
-        Cancellable job = Cancellables.create();
-        Runnable newRunnable = wrapRunnable(runnable, job);
-        job.addCancellable(parent.schedule(newRunnable));
-        return job;
+        return cancellableOf(parent.schedule(runnable));
     }
 
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
         if (isCancelled()) return this;
-        Cancellable job = Cancellables.create();
-        Runnable newRunnable = wrapRunnable(runnable, job);
-        job.addCancellable(parent.schedule(newRunnable, delay, unit));
-        return job;
+        return cancellableOf(parent.schedule(runnable, delay, unit));
     }
 
     @Override
     public Cancellable schedulePeriodically(Runnable runnable, long initialDelay, long period, TimeUnit unit) {
         if (isCancelled()) return this;
-        Cancellable job = Cancellables.create();
-        Runnable newRunnable = wrapRunnable(runnable, job);
-        job.addCancellable(parent.schedulePeriodically(newRunnable, initialDelay, period, unit));
-        return job;
+        return cancellableOf(parent.schedulePeriodically(runnable, initialDelay, period, unit));
     }
 
-    private Runnable wrapRunnable(Runnable runnable, Cancellable cancellable) {
+    private Cancellable cancellableOf(Cancellable cancellable) {
         addCancellable(cancellable);
-        return () -> {
-            if (!cancellable.isCancelled()) {
-                runnable.run();
-                cancellable.cancel();
-            }
-        };
+        return cancellable;
     }
 
     @Override
     public void addCancellable(ICancellable onCancel) {
         cancellable.addCancellable(onCancel);
     }
-
 
     @Override
     public void cancel() {

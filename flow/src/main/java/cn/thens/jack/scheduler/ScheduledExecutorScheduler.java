@@ -15,12 +15,16 @@ class ScheduledExecutorScheduler extends Scheduler {
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        return Cancellables.from(executor.submit(runnable));
+        OneOffJob job = new OneOffJob(runnable);
+        job.addCancellable(Cancellables.from(executor.submit(job)));
+        return job;
     }
 
     @Override
     public Cancellable schedule(Runnable runnable, long delay, TimeUnit unit) {
-        return Cancellables.from(executor.schedule(runnable, delay, unit));
+        OneOffJob job = new OneOffJob(runnable);
+        job.addCancellable(Cancellables.from(executor.schedule(job, delay, unit)));
+        return job;
     }
 
     @Override
