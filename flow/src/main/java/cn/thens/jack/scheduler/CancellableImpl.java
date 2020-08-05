@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class CancellableImpl implements Cancellable {
     private final Set<ICancellable> cancelableSet = new CopyOnWriteArraySet<>();
     private final AtomicBoolean cancelFlag;
+//    private final byte[] debugBytes = new byte[1024 * 1024];
 
     CancellableImpl(boolean isCancelled) {
         cancelFlag = new AtomicBoolean(isCancelled);
@@ -39,6 +40,15 @@ class CancellableImpl implements Cancellable {
             if (isCancelled()) {
                 onCancel.cancel();
             } else {
+                if (onCancel instanceof Cancellable) {
+                    final Cancellable item = (Cancellable) onCancel;
+                    if (item.isCancelled()) {
+                        return;
+                    }
+                    cancelableSet.add(onCancel);
+                    item.addCancellable(() -> cancelableSet.remove(item));
+                    return;
+                }
                 cancelableSet.add(onCancel);
             }
         }

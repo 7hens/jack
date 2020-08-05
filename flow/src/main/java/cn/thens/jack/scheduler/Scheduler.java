@@ -16,12 +16,15 @@ public abstract class Scheduler implements IScheduler {
     public Cancellable schedulePeriodically(final Runnable runnable, final long initialDelay,
                                             final long period, final TimeUnit unit) {
         final Cancellable cancellable = Cancellables.create();
-        cancellable.addCancellable(schedule(new Runnable() {
+        final Cancellable job = Cancellables.single();
+        cancellable.addCancellable(job);
+        job.addCancellable(schedule(new Runnable() {
             @Override
             public void run() {
                 if (!cancellable.isCancelled()) {
                     runnable.run();
-                    cancellable.addCancellable(schedule(this, period, unit));
+                    //noinspection FunctionalExpressionCanBeFolded
+                    job.addCancellable(schedule(this::run, period, unit));
                 }
             }
         }, initialDelay, unit));

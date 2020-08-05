@@ -60,4 +60,12 @@ public class SchedulerTest {
         logger.log("processName: " + runtimeMXBean.getName());
         logger.log("vmVendor: " + runtimeMXBean.getVmVendor());
     }
+
+    @Test
+    public void interval() {
+        TestX.Logger logger = TestX.logger();
+        Schedulers.timer().interval(10, TimeUnit.MILLISECONDS)
+                .schedule(() -> logger.log("A"));
+        TestX.delay(1000);
+    }
 }
