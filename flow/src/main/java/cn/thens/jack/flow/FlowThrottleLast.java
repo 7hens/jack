@@ -32,8 +32,7 @@ class FlowThrottleLast<T> extends Flow<T> {
                 }
                 try {
                     lastFlow.cancel();
-                    lastFlow = flowFactory.call(reply.data())
-                            .asFlow()
+                    lastFlow = flowFactory.call(reply.data()).asFlow()
                             .collectWith(emitter, new CollectorHelper() {
                                 @Override
                                 protected void onTerminate(Throwable error) throws Throwable {

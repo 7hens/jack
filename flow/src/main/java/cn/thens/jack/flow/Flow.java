@@ -484,6 +484,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowCreate.error(e);
     }
 
+    public static <T> Flow<T> cancel() {
+        return error(Reply.cancel().error());
+    }
+
     public static <T> Flow<T> never() {
         return FlowCreate.never();
     }

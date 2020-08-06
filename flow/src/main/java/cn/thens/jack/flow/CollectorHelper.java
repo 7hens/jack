@@ -1,8 +1,6 @@
 package cn.thens.jack.flow;
 
 
-import java.util.concurrent.CancellationException;
-
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -17,11 +15,11 @@ public abstract class CollectorHelper<T> implements Collector<T> {
         }
         Throwable error = reply.error();
         onTerminate(error);
-        if (error == null) {
+        if (reply.isComplete()) {
             onComplete();
             return;
         }
-        if (error instanceof CancellationException) {
+        if (reply.isCancel()) {
             onCancel();
             return;
         }

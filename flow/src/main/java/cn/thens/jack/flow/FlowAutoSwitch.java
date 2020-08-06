@@ -1,7 +1,5 @@
 package cn.thens.jack.flow;
 
-import java.util.concurrent.CancellationException;
-
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -42,6 +40,6 @@ class FlowAutoSwitch<T> extends Flow<T> {
     }
 
     static <T> FlowAutoSwitch<T> autoCancel(Flow<T> upFlow, IFlow<?> switchFlow) {
-        return autoSwitch(upFlow, switchFlow, Flow.error(new CancellationException()));
+        return autoSwitch(upFlow, switchFlow, Flow.cancel());
     }
 }
