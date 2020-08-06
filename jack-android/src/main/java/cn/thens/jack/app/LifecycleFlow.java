@@ -32,13 +32,6 @@ public final class LifecycleFlow {
 
     public static Flow<Lifecycle.Event> mock(final View view) {
         return Flow.create(emitter -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (view.isAttachedToWindow()) {
-                    emitter.data(Lifecycle.Event.ON_CREATE);
-                    emitter.data(Lifecycle.Event.ON_START);
-                    emitter.data(Lifecycle.Event.ON_RESUME);
-                }
-            }
             View.OnAttachStateChangeListener listener = new View.OnAttachStateChangeListener() {
                 @Override
                 public void onViewAttachedToWindow(View v) {
@@ -55,6 +48,11 @@ public final class LifecycleFlow {
                     emitter.complete();
                 }
             };
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                if (view.isAttachedToWindow()) {
+                    listener.onViewAttachedToWindow(view);
+                }
+            }
             view.addOnAttachStateChangeListener(listener);
             emitter.addCancellable(() -> view.removeOnAttachStateChangeListener(listener));
         });

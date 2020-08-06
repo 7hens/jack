@@ -19,6 +19,13 @@ import cn.thens.jack.scheduler.Schedulers;
  */
 public class FlowTest {
     @Test
+    public void interval() {
+        Flow.interval(10, TimeUnit.MILLISECONDS)
+                .onCollect(TestX.collector("A"))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void take() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
@@ -65,6 +72,16 @@ public class FlowTest {
                 .onCollect(TestX.collector("A"))
                 .take(10)
                 .skipLast(5)
+                .onCollect(TestX.collector("B"))
+                .to(TestX.collect());
+    }
+
+    @Test
+    public void skipAll() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .onCollect(TestX.collector("A"))
+                .take(10)
+                .skipAllTo(Flow.just(100))
                 .onCollect(TestX.collector("B"))
                 .to(TestX.collect());
     }

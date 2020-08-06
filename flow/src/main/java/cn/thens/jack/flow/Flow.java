@@ -291,6 +291,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return skipAll();
     }
 
+    public <R> Flow<R> skipAllTo(IFlow<R> next) {
+        return last().flatMap(it -> next);
+    }
+
     public Flow<T> first(Predicate<? super T> predicate) {
         return FlowElementAt.first(this, predicate);
     }
