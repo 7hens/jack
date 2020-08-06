@@ -78,14 +78,14 @@ public interface Predicate<T> {
                     try {
                         return predicate.test(t);
                     } catch (Throwable throwable) {
-                        throw Things.wrap(throwable);
+                        throw Values.wrap(throwable);
                     }
                 }
             };
         }
 
         public static <T> Predicate.X<T> eq(T value) {
-            return of(it -> Things.equals(it, value));
+            return of(it -> Values.equals(it, value));
         }
 
         public static <T> Predicate.X<T> take(int count) {
@@ -122,7 +122,7 @@ public interface Predicate<T> {
                     K key = keySelector.call(t);
                     Object prevKey = lastKey;
                     lastKey = key;
-                    return Things.equals(key, prevKey);
+                    return Values.equals(key, prevKey);
                 }
             });
         }

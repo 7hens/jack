@@ -23,7 +23,7 @@ import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Func3;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
 
@@ -81,10 +81,10 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
     }
 
     public Chain<T> sub(int startIndex, int endIndex) {
-        Things.require(startIndex >= 0,
+        Values.require(startIndex >= 0,
                 "startIndex should be non-negative, but is " + startIndex);
-        Things.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
-        Things.require(endIndex >= startIndex,
+        Values.require(endIndex >= 0, "endIndex should be non-negative, but is " + endIndex);
+        Values.require(endIndex >= startIndex,
                 "endIndex should be not less than startIndex, but was " + endIndex + " < " +
                         startIndex);
         Chain<T> source = this;
@@ -142,7 +142,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
     }
 
     public Chain<T> take(int n) {
-        Things.require(n > 0, "Requested element count " + n + " is less than zero");
+        Values.require(n > 0, "Requested element count " + n + " is less than zero");
         if (n == 0) return empty();
         return takeUtil(Predicate.X.skip(n - 1));
     }
@@ -156,7 +156,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
     }
 
     public Chain<T> skip(int n) {
-        Things.require(n >= 0, "Requested element count " + n + " is less than zero");
+        Values.require(n >= 0, "Requested element count " + n + " is less than zero");
         return filter(Predicate.X.skip(n));
     }
 
@@ -169,7 +169,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
     }
 
     public <R> Chain<R> filterIsInstance(Class<R> clazz) {
-        return filter(it -> Things.is(it, clazz)).cast(clazz);
+        return filter(it -> Values.is(it, clazz)).cast(clazz);
     }
 
     public Chain<T> filterNotNull() {
@@ -887,7 +887,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
             }
             return buffer;
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 
@@ -947,7 +947,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
         try {
             return chain.asChain();
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 

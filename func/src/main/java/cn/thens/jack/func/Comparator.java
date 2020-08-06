@@ -50,7 +50,7 @@ public interface Comparator<T> {
                     try {
                         return comparator.compare(a, b);
                     } catch (Throwable e) {
-                        throw Things.wrap(e);
+                        throw Values.wrap(e);
                     }
                 }
             };

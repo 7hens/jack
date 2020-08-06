@@ -24,7 +24,7 @@ public final class Once<R> {
             try {
                 result = func.call();
             } catch (Throwable e) {
-                throw Things.wrap(e);
+                throw Values.wrap(e);
             } finally {
                 state.set(ENDED);
             }

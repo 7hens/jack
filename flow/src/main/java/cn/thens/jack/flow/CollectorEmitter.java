@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
 import cn.thens.jack.scheduler.ICancellable;
@@ -69,7 +69,7 @@ class CollectorEmitter<T> implements Emitter<T> {
             try {
                 collector.post(reply);
             } catch (Throwable e) {
-                throw Things.wrap(e);
+                throw Values.wrap(e);
             }
         });
     }

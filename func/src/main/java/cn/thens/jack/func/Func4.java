@@ -64,7 +64,7 @@ public interface Func4<P1, P2, P3, P4, R> {
                     try {
                         return func.call(p1, p2, p3, p4);
                     } catch (Throwable e) {
-                        throw Things.wrap(e);
+                        throw Values.wrap(e);
                     }
                 }
             };

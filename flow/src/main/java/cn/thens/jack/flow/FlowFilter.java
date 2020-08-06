@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 
 /**
@@ -90,7 +90,7 @@ abstract class FlowFilter<T> extends Flow<T> {
             @Override
             public boolean test(T data) throws Throwable {
                 K key = keySelector.call(data);
-                if (Things.equals(key, lastKey)) {
+                if (Values.equals(key, lastKey)) {
                     return false;
                 }
                 lastKey = key;

@@ -63,7 +63,7 @@ public interface Func2<P1, P2, R> {
                     try {
                         return func.call(p1, p2);
                     } catch (Throwable e) {
-                        throw Things.wrap(e);
+                        throw Values.wrap(e);
                     }
                 }
             };

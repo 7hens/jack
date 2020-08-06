@@ -7,7 +7,7 @@ import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Once;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 
 @SuppressWarnings({"WeakerAccess", "unused", "unchecked"})
 public abstract class Ref<T> implements IRef<T> {
@@ -22,7 +22,7 @@ public abstract class Ref<T> implements IRef<T> {
     @Override
     public boolean equals(Object that) {
         if (this == that) return true;
-        return Things.equals(valueOf(get()), valueOf(that));
+        return Values.equals(valueOf(get()), valueOf(that));
     }
 
     private static Object valueOf(Object value) {
@@ -34,12 +34,12 @@ public abstract class Ref<T> implements IRef<T> {
 
     @Override
     public int hashCode() {
-        return Things.hash(get());
+        return Values.hash(get());
     }
 
     @Override
     public String toString() {
-        return Things.toString(get());
+        return Values.toString(get());
     }
 
     public Class<?> type() {
@@ -67,22 +67,22 @@ public abstract class Ref<T> implements IRef<T> {
     }
 
     public Ref<T> requireEquals(T value) {
-        Things.require(equals(value));
+        Values.require(equals(value));
         return this;
     }
 
     public Ref<T> requireNotNull() {
-        Things.requireNotNull(get());
+        Values.requireNotNull(get());
         return this;
     }
 
     public Ref<T> require(Predicate<? super Ref<? extends T>> predicate) {
-        Things.require(Predicate.X.of(predicate).test(this));
+        Values.require(Predicate.X.of(predicate).test(this));
         return this;
     }
 
     public boolean is(Class<?> clazz) {
-        return Things.is(get(), clazz);
+        return Values.is(get(), clazz);
     }
 
     public boolean isNot(Class<?> clazz) {
@@ -165,7 +165,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.exists(get());
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 
@@ -174,7 +174,7 @@ public abstract class Ref<T> implements IRef<T> {
             key.set(get(), value);
             return this;
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 
@@ -182,7 +182,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return key.get(get(), defaultValue);
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 
@@ -190,7 +190,7 @@ public abstract class Ref<T> implements IRef<T> {
         try {
             return get(key, key.getDefaultValue());
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 

@@ -10,7 +10,10 @@ import java.util.Arrays;
  * @author 7hens
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public final class Things {
+public final class Values {
+    public static final boolean TRUE = Boolean.parseBoolean("true");
+    public static final boolean FALSE = Boolean.parseBoolean("false");
+
     @SuppressWarnings("EqualsReplaceableByObjectsCall")
     public static boolean equals(Object a, Object b) {
         return (a == b) || (a != null && a.equals(b));

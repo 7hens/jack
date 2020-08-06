@@ -28,7 +28,7 @@ public interface Action0 {
                     try {
                         action.run();
                     } catch (Throwable e) {
-                        throw Things.wrap(e);
+                        throw Values.wrap(e);
                     }
                 }
             };

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import cn.thens.jack.TestX;
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 
 /**
  * @author 7hens
@@ -22,7 +22,7 @@ public class PolyFlowTest {
                 .flowOn(TestX.scheduler("a"))
                 .mapToFlow(it -> Flow.interval(1, TimeUnit.SECONDS)
                         .take(5)
-                        .onEach(i -> Things.require(i < 4))
+                        .onEach(i -> Values.require(i < 4))
                         .map(i -> it + "." + i))
                 .polyTo(converter)
                 .onCollect(TestX.collector("B"))

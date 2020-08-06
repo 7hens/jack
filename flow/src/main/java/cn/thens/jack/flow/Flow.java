@@ -23,7 +23,7 @@ import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Schedulers;
@@ -189,7 +189,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public <R> Flow<R> filterIsInstance(Class<R> cls) {
-        return filter(it -> Things.is(it, cls)).cast(cls);
+        return filter(it -> Values.is(it, cls)).cast(cls);
     }
 
     @Deprecated

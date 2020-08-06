@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -203,7 +203,7 @@ public class FlowTest {
     public void delayError() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .onEach(it -> Things.require(it < 3L))
+                .onEach(it -> Values.require(it < 3L))
                 .delayError(Flow.timer(3, TimeUnit.SECONDS))
 //                .take(3)
                 .onCollect(TestX.collector("B"))

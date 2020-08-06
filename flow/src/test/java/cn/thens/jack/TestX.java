@@ -12,7 +12,7 @@ import cn.thens.jack.flow.Collector;
 import cn.thens.jack.flow.CollectorHelper;
 import cn.thens.jack.flow.Flow;
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
@@ -100,7 +100,7 @@ public class TestX {
         try {
             Thread.sleep(timeMs);
         } catch (InterruptedException e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 

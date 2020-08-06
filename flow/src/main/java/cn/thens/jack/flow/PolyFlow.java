@@ -3,14 +3,14 @@ package cn.thens.jack.flow;
 import java.util.List;
 
 import cn.thens.jack.func.Func1;
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 
 public abstract class PolyFlow<T> extends Flow<IFlow<T>> {
     public <R> R polyTo(Func1<? super PolyFlow<T>, ? extends R> converter) {
         try {
             return converter.call(this);
         } catch (Throwable e) {
-            throw Things.wrap(e);
+            throw Values.wrap(e);
         }
     }
 

@@ -58,7 +58,7 @@ public interface Func0<R> {
                     try {
                         return func.call();
                     } catch (Throwable e) {
-                        throw Things.wrap(e);
+                        throw Values.wrap(e);
                     }
                 }
             };

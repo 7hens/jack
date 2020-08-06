@@ -2,7 +2,7 @@ package cn.thens.jack.flow;
 
 import java.util.concurrent.CancellationException;
 
-import cn.thens.jack.func.Things;
+import cn.thens.jack.func.Values;
 
 /**
  * @author 7hens
@@ -67,7 +67,7 @@ public abstract class Reply<T> {
     }
 
     public static <T> Reply<T> error(final Throwable error) {
-        final Throwable cause = Things.unwrap(error);
+        final Throwable cause = Values.unwrap(error);
         return new Reply<T>() {
             @Override
             public boolean isTerminal() {
