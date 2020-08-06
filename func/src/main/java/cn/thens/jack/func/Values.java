@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * @author 7hens
  */
-@SuppressWarnings({"unused", "UnusedReturnValue"})
+@SuppressWarnings({"unused", "UnusedReturnValue", "WeakerAccess"})
 public final class Values {
     public static final boolean TRUE = Boolean.parseBoolean("true");
     public static final boolean FALSE = Boolean.parseBoolean("false");
@@ -29,6 +29,14 @@ public final class Values {
 
     public static <T> int compare(T a, T b, Comparator<? super T> comparator) {
         return a == b ? 0 : Comparator.X.of(comparator).compare(a, b);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Comparable<?>> int compare(T a, T b) {
+        if (a == b) return 0;
+        if (a == null) return -1;
+        if (b == null) return 1;
+        return ((Comparable<Object>) a).compareTo(b);
     }
 
     public static boolean is(Object obj, Class<?> cls) {

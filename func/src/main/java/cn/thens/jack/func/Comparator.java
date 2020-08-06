@@ -35,14 +35,6 @@ public interface Comparator<T> {
             return then(comparator);
         }
 
-        @SuppressWarnings("unchecked")
-        public static <T extends Comparable<?>> int compareValues(T a, T b) {
-            if (a == b) return 0;
-            if (a == null) return -1;
-            if (b == null) return 1;
-            return ((Comparable<Object>) a).compareTo(b);
-        }
-
         public static <T> Comparator.X<T> of(Comparator<T> comparator) {
             return new Comparator.X<T>() {
                 @Override
@@ -57,7 +49,7 @@ public interface Comparator<T> {
         }
 
         public static <T> Comparator.X<T> by(Func1<? super T, ? extends Comparable<?>> selector) {
-            return of((a, b) -> compareValues(selector.call(a), selector.call(b)));
+            return of((a, b) -> Values.compare(selector.call(a), selector.call(b)));
         }
 
         public static <T, K> Comparator.X<T> by(Comparator<? super K> comparator, Func1<T, ? extends K> selector) {
