@@ -51,6 +51,10 @@ public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         });
     }
 
+    public static <R> R call(Func0<? extends R> func) {
+        return of(func).call();
+    }
+
     public static <R> Func0.X<R>
     of(Func0<? extends R> func) {
         return Func0.X.of(func);
@@ -145,7 +149,7 @@ public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
 
     @Override
     public R call() {
-        return call(null);
+        return call((P1) null);
     }
 
     @Override

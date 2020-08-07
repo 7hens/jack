@@ -38,6 +38,10 @@ public class Actions<P1, P2, P3, P4, P5, P6, P7, P8, P9> implements
         });
     }
 
+    public static void run(Action0 action) {
+        of(action).run();
+    }
+
     public static Action0.X of(Action0 action) {
         return Action0.X.of(action);
     }
@@ -133,7 +137,7 @@ public class Actions<P1, P2, P3, P4, P5, P6, P7, P8, P9> implements
 
     @Override
     public void run() {
-        run(null);
+        run((P1) null);
     }
 
     @Override
