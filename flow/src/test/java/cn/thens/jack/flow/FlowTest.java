@@ -7,10 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
 import cn.thens.jack.func.Func1;
+import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Schedulers;
 
@@ -20,8 +22,16 @@ import cn.thens.jack.scheduler.Schedulers;
 public class FlowTest {
     @Test
     public void interval() {
-        Flow.interval(10, TimeUnit.MILLISECONDS)
-                .onCollect(TestX.collector("A"))
+        AtomicInteger i = new AtomicInteger();
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .mergeWith(Flow.interval(200, TimeUnit.MILLISECONDS))
+                .mergeWith(Flow.interval(300, TimeUnit.MILLISECONDS))
+                .flatMap(Funcs.always(Flow.single(i::incrementAndGet)
+                        .onCollect(TestX.collector("A"))
+                        .flowOn(TestX.scheduler("a"))
+                        .onCollect(TestX.collector("B"))
+                        .flowOn(TestX.scheduler("b"))))
+                .flowOn(TestX.scheduler("c"))
                 .to(TestX.collect());
     }
 

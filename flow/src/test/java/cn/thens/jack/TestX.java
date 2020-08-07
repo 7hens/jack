@@ -44,41 +44,37 @@ public class TestX {
     }
 
     public static <T> Collector<T> collector(String name) {
-        Logger logger = logger();
+        Logger logger = logger(name);
         return new CollectorHelper<T>() {
             @Override
             protected void onStart(Cancellable cancellable) throws Throwable {
                 super.onStart(cancellable);
-                log("onStart");
+                logger.log("onStart");
             }
 
             @Override
             protected void onEach(T data) throws Throwable {
                 super.onEach(data);
-                log("onEach: " + data);
+                logger.log("onEach: " + data);
             }
 
             @Override
             protected void onComplete() throws Throwable {
                 super.onComplete();
-                log("onComplete");
+                logger.log("onComplete");
             }
 
             @Override
             protected void onError(Throwable e) throws Throwable {
                 super.onError(e);
-                log("onError: " + e.getClass().getName());
+                logger.err("onError: " + e.getClass().getName());
 //                e.printStackTrace();
             }
 
             @Override
             protected void onCancel() throws Throwable {
                 super.onCancel();
-                log("onCancel");
-            }
-
-            private void log(String message) {
-                logger.log("[" + name + "] " + message);
+                logger.err("onCancel");
             }
         };
     }
@@ -119,16 +115,33 @@ public class TestX {
         };
     }
 
+    public static Logger logger(String tag) {
+        return new Logger(tag);
+    }
+
     public static Logger logger() {
-        return new Logger();
+        return logger(".");
     }
 
     public static class Logger {
         private String testName = getTestMethodName();
+        private final String tag;
+
+        public Logger(String tag) {
+            this.tag = tag;
+        }
+
+        private String debugInfo(String message) {
+            String threadName = Thread.currentThread().getName();
+            return testName + ": (" + threadName + ") [" + tag + "] " + message;
+        }
 
         public void log(String message) {
-            String threadName = Thread.currentThread().getName();
-            System.out.println(testName + ": (" + threadName + ") " + message);
+            System.out.println(debugInfo(message));
+        }
+
+        public void err(String message) {
+            System.err.println(debugInfo(message));
         }
     }
 }
