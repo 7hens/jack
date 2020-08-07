@@ -43,6 +43,14 @@ public final class Values {
         return cls.isInstance(obj);
     }
 
+    public static boolean isNull(Object obj) {
+        return obj == null;
+    }
+
+    public static boolean isNotNull(Object obj) {
+        return obj != null;
+    }
+
     public static <T> T safeCast(Object obj, Class<T> cls) {
         return is(obj, cls) ? cls.cast(obj) : null;
     }
