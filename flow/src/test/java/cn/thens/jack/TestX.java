@@ -141,7 +141,8 @@ public class TestX {
         }
 
         public void err(String message) {
-            System.err.println(debugInfo(message));
+            System.out.println("[ERROR]:");
+            System.out.println(debugInfo(message));
         }
     }
 }

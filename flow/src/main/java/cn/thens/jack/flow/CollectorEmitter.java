@@ -34,26 +34,28 @@ class CollectorEmitter<T> implements Emitter<T> {
     @Override
     public void post(Reply<? extends T> reply) {
         if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
-            if (reply.isCancel()) {
-                clearBuffer();
-                collectScheduled(reply);
-                return;
-            }
-            if (isCollecting.compareAndSet(false, true)) {
-                collectScheduled(reply);
-                return;
-            }
-            if (reply.isTerminal()) {
-                terminalReply = reply;
-                return;
-            }
             try {
+                if (reply.isCancel()) {
+                    clearBuffer();
+                }
+                if (isCollecting.compareAndSet(false, true)) {
+                    schedule(() -> {
+                        try {
+                            collector.post(reply);
+                        } catch (Throwable e) {
+                            throw Values.wrap(e);
+                        }
+                    });
+                    return;
+                }
+                if (reply.isTerminal()) {
+                    terminalReply = reply;
+                    return;
+                }
                 buffer.add(reply.data());
                 backpressure.apply(buffer);
             } catch (Throwable e) {
-                clearBuffer();
-                collectScheduled(Reply.error(e));
-//                error(e);
+                error(e);
             }
         }
     }
@@ -62,16 +64,6 @@ class CollectorEmitter<T> implements Emitter<T> {
         isEmitterTerminated.set(true);
         terminalReply = null;
         buffer.clear();
-    }
-
-    private void collectScheduled(Reply<? extends T> reply) {
-        schedule(() -> {
-            try {
-                collector.post(reply);
-            } catch (Throwable e) {
-                throw Values.wrap(e);
-            }
-        });
     }
 
     private Collector<T> wrapCollector(Collector<? super T> collector) {

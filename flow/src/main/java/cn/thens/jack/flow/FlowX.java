@@ -27,17 +27,4 @@ public class FlowX {
                     .to(FlowX.poly());
         });
     }
-
-    public static <T, R> Func1.X<Flow<T>, Flow<R>>
-    lift(Func1<? super Emitter<? super R>, ? extends Collector<? super T>> operator) {
-        return Funcs.of(flow -> {
-            return Flow.create(emitter -> {
-                Collector<? super T> collector = operator.call(emitter);
-                if (collector instanceof CollectorHelper) {
-                    ((CollectorHelper) collector).onStart(emitter);
-                }
-                flow.collectWith(emitter, collector);
-            });
-        });
-    }
 }

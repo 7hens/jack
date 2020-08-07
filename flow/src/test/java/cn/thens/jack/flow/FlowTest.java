@@ -23,15 +23,21 @@ public class FlowTest {
     @Test
     public void interval() {
         AtomicInteger i = new AtomicInteger();
-        Flow.interval(100, TimeUnit.MILLISECONDS)
-                .mergeWith(Flow.interval(200, TimeUnit.MILLISECONDS))
-                .mergeWith(Flow.interval(300, TimeUnit.MILLISECONDS))
-                .flatMap(Funcs.always(Flow.single(i::incrementAndGet)
-                        .onCollect(TestX.collector("A"))
-                        .flowOn(TestX.scheduler("a"))
-                        .onCollect(TestX.collector("B"))
-                        .flowOn(TestX.scheduler("b"))))
+        TestX.Logger logger = TestX.logger();
+        Flow.interval(600, TimeUnit.MILLISECONDS)
+//                .mergeWith(Flow.interval(200, TimeUnit.MILLISECONDS))
+//                .mergeWith(Flow.interval(300, TimeUnit.MILLISECONDS))
+                .flatMap(Funcs.always(Flow.interval(100, TimeUnit.MILLISECONDS)
+                                .onCollect(TestX.collector("A"))
+                                .flowOn(TestX.scheduler("a"))
+                                .take(3)
+//                        .onCollect(TestX.collector("B"))
+                                .flowOn(TestX.scheduler("b"))
+                                .delayStart(Flow.timer(100, TimeUnit.MILLISECONDS))
+                                .onStart(it -> logger.log("============================="))
+                ))
                 .flowOn(TestX.scheduler("c"))
+                .take(10)
                 .to(TestX.collect());
     }
 
@@ -90,9 +96,13 @@ public class FlowTest {
     public void skipAll() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .take(10)
+                .take(3)
                 .skipAllTo(Flow.just(100))
                 .onCollect(TestX.collector("B"))
+                .to(TestX.collect());
+        Flow.empty()
+                .skipAllTo(Flow.just(1001))
+                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 
@@ -310,7 +320,7 @@ public class FlowTest {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("Before"))
                 .take(5)
-                .to(FlowX.lift(emitter -> collector))
+                .lift(emitter -> collector)
                 .timeout(Flow.timer(1, TimeUnit.SECONDS))
                 .to(TestX.collect());
     }

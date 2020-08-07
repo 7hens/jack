@@ -75,6 +75,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return Funcs.of(operator).call(this);
     }
 
+    public <R> Flow<R> lift(Func1<? super Emitter<? super R>, ? extends Collector<? super T>> operator) {
+        return FlowLift.lift(this, operator);
+    }
+
     public Flow<T> onCollect(Collector<? super T> collector) {
         return FlowOnCollect.onCollect(this, collector);
     }
@@ -292,7 +296,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public <R> Flow<R> skipAllTo(IFlow<R> next) {
-        return last().flatMap(it -> next);
+        return FlowLift.skipAllTo(this, next);
     }
 
     public Flow<T> first(Predicate<? super T> predicate) {
