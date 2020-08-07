@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cn.thens.jack.TestX;
+import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Values;
@@ -38,6 +39,19 @@ public class FlowTest {
                 ))
                 .flowOn(TestX.scheduler("c"))
                 .take(10)
+                .to(TestX.collect());
+    }
+
+    @Test
+    public void error() {
+        Flow.create(Actions.error(new NullPointerException()))
+                .onCollect(TestX.collector("A"))
+                .flowOn(TestX.scheduler("a"))
+                .to(TestX.collect());
+
+        Flow.error(new NullPointerException())
+                .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
     }
 
@@ -163,6 +177,29 @@ public class FlowTest {
     }
 
     @Test
+    public void catchError() {
+        Flow.just(0, 1)
+                .onEach(it -> Values.require(it <= 0))
+                .onCollect(TestX.collector("A"))
+                .flowOn(TestX.scheduler("a"))
+                .catchError(Flow.just(100))
+                .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
+                .to(TestX.collect());
+
+//        Flow.<Integer>create(Actions.error(new NullPointerException()))
+        Flow.single(Funcs.error(new NullPointerException()))
+                .onCollect(TestX.collector("C"))
+                .flowOn(TestX.scheduler("c"))
+                .catchError(Flow.just(100))
+                .onCollect(TestX.collector("D"))
+                .flowOn(TestX.scheduler("d"))
+                .to(TestX.collect());
+
+
+    }
+
+    @Test
     public void retry() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .take(3)
@@ -185,7 +222,6 @@ public class FlowTest {
                 .retry(Flow.timer(400, TimeUnit.MILLISECONDS))
                 .onCollect(TestX.collector("D"))
                 .to(TestX.collect());
-
     }
 
     @Test
@@ -325,6 +361,12 @@ public class FlowTest {
                 .onCollect(TestX.collector("Before"))
                 .take(5)
                 .lift(emitter -> collector)
+                .timeout(Flow.timer(1, TimeUnit.SECONDS))
+                .to(TestX.collect());
+
+        Flow.<Long>error(new NullPointerException())
+                .lift(emitter -> collector)
+                .flowOn(TestX.scheduler("c"))
                 .timeout(Flow.timer(1, TimeUnit.SECONDS))
                 .to(TestX.collect());
     }
