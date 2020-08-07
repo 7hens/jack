@@ -34,9 +34,13 @@ class FlowLift<T, R> extends Flow<R> {
         return lift(upFlow, emitter -> {
             return new CollectorHelper<T>() {
                 @Override
-                protected void onComplete() throws Throwable {
-                    super.onComplete();
-                    next.asFlow().onStartCollect(emitter);
+                protected void onTerminate(Throwable error) throws Throwable {
+                    super.onTerminate(error);
+                    if (error == null) {
+                        next.asFlow().onStartCollect(emitter);
+                        return;
+                    }
+                    emitter.error(error);
                 }
             };
         });

@@ -104,6 +104,10 @@ public class FlowTest {
                 .skipAllTo(Flow.just(1001))
                 .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
+        Flow.error(new NullPointerException())
+                .skipAllTo(Flow.just(1001))
+                .onCollect(TestX.collector("D"))
+                .to(TestX.collect());
     }
 
     @Test
