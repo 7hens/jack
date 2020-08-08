@@ -10,7 +10,6 @@ import cn.thens.jack.func.Action2;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Funcs;
-import cn.thens.jack.ref.Ref;
 import cn.thens.jack.tuple.Tuple2;
 import cn.thens.jack.tuple.Tuples;
 
@@ -80,6 +79,6 @@ class ChainMap<T, R> extends Chain<R> {
     }
 
     static <T, U> Chain<U> cast(Chain<T> up, Class<U> clazz) {
-        return map(up, item -> Ref.of(item).cast(clazz).get());
+        return map(up, clazz::cast);
     }
 }

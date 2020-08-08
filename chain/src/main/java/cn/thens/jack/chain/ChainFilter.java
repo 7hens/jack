@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.ref.Ref;
 
 class ChainFilter<T> extends Chain<T> {
     private static final int STATE_UNKNOWN = -1;
