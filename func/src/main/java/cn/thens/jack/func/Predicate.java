@@ -88,6 +88,18 @@ public interface Predicate<T> {
             return of(it -> Values.equals(it, value));
         }
 
+        public static <T> Predicate.X<T> isNull() {
+            return of(Values::isNull);
+        }
+
+        public static <T> Predicate.X<T> isNotNull() {
+            return of(Values::isNotNull);
+        }
+
+        public static <T> Predicate.X<T> is(Class<?> cls) {
+            return of(it -> Values.is(it, cls));
+        }
+
         public static <T> Predicate.X<T> take(int count) {
             final AtomicInteger restCount = new AtomicInteger(count);
             return of(it -> restCount.decrementAndGet() >= 0);

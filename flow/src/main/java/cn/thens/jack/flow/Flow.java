@@ -23,7 +23,6 @@ import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Predicate;
-import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Schedulers;
@@ -184,16 +183,15 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> filterNot(Predicate<? super T> predicate) {
-        return filter(it -> !predicate.test(it));
+        return filter(Predicate.X.of(predicate).not());
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     public Flow<T> filterNotNull() {
-        return filter(it -> it != null);
+        return filter(Predicate.X.isNotNull());
     }
 
     public <R> Flow<R> filterIsInstance(Class<R> cls) {
-        return filter(it -> Values.is(it, cls)).cast(cls);
+        return filter(Predicate.X.is(cls)).cast(cls);
     }
 
     @Deprecated
@@ -439,8 +437,8 @@ public abstract class Flow<T> implements IFlow<T> {
         return window(count).flatToList();
     }
 
-    public Flow<T> onBackPressure(BackPressure<T> backpressure) {
-        return new FlowOnBackPressure<>(this, backpressure);
+    public Flow<T> onBackPressure(BackPressure<T> backPressure) {
+        return new FlowOnBackPressure<>(this, backPressure);
     }
 
     public static <T> Flow<T> create(Action1<? super Emitter<? super T>> onStart) {

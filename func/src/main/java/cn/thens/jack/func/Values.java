@@ -1,5 +1,8 @@
 package cn.thens.jack.func;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
@@ -15,7 +18,7 @@ public final class Values {
     public static final boolean FALSE = Boolean.parseBoolean("false");
 
     @SuppressWarnings("EqualsReplaceableByObjectsCall")
-    public static boolean equals(Object a, Object b) {
+    public static boolean equals(@Nullable Object a, @Nullable Object b) {
         return (a == b) || (a != null && a.equals(b));
     }
 
@@ -23,39 +26,65 @@ public final class Values {
         return Arrays.hashCode(objects);
     }
 
-    public static <T> T elvis(T value, T fallback) {
+    public static <T> T elvis(@Nullable T value, @Nullable T fallback) {
         return value != null ? value : fallback;
     }
 
-    public static <T> int compare(T a, T b, Comparator<? super T> comparator) {
+    public static <T> int compare(@Nullable T a, @Nullable T b, @NotNull Comparator<? super T> comparator) {
         return a == b ? 0 : Comparator.X.of(comparator).compare(a, b);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Comparable<?>> int compare(T a, T b) {
+    public static <T extends Comparable<?>> int compare(@Nullable T a, @Nullable T b) {
         if (a == b) return 0;
         if (a == null) return -1;
         if (b == null) return 1;
         return ((Comparable<Object>) a).compareTo(b);
     }
 
-    public static boolean is(Object obj, Class<?> cls) {
+    public static boolean is(@Nullable Object obj, @NotNull Class<?> cls) {
         return cls.isInstance(obj);
     }
 
-    public static boolean isNull(Object obj) {
+    public static boolean isNull(@Nullable Object obj) {
         return obj == null;
     }
 
-    public static boolean isNotNull(Object obj) {
+    public static boolean isNotNull(@Nullable Object obj) {
         return obj != null;
     }
 
-    public static <T> T safeCast(Object obj, Class<T> cls) {
+    public static boolean isEmpty(@Nullable Iterable<?> iterable) {
+        return iterable == null || iterable.iterator().hasNext();
+    }
+
+    public static boolean isNotEmpty(@Nullable Iterable<?> iterable) {
+        return !isEmpty(iterable);
+    }
+
+    public static <T> boolean isEmpty(@Nullable T[] array) {
+        return array == null || array.length == 0;
+    }
+
+    public static <T> boolean isNotEmpty(@Nullable T[] array) {
+        return !isEmpty(array);
+    }
+
+    public static <T> boolean isEmpty(@Nullable CharSequence text) {
+        return text == null || text.length() == 0;
+    }
+
+    public static <T> boolean isNotEmpty(@Nullable CharSequence text) {
+        return !isEmpty(text);
+    }
+
+    @Nullable
+    public static <T> T safeCast(@Nullable Object obj, @NotNull Class<T> cls) {
         return is(obj, cls) ? cls.cast(obj) : null;
     }
 
-    public static Type type(final Class<?> rawType, final Type... typeArgs) {
+    @NotNull
+    public static Type type(@NotNull final Class<?> rawType, @NotNull final Type... typeArgs) {
         return new ParameterizedType() {
             @Override
             public Type getRawType() {
@@ -74,7 +103,7 @@ public final class Values {
         };
     }
 
-    public static boolean require(boolean value, Object message) {
+    public static boolean require(boolean value, @Nullable Object message) {
         if (value) return true;
         if (message instanceof RuntimeException) {
             throw (RuntimeException) message;
@@ -85,7 +114,7 @@ public final class Values {
         throw new IllegalArgumentException(toString(message));
     }
 
-    public static boolean require(boolean value, Func0<?> message) {
+    public static boolean require(boolean value, @NotNull Func0<?> message) {
         if (value) return true;
         return require(false, Funcs.of(message).call());
     }
@@ -94,12 +123,15 @@ public final class Values {
         return require(value, "Failed requirement");
     }
 
-    public static <T> T requireNotNull(T value) {
+    @NotNull
+    public static <T> T requireNotNull(@Nullable T value) {
         require(value != null, new NullPointerException());
+        //noinspection ConstantConditions
         return value;
     }
 
-    public static String toString(Object obj) {
+    @NotNull
+    public static String toString(@Nullable Object obj) {
         if (obj == null) return "null";
         if (obj instanceof String) return (String) obj;
         if (obj instanceof Throwable) return getStackTraceString((Throwable) obj);
@@ -124,14 +156,16 @@ public final class Values {
         return sw.toString();
     }
 
-    public static RuntimeException wrap(Throwable e) {
+    @NotNull
+    public static RuntimeException wrap(@NotNull Throwable e) {
         if (e instanceof RuntimeException) {
             return (RuntimeException) e;
         }
         return new ThrowableWrapper(e);
     }
 
-    public static Throwable unwrap(Throwable e) {
+    @NotNull
+    public static Throwable unwrap(@NotNull Throwable e) {
         if (e instanceof ThrowableWrapper) {
             return unwrap(e.getCause());
         }
