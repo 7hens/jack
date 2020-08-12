@@ -368,8 +368,12 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowDelay.delay(this, delayFlow);
     }
 
+    public Flow<T> delayError(Func1<? super Throwable, ? extends IFlow<?>> delayFunc) {
+        return delay(reply -> reply.isError() ? delayFunc.call(reply.error()) : Flow.empty());
+    }
+
     public Flow<T> delayError(IFlow<?> delayFlow) {
-        return delay(reply -> reply.isError() ? delayFlow : Flow.empty());
+        return delay(Funcs.always(delayFlow));
     }
 
     public Flow<T> delayStart(IFlow<?> delayFlow) {
