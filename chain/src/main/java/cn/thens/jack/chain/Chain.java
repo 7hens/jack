@@ -328,7 +328,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
 
     public T firstOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
-        return iterator.hasNext() ? iterator.next() : Funcs.of(defaultValue).call();
+        return iterator.hasNext() ? iterator.next() : Funcs.call(defaultValue);
     }
 
     public T first() {
@@ -351,7 +351,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
             }
             index++;
         }
-        return Tuples.of(-1, Funcs.of(defaultValue).call());
+        return Tuples.of(-1, Funcs.call(defaultValue));
     }
 
     public T firstOrElse(Predicate<? super T> predicate, Func0<T> defaultValue) {
@@ -372,7 +372,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
     public T lastOrElse(Func0<T> defaultValue) {
         Iterator<T> iterator = iterator();
         if (!iterator.hasNext()) {
-            return Funcs.of(defaultValue).call();
+            return Funcs.call(defaultValue);
         }
         T last = iterator.next();
         while (iterator.hasNext()) {
@@ -406,7 +406,7 @@ public abstract class Chain<T> implements Iterable<T>, IChain<T> {
             }
             index++;
         }
-        return Tuples.of(lastIndex, found ? last : Funcs.of(defaultValue).call());
+        return Tuples.of(lastIndex, found ? last : Funcs.call(defaultValue));
     }
 
     public T lastOrElse(Predicate<? super T> predicate, Func0<T> defaultValue) {

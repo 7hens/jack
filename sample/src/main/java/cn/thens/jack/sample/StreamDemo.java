@@ -11,7 +11,7 @@ public class StreamDemo {
                 .safeCall(it -> (long) it)
                 .safeCall(it -> it + "safeCall")
                 .get();
-        int i = Funcs.of(() -> 12).call();
-        Actions.of(() -> System.out.println("hello, world")).run();
+        int i = Funcs.call(() -> 12);
+        Actions.run(() -> System.out.println("hello, world"));
     }
 }

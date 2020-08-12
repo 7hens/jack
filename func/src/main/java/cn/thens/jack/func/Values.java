@@ -116,7 +116,7 @@ public final class Values {
 
     public static boolean require(boolean value, @NotNull Func0<?> message) {
         if (value) return true;
-        return require(false, Funcs.of(message).call());
+        return require(false, Funcs.call(message));
     }
 
     public static boolean require(boolean value) {
