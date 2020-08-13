@@ -473,4 +473,16 @@ public class FlowTest {
                 .onCollect(TestX.collector("just"))
                 .to(TestX.collect());
     }
+
+    @Test
+    public void repeat() {
+        Flow.interval(100, TimeUnit.MILLISECONDS)
+                .take(1)
+                .onCollect(TestX.collector("A"))
+                .flowOn(TestX.scheduler("a"))
+                .repeat(3)
+                .onCollect(TestX.collector("B"))
+                .flowOn(TestX.scheduler("b"))
+                .to(TestX.collect());
+    }
 }

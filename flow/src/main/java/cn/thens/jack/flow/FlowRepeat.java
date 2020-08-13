@@ -24,12 +24,12 @@ abstract class FlowRepeat<T> extends Flow<T> {
             }
 
             @Override
-            protected void onTerminate(Throwable error) throws Throwable {
-                super.onTerminate(error);
+            protected void onComplete() throws Throwable {
+                super.onComplete();
                 try {
                     onFlowTerminate(emitter);
                 } catch (Throwable e) {
-                    emitter.error(error);
+                    emitter.error(e);
                 }
             }
         });
@@ -52,6 +52,8 @@ abstract class FlowRepeat<T> extends Flow<T> {
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
                 if (shouldRepeat.call()) {
                     onStartCollect(emitter);
+                } else {
+                    emitter.complete();
                 }
             }
         };
@@ -59,12 +61,14 @@ abstract class FlowRepeat<T> extends Flow<T> {
 
     static <T> FlowRepeat<T> repeat(Flow<T> upFlow, int count) {
         return new FlowRepeat<T>(upFlow) {
-            AtomicInteger resetCount = new AtomicInteger(count);
+            AtomicInteger restCount = new AtomicInteger(count);
 
             @Override
             void onFlowTerminate(Emitter<? super T> emitter) throws Throwable {
-                if (resetCount.decrementAndGet() >= 0) {
+                if (restCount.decrementAndGet() > 0) {
                     onStartCollect(emitter);
+                } else {
+                    emitter.complete();
                 }
             }
         };
