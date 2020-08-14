@@ -107,37 +107,36 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     @SafeVarargs
-    public final PolyFlow<T> polyWith(IFlow<T> flow, IFlow<T>... moreFlows) {
+    public final PolyFlow<T> polyWith(IFlow<T>... flows) {
         ArrayList<IFlow<T>> flowList = new ArrayList<>();
         flowList.add(this);
-        flowList.add(flow);
-        flowList.addAll(Arrays.asList(moreFlows));
+        flowList.addAll(Arrays.asList(flows));
         return from(flowList).to(FlowX.poly());
     }
 
     @SafeVarargs
-    public final Flow<T> concatWith(IFlow<T> flow, IFlow<T>... moreFlows) {
-        return polyWith(flow, moreFlows).flatConcat();
+    public final Flow<T> concatWith(IFlow<T>... flows) {
+        return polyWith(flows).flatConcat();
     }
 
     @SafeVarargs
-    public final Flow<T> mergeWith(IFlow<T> flow, IFlow<T>... moreFlows) {
-        return polyWith(flow, moreFlows).flatMerge();
+    public final Flow<T> mergeWith(IFlow<T>... flows) {
+        return polyWith(flows).flatMerge();
     }
 
     @SafeVarargs
-    public final Flow<T> switchWith(IFlow<T> flow, IFlow<T>... moreFlows) {
-        return polyWith(flow, moreFlows).flatSwitch();
+    public final Flow<T> switchWith(IFlow<T>... flows) {
+        return polyWith(flows).flatSwitch();
     }
 
     @SafeVarargs
-    public final Flow<List<T>> zipWith(IFlow<T> flow, IFlow<T>... moreFlows) {
-        return polyWith(flow, moreFlows).flatZip();
+    public final Flow<List<T>> zipWith(IFlow<T>... flows) {
+        return polyWith(flows).flatZip();
     }
 
     @SafeVarargs
-    public final Flow<List<T>> joinWith(IFlow<T> flow, IFlow<T>... moreFlows) {
-        return polyWith(flow, moreFlows).flatJoin();
+    public final Flow<List<T>> joinWith(IFlow<T>... flows) {
+        return polyWith(flows).flatJoin();
     }
 
     public <R> Flow<R> map(Func1<? super T, ? extends R> mapper) {
