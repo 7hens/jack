@@ -1,5 +1,7 @@
 package cn.thens.jack.flow;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,7 +19,8 @@ import cn.thens.jack.scheduler.Schedulers;
 public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     private final AtomicReference<Reply<? extends T>> terminalReplyRef = new AtomicReference<>();
     private final List<Collector<? super T>> collectors = new CopyOnWriteArrayList<>();
-    private final CollectorEmitter<T> collectorEmitter;
+    private final Emitter<T> collectorEmitter;
+    private boolean autoCancel = false;
 
     private FlowEmitter() {
         Scheduler scheduler = Schedulers.unconfined();
@@ -77,7 +80,12 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
                 return;
             }
             collectors.add(emitter);
-            emitter.addCancellable(() -> collectors.remove(emitter));
+            emitter.addCancellable(() -> {
+                collectors.remove(emitter);
+                if (autoCancel && collectors.isEmpty()) {
+                    cancel();
+                }
+            });
         });
     }
 
@@ -88,6 +96,12 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
         if (reply.isTerminal()) {
             collectors.clear();
         }
+    }
+
+    @ApiStatus.Experimental
+    public FlowEmitter<T> autoCancel() {
+        autoCancel = true;
+        return this;
     }
 
     public static <T> FlowEmitter<T> publish() {

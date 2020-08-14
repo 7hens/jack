@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
@@ -71,15 +72,30 @@ public abstract class Flow<T> implements IFlow<T> {
         return new FlowFlowOn<>(this, upScheduler);
     }
 
-    public Flow<T> publish(FlowEmitter<T> emitter) {
-        final AtomicBoolean isStarted = new AtomicBoolean(false);
+    @ApiStatus.Experimental
+    public Flow<T> publish(Func0<? extends FlowEmitter<T>> emitterFunc) {
         final Flow<T> self = this;
+        final AtomicBoolean isStarted = new AtomicBoolean(false);
+        final AtomicReference<FlowEmitter<T>> emitterRef = new AtomicReference<>(Funcs.call(emitterFunc));
         return Flow.defer(() -> {
+            final FlowEmitter<T> emitter = emitterRef.get();
             if (isStarted.compareAndSet(false, true)) {
                 self.onStartCollect(emitter);
+                emitter.addCancellable(() -> {
+                    FlowEmitter<T> newEmitter = Funcs.call(emitterFunc);
+                    if (newEmitter != emitter) {
+                        isStarted.set(false);
+                        emitterRef.set(newEmitter);
+                    }
+                });
             }
             return emitter.asFlow();
         });
+    }
+
+    @ApiStatus.Experimental
+    public Flow<T> publish(FlowEmitter<T> emitter) {
+        return publish(Funcs.always(emitter));
     }
 
     public <R> R to(Func1<? super Flow<T>, ? extends R> operator) {
