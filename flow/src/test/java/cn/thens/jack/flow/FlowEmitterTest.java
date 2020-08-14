@@ -47,4 +47,26 @@ public class FlowEmitterTest {
                 .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
+
+    @Test
+    public void lazyFlow() {
+        FlowEmitter<Long> flowEmitter = FlowEmitter.publish();
+        Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
+                .onCollect(TestX.collector("A"))
+                .publish(flowEmitter);
+
+        Flow.timer(3, TimeUnit.SECONDS)
+                .onCollect(TestX.collector("Delay 3s"))
+                .flatMap(it -> publishFlow)
+                .onCollect(TestX.collector("B"))
+                .take(3)
+                .to(TestX.collect());
+
+        Flow.timer(6, TimeUnit.SECONDS)
+                .onCollect(TestX.collector("Delay 6s"))
+                .flatMap(it -> publishFlow)
+                .onCollect(TestX.collector("C"))
+                .take(3)
+                .to(TestX.collect());
+    }
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
@@ -68,6 +69,17 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<T> flowOn(IScheduler upScheduler) {
         return new FlowFlowOn<>(this, upScheduler);
+    }
+
+    public Flow<T> publish(FlowEmitter<T> emitter) {
+        final AtomicBoolean isStarted = new AtomicBoolean(false);
+        final Flow<T> self = this;
+        return Flow.defer(() -> {
+            if (isStarted.compareAndSet(false, true)) {
+                self.onStartCollect(emitter);
+            }
+            return emitter.asFlow();
+        });
     }
 
     public <R> R to(Func1<? super Flow<T>, ? extends R> operator) {
