@@ -3,6 +3,7 @@ package cn.thens.jack.scheduler;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -54,8 +55,8 @@ public final class Schedulers {
         int processorCount = Runtime.getRuntime().availableProcessors();
         int maxThreadCount = Math.max(processorCount, expectedThreadCount);
         return from(new ThreadPoolExecutor(processorCount, maxThreadCount,
-                60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
-                threadFactory(name, false)));
+                60, TimeUnit.SECONDS, new EmptyBlockingQueue<>(),
+                threadFactory(name, false), rejectHandler(name)));
     }
 
     private static ThreadFactory threadFactory(String name, boolean isSingle) {
@@ -66,6 +67,17 @@ public final class Schedulers {
             thread.setPriority(Thread.NORM_PRIORITY);
             thread.setDaemon(true);
             return thread;
+        };
+    }
+
+    private static RejectedExecutionHandler rejectHandler(String name) {
+        final Executor fallbackExecutor = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(1024), threadFactory(name + "-x", true));
+        return new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+                fallbackExecutor.execute(runnable);
+            }
         };
     }
 }
