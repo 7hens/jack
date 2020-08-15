@@ -400,7 +400,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> delayError(IFlow<?> delayFlow) {
-        return delay(Funcs.always(delayFlow));
+        return delayError(Funcs.always(delayFlow));
     }
 
     public Flow<T> delayStart(IFlow<?> delayFlow) {
