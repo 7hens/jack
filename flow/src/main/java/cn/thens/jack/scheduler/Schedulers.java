@@ -1,5 +1,6 @@
 package cn.thens.jack.scheduler;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -55,7 +56,7 @@ public final class Schedulers {
         int processorCount = Runtime.getRuntime().availableProcessors();
         int maxThreadCount = Math.max(processorCount, expectedThreadCount);
         return from(new ThreadPoolExecutor(processorCount, maxThreadCount,
-                60, TimeUnit.SECONDS, new EmptyBlockingQueue<>(),
+                60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1),
                 threadFactory(name, false), rejectHandler(name)));
     }
 

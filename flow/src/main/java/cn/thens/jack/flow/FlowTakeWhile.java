@@ -10,7 +10,7 @@ class FlowTakeWhile<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final Predicate<? super T> predicate;
 
-    FlowTakeWhile(Flow<T> upFlow, Predicate<? super T> predicate) {
+    private FlowTakeWhile(Flow<T> upFlow, Predicate<? super T> predicate) {
         this.upFlow = upFlow;
         this.predicate = predicate;
     }
@@ -35,5 +35,19 @@ class FlowTakeWhile<T> extends Flow<T> {
                 }
             }
         });
+    }
+
+    static <T> Flow<T> takeWhile(Flow<T> upFlow, Predicate<? super T> predicate) {
+        return new FlowTakeWhile<>(upFlow, predicate);
+    }
+
+    static <T> Flow<T> take(Flow<T> upFlow, int count) {
+        if (count < 0) {
+            return upFlow.takeLast(-count);
+        }
+        if (count == 0) {
+            return Flow.empty();
+        }
+        return Flow.defer(() -> takeWhile(upFlow, Predicate.X.take(count)));
     }
 }

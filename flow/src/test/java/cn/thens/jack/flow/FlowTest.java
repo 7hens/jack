@@ -377,7 +377,7 @@ public class FlowTest {
 //                .onCollect(TestX.collector("A"))
                 .onBackPressure(backpressure)
                 .map(it -> {
-                    TestX.delay(1000);
+                    TestX.sleep(1000);
                     return it;
                 })
 //                .take(6)

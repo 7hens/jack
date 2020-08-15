@@ -32,7 +32,7 @@ public class FlowEmitterTest {
                 .onCollect(TestX.collector("A"))
                 .collect();
 
-        TestX.delay(100);
+        TestX.sleep(100);
         emitter.data(-1L);
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
@@ -43,7 +43,7 @@ public class FlowEmitterTest {
                 .onCollect(TestX.collector("B"))
                 .collect();
 
-        TestX.delay(600);
+        TestX.sleep(600);
         emitter.asFlow()
                 .onCollect(TestX.collector("C"))
                 .to(TestX.collect());

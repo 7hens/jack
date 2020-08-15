@@ -92,11 +92,20 @@ public class TestX {
         }));
     }
 
-    public static void delay(long timeMs) {
+    public static void sleep(long timeMs) {
         try {
             Thread.sleep(timeMs);
         } catch (InterruptedException e) {
             throw Values.wrap(e);
+        }
+    }
+
+    public static void block(long timeMs) {
+        long start = System.currentTimeMillis();
+        for (; ; ) {
+            if (System.currentTimeMillis() - start > timeMs) {
+                break;
+            }
         }
     }
 
@@ -106,7 +115,7 @@ public class TestX {
                 CountDownLatch latch = new CountDownLatch(1);
                 flow.onTerminate(it -> latch.countDown()).collect();
                 latch.await();
-                delay(100);
+                sleep(100);
                 logger().log("==========================");
             } catch (Throwable e) {
                 e.printStackTrace();

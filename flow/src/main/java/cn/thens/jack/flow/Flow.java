@@ -288,7 +288,7 @@ public abstract class Flow<T> implements IFlow<T> {
     }
 
     public Flow<T> takeWhile(Predicate<? super T> predicate) {
-        return new FlowTakeWhile<>(this, predicate);
+        return FlowTakeWhile.takeWhile(this, predicate);
     }
 
     public Flow<T> takeUntil(Predicate<? super T> predicate) {

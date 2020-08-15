@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.thens.jack.TestX;
 import cn.thens.jack.flow.Flow;
@@ -37,7 +38,7 @@ public class SchedulerTest {
         }, 200, 100, TimeUnit.MILLISECONDS);
         logger.log("F");
 
-        TestX.delay(2000);
+        TestX.sleep(2000);
     }
 
     @Test
@@ -66,6 +67,25 @@ public class SchedulerTest {
         TestX.Logger logger = TestX.logger();
         Schedulers.timer().interval(10, TimeUnit.MILLISECONDS)
                 .schedule(() -> logger.log("A"));
-        TestX.delay(1000);
+        TestX.sleep(1000);
+    }
+
+    @Test
+    public void core() {
+        TestX.Logger logger = TestX.logger();
+        logger.log("availableProcessors: " + Runtime.getRuntime().availableProcessors());
+        AtomicInteger count = new AtomicInteger(0);
+
+        Flow<Object> blockingFLow = Flow.complete(() -> TestX.block(100))
+                .flowOn(Schedulers.core())
+                .skipAllTo(Flow.just(0));
+
+        Flow.interval(20, TimeUnit.MILLISECONDS)
+                .flatMap(it -> blockingFLow)
+                .take(100)
+                .map(it -> count.getAndIncrement())
+                .onCollect(TestX.collector("A"))
+                .flowOn(Schedulers.core())
+                .to(TestX.collect());
     }
 }
