@@ -72,8 +72,10 @@ public final class Schedulers {
     }
 
     private static RejectedExecutionHandler rejectHandler(String name) {
-        final Executor fallbackExecutor = new ThreadPoolExecutor(1, 1, 60, TimeUnit.SECONDS,
+        final ThreadPoolExecutor fallbackExecutor = new ThreadPoolExecutor(
+                1, 1, 60, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(1024), threadFactory(name + "-x", true));
+        fallbackExecutor.allowsCoreThreadTimeOut();
         return new RejectedExecutionHandler() {
             @Override
             public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
