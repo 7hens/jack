@@ -52,20 +52,20 @@ public class FlowEmitterTest {
     @Test
     public void lazyFlow() {
         Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
-                .onCollect(TestX.collector("A"))
-                .publish(Funcs.always(FlowEmitter.replay()));
+                .onCollect(TestX.collector("publish"))
+                .publish(() -> FlowEmitter.<Long>publish().autoCancel());
 
         Flow.timer(3, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 3s"))
                 .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("B"))
-                .take(3)
+                .onCollect(TestX.collector("3s"))
+                .take(1)
                 .collect();
 
         Flow.timer(6, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 6s"))
                 .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("C"))
+                .onCollect(TestX.collector("6s"))
                 .take(3)
                 .to(TestX.collect());
     }
