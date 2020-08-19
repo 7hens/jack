@@ -55,8 +55,8 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     private void clearBuffer() {
         bufferSize.set(0);
-        terminalReply = null;
         buffer.clear();
+        terminalReply = null;
     }
 
     @Override
@@ -68,7 +68,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
                 } else if (terminalReply != null) {
                     handle(terminalReply);
                 }
-                if (bufferSize.decrementAndGet() == 0) {
+                if (bufferSize.get() == 0 || bufferSize.decrementAndGet() == 0) {
                     break;
                 }
             }
