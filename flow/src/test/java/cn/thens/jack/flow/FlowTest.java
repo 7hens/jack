@@ -291,7 +291,10 @@ public class FlowTest {
     public void emitter() {
         AtomicInteger i = new AtomicInteger();
         Flow.create(emitter -> {
-            emitter.data(i.incrementAndGet());
+            int data = i.incrementAndGet();
+            for (int j = 0; j < 10; j++) {
+                emitter.data(data + "." + j);
+            }
             emitter.complete();
         })////////
                 .delayStart(Flow.timer(10, TimeUnit.MILLISECONDS))

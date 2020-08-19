@@ -62,12 +62,14 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     @Override
     public void run() {
         try {
-            while (bufferSize.get() > 0 && bufferSize.getAndDecrement() > 0) {
+            while (bufferSize.get() > 0) {
                 if (!buffer.isEmpty()) {
                     handle(Reply.data(buffer.remove(0)));
-                }
-                if (terminalReply != null) {
+                } else if (terminalReply != null) {
                     handle(terminalReply);
+                }
+                if (bufferSize.decrementAndGet() == 0) {
+                    break;
                 }
             }
         } catch (Throwable e) {
