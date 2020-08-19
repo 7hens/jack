@@ -22,13 +22,10 @@ class FlowDelay<T> extends Flow<T> {
         upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) throws Throwable {
-                final boolean isComplete = reply.isComplete();
-                if (isComplete) System.out.println("delay: start complete");
                 delayFunc.call(reply).asFlow().collectWith(emitter, new CollectorHelper() {
                     @Override
                     protected void onTerminate(Throwable error) throws Throwable {
                         super.onTerminate(error);
-                        if (isComplete) System.out.println("delay: END complete");
                         emitter.post(reply);
                     }
                 });

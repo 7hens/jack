@@ -3,6 +3,7 @@ package cn.thens.jack.flow;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
@@ -13,11 +14,11 @@ import cn.thens.jack.scheduler.IScheduler;
  * @author 7hens
  */
 class CollectorEmitter<T> implements Emitter<T>, Runnable {
-    private final AtomicBoolean isCollecting = new AtomicBoolean(false);
     private final AtomicBoolean isCollectorTerminated = new AtomicBoolean(false);
     private final AtomicBoolean isEmitterTerminated = new AtomicBoolean(false);
     private final List<T> buffer = new CopyOnWriteArrayList<>();
     private Reply<? extends T> terminalReply = null;
+    private final AtomicInteger bufferSize = new AtomicInteger();
 
     private final IScheduler scheduler;
     private final Collector<? super T> collector;
@@ -43,34 +44,35 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
                     buffer.add(reply.data());
                     backpressure.apply(buffer);
                 }
+                if (bufferSize.getAndIncrement() == 0) {
+                    schedule(this);
+                }
             } catch (Throwable e) {
                 error(e);
             }
-            schedule(this);
         }
     }
 
     private void clearBuffer() {
-        isEmitterTerminated.set(true);
+        bufferSize.set(0);
         terminalReply = null;
         buffer.clear();
     }
 
     @Override
     public void run() {
-        if (isCollecting.compareAndSet(false, true)) {
-            try {
-                while (!buffer.isEmpty()) {
+        try {
+            while (bufferSize.get() > 0 && bufferSize.getAndDecrement() > 0) {
+                if (!buffer.isEmpty()) {
                     handle(Reply.data(buffer.remove(0)));
                 }
                 if (terminalReply != null) {
                     handle(terminalReply);
                 }
-            } catch (Throwable e) {
-                error(e);
-            } finally {
-                isCollecting.set(false);
             }
+        } catch (Throwable e) {
+            clearBuffer();
+            error(e);
         }
     }
 

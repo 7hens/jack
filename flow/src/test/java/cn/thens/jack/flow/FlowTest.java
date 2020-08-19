@@ -288,7 +288,7 @@ public class FlowTest {
     }
 
     @Test
-    public void delayError2() {
+    public void emitter() {
         AtomicInteger i = new AtomicInteger();
         Flow.create(emitter -> {
             emitter.data(i.incrementAndGet());

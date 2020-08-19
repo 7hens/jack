@@ -37,7 +37,6 @@ abstract class FlowRepeat<T> extends Flow<T> {
         return new FlowRepeat<T>(upFlow) {
             @Override
             void onFlowComplete(Emitter<? super T> emitter) throws Throwable {
-                System.out.println("onFlowComplete");
                 onStartCollect(emitter);
             }
         };
