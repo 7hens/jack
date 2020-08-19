@@ -8,7 +8,7 @@ import cn.thens.jack.func.Funcs;
  * @author 7hens
  */
 @SuppressWarnings("WeakerAccess")
-public class FlowX {
+public final class FlowX {
     private FlowX() {
     }
 

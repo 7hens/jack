@@ -21,19 +21,17 @@ class FlowDelay<T> extends Flow<T> {
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         upFlow.collectWith(emitter, new Collector<T>() {
             @Override
-            public void post(Reply<? extends T> reply) {
-                try {
-                    delayFunc.call(reply).asFlow()
-                            .collectWith(emitter, new CollectorHelper() {
-                                @Override
-                                protected void onTerminate(Throwable error) throws Throwable {
-                                    super.onTerminate(error);
-                                    emitter.post(reply);
-                                }
-                            });
-                } catch (Throwable e) {
-                    emitter.error(e);
-                }
+            public void post(Reply<? extends T> reply) throws Throwable {
+                final boolean isComplete = reply.isComplete();
+                if (isComplete) System.out.println("delay: start complete");
+                delayFunc.call(reply).asFlow().collectWith(emitter, new CollectorHelper() {
+                    @Override
+                    protected void onTerminate(Throwable error) throws Throwable {
+                        super.onTerminate(error);
+                        if (isComplete) System.out.println("delay: END complete");
+                        emitter.post(reply);
+                    }
+                });
             }
         });
     }

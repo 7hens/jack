@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import cn.thens.jack.func.Values;
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Cancellables;
 import cn.thens.jack.scheduler.ICancellable;
@@ -13,7 +12,7 @@ import cn.thens.jack.scheduler.IScheduler;
 /**
  * @author 7hens
  */
-class CollectorEmitter<T> implements Emitter<T> {
+class CollectorEmitter<T> implements Emitter<T>, Runnable {
     private final AtomicBoolean isCollecting = new AtomicBoolean(false);
     private final AtomicBoolean isCollectorTerminated = new AtomicBoolean(false);
     private final AtomicBoolean isEmitterTerminated = new AtomicBoolean(false);
@@ -27,7 +26,7 @@ class CollectorEmitter<T> implements Emitter<T> {
 
     private CollectorEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backpressure) {
         this.scheduler = scheduler;
-        this.collector = wrapCollector(collector);
+        this.collector = collector;
         this.backpressure = backpressure;
     }
 
@@ -38,25 +37,16 @@ class CollectorEmitter<T> implements Emitter<T> {
                 if (reply.isCancel()) {
                     clearBuffer();
                 }
-                if (isCollecting.compareAndSet(false, true)) {
-                    schedule(() -> {
-                        try {
-                            collector.post(reply);
-                        } catch (Throwable e) {
-                            throw Values.wrap(e);
-                        }
-                    });
-                    return;
-                }
                 if (reply.isTerminal()) {
                     terminalReply = reply;
-                    return;
+                } else {
+                    buffer.add(reply.data());
+                    backpressure.apply(buffer);
                 }
-                buffer.add(reply.data());
-                backpressure.apply(buffer);
             } catch (Throwable e) {
                 error(e);
             }
+            schedule(this);
         }
     }
 
@@ -66,28 +56,32 @@ class CollectorEmitter<T> implements Emitter<T> {
         buffer.clear();
     }
 
-    private Collector<T> wrapCollector(Collector<? super T> collector) {
-        return new Collector<T>() {
-            @Override
-            public void post(Reply<? extends T> reply) throws Throwable {
-                isCollecting.set(true);
-                if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
-                    collector.post(reply);
-                    if (reply.isTerminal()) {
-                        clearBuffer();
-                        cancellable.cancel();
-                        return;
-                    }
-                    if (!buffer.isEmpty()) {
-                        post(Reply.data(buffer.remove(0)));
-                    } else if (terminalReply != null) {
-                        post(terminalReply);
-                    } else {
-                        isCollecting.set(false);
-                    }
+    @Override
+    public void run() {
+        if (isCollecting.compareAndSet(false, true)) {
+            try {
+                while (!buffer.isEmpty()) {
+                    handle(Reply.data(buffer.remove(0)));
                 }
+                if (terminalReply != null) {
+                    handle(terminalReply);
+                }
+            } catch (Throwable e) {
+                error(e);
+            } finally {
+                isCollecting.set(false);
             }
-        };
+        }
+    }
+
+    private void handle(Reply<? extends T> reply) throws Throwable {
+        if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
+            collector.post(reply);
+            if (reply.isTerminal()) {
+                clearBuffer();
+                cancellable.cancel();
+            }
+        }
     }
 
     @Override

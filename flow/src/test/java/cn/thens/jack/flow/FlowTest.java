@@ -288,6 +288,24 @@ public class FlowTest {
     }
 
     @Test
+    public void delayError2() {
+        AtomicInteger i = new AtomicInteger();
+        Flow.create(emitter -> {
+            emitter.data(i.incrementAndGet());
+            emitter.complete();
+        })////////
+                .delayStart(Flow.timer(10, TimeUnit.MILLISECONDS))
+                .onCollect(TestX.collector("A"))
+                .flowOn(Schedulers.io())
+                .delay(Flow.empty())
+                .onCollect(TestX.collector("B"))
+                .flowOn(Schedulers.io())
+                .repeat()
+                .ifEmpty(Flow.error(new NullPointerException()))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void toList() {
         Flow.interval(1, TimeUnit.SECONDS)
                 .take(3)
