@@ -24,9 +24,13 @@ abstract class FlowRepeat<T> extends Flow<T> {
             }
 
             @Override
-            protected void onComplete() throws Throwable {
-                super.onComplete();
-                onFlowComplete(emitter);
+            protected void onTerminate(Throwable error) throws Throwable {
+                super.onTerminate(error);
+                if (error == null) {
+                    onFlowComplete(emitter);
+                } else {
+                    emitter.error(error);
+                }
             }
         });
     }

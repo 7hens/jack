@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -294,6 +295,9 @@ public class FlowTest {
             int data = i.incrementAndGet();
             for (int j = 0; j < 10; j++) {
                 emitter.data(data + "." + j);
+                if (j == 5) {
+                    emitter.error(new NullPointerException());
+                }
             }
             emitter.complete();
         })////////
@@ -303,8 +307,11 @@ public class FlowTest {
                 .delay(Flow.empty())
                 .onCollect(TestX.collector("B"))
                 .flowOn(Schedulers.io())
+                .retry()
                 .repeat()
                 .ifEmpty(Flow.error(new NullPointerException()))
+                .skipAll()
+                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 
