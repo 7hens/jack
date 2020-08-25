@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -151,9 +150,10 @@ public class FlowTest {
 
     @Test
     public void timeout() {
-        Flow.timer(200, TimeUnit.MILLISECONDS)
+        Flow.timer(2, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("A"))
-                .timeout(Flow.timer(100, TimeUnit.MILLISECONDS), Flow.just(33L))
+                .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
+                .take(3)
                 .onCollect(TestX.collector("B"))
                 .to(TestX.collect());
     }

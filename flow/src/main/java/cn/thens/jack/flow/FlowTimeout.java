@@ -12,8 +12,8 @@ class FlowTimeout<T> extends Flow<T> {
     private final Flow<T> upFlow;
     private final IFlow<?> timeoutFlow;
     private final IFlow<T> fallback;
-    private Cancellable upFlowCancellable = Cancellables.create();
-    private Cancellable timeoutCancellable = Cancellables.create();
+    private Cancellable upFlowCancellable = Cancellables.single();
+    private Cancellable timeoutCancellable = Cancellables.single();
     private final AtomicBoolean isTransferred = new AtomicBoolean(false);
 
     FlowTimeout(Flow<T> upFlow, IFlow<?> timeoutFlow, IFlow<T> fallback) {
@@ -24,7 +24,7 @@ class FlowTimeout<T> extends Flow<T> {
 
     @Override
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
-        timeoutCancellable = startTimeoutFlow(emitter);
+        timeoutCancellable.addCancellable(startTimeoutFlow(emitter));
         upFlowCancellable.addCancellable(upFlow.collectWith(emitter, reply -> {
             if (isTransferred.get()) return;
             emitter.post(reply);
@@ -33,7 +33,7 @@ class FlowTimeout<T> extends Flow<T> {
                 return;
             }
             try {
-                timeoutCancellable = startTimeoutFlow(emitter);
+                timeoutCancellable.addCancellable(startTimeoutFlow(emitter));
             } catch (Throwable e) {
                 emitter.error(e);
             }
@@ -43,9 +43,9 @@ class FlowTimeout<T> extends Flow<T> {
     private Cancellable startTimeoutFlow(Emitter<? super T> emitter) throws Throwable {
         return timeoutFlow.asFlow().collectWith(emitter, reply -> {
             if (reply.isTerminal() && !emitter.isCancelled()) {
-                upFlowCancellable.cancel();
                 if (isTransferred.compareAndSet(false, true)) {
                     try {
+                        upFlowCancellable.cancel();
                         fallback.asFlow().onStartCollect(emitter);
                     } catch (Throwable e) {
                         emitter.error(e);
