@@ -1,39 +1,18 @@
 package cn.thens.jack.flow;
 
-import org.jetbrains.annotations.ApiStatus;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.ICancellable;
-import cn.thens.jack.scheduler.Scheduler;
-import cn.thens.jack.scheduler.Schedulers;
 
 
 /**
  * @author 7hens
  */
-@SuppressWarnings("WeakerAccess")
-public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
-    private final AtomicReference<Reply<? extends T>> terminalReplyRef = new AtomicReference<>();
-    private final List<Collector<? super T>> collectors = new CopyOnWriteArrayList<>();
-    private final Emitter<T> collectorEmitter;
-    private boolean autoCancel = false;
-
-    private FlowEmitter() {
-        Scheduler scheduler = Schedulers.unconfined();
-        Collector<T> collector = this::onCollect;
-        collectorEmitter = CollectorEmitter.create(scheduler, collector);
-    }
+public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
+    protected abstract Emitter<? super T> emitter();
 
     @Override
     public void post(Reply<? extends T> reply) {
-        if (reply.isTerminal()) {
-            terminalReplyRef.compareAndSet(null, reply);
-        }
-        collectorEmitter.post(reply);
+        emitter().post(reply);
     }
 
     @Override
@@ -58,109 +37,41 @@ public class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     @Override
     public boolean isCancelled() {
-        return collectorEmitter.isCancelled();
+        return emitter().isCancelled();
     }
 
     @Override
     public void addCancellable(ICancellable onCancel) {
-        collectorEmitter.addCancellable(onCancel);
+        emitter().addCancellable(onCancel);
     }
 
     @Override
     public Cancellable schedule(Runnable runnable) {
-        return collectorEmitter.schedule(runnable);
+        return emitter().schedule(runnable);
     }
 
     @Override
-    public Flow<T> asFlow() {
-        return Flow.create(emitter -> {
-            Reply<? extends T> terminalReply = terminalReplyRef.get();
-            if (terminalReply != null) {
-                emitter.post(terminalReply);
-                return;
-            }
-            collectors.add(emitter);
-            emitter.addCancellable(() -> {
-                collectors.remove(emitter);
-                if (autoCancel && collectors.isEmpty()) {
-                    cancel();
-                }
-            });
-        });
-    }
+    public abstract Flow<T> asFlow();
 
-    protected void onCollect(Reply<? extends T> reply) throws Throwable {
-        for (Collector<? super T> collector : collectors) {
-            collector.post(reply);
-        }
-        if (reply.isTerminal()) {
-            collectors.clear();
-        }
-    }
+    public abstract boolean hasCollectors();
 
-    @ApiStatus.Experimental
     public FlowEmitter<T> autoCancel() {
-        autoCancel = true;
-        return this;
+        return new FlowEmitterAutoCancel<>(this);
     }
 
     public static <T> FlowEmitter<T> publish() {
-        return new FlowEmitter<>();
-    }
-
-    private static <T> FlowEmitter<T> behavior(Reply<? extends T> initReply) {
-        return new FlowEmitter<T>() {
-            private Reply<? extends T> lastReply = initReply;
-
-            @Override
-            protected void onCollect(Reply<? extends T> reply) throws Throwable {
-                if (!reply.isTerminal()) {
-                    lastReply = reply;
-                }
-                super.onCollect(reply);
-            }
-
-            @Override
-            public Flow<T> asFlow() {
-                return Flow.<T>create(emitter -> {
-                    if (lastReply != null) {
-                        emitter.post(lastReply);
-                    }
-                    emitter.complete();
-                }) ////////////////
-                        .polyWith(super.asFlow())
-                        .flatMerge();
-            }
-        };
+        return new FlowEmitterPublish<>();
     }
 
     public static <T> FlowEmitter<T> behavior() {
-        return behavior(null);
+        return new FlowEmitterBehavior<>(null);
     }
 
     public static <T> FlowEmitter<T> behavior(T initData) {
-        return behavior(Reply.data(initData));
+        return new FlowEmitterBehavior<>(Reply.data(initData));
     }
 
     public static <T> FlowEmitter<T> replay() {
-        return new FlowEmitter<T>() {
-            private List<Reply<? extends T>> replyBuffer = new CopyOnWriteArrayList<>();
-
-            @Override
-            protected void onCollect(Reply<? extends T> reply) throws Throwable {
-                replyBuffer.add(reply);
-                super.onCollect(reply);
-            }
-
-            @Override
-            public Flow<T> asFlow() {
-                return Flow.<T>create(emitter -> {
-                    for (Reply<? extends T> reply : replyBuffer) {
-                        emitter.post(reply);
-                    }
-                    emitter.complete();
-                }).polyWith(super.asFlow()).flatConcat();
-            }
-        };
+        return new FlowEmitterReplay<>();
     }
 }

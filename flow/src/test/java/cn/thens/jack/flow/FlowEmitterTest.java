@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import cn.thens.jack.TestX;
-import cn.thens.jack.func.Funcs;
 
 /**
  * @author 7hens
@@ -53,7 +52,7 @@ public class FlowEmitterTest {
     public void lazyFlow() {
         Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("publish"))
-                .publish(() -> FlowEmitter.<Long>publish().autoCancel());
+                .publish(FlowEmitter::publish);
 
         Flow.timer(3, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 3s"))
@@ -73,20 +72,20 @@ public class FlowEmitterTest {
     @Test
     public void autoCancel() {
         Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
-                .onCollect(TestX.collector("A"))
+                .onCollect(TestX.collector("publish"))
                 .publish(() -> FlowEmitter.<Long>publish().autoCancel());
 
         Flow.timer(3, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 3s"))
                 .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("B"))
+                .onCollect(TestX.collector("3s"))
                 .take(2)
                 .collect();
 
         Flow.timer(6, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 6s"))
                 .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("C"))
+                .onCollect(TestX.collector("6s"))
                 .take(2)
                 .to(TestX.collect());
     }
