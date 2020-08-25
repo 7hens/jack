@@ -44,20 +44,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     protected void onCancel() throws Throwable {
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> CollectorHelper<T> from(final Collector<? super T> collector) {
-        if (collector instanceof CollectorHelper) {
-            return (CollectorHelper) collector;
-        }
-        return new CollectorHelper<T>() {
-            @Override
-            public void post(Reply<? extends T> reply) throws Throwable {
-                super.post(reply);
-                collector.post(reply);
-            }
-        };
-    }
-
+    @SuppressWarnings("rawtypes")
     private static CollectorHelper INSTANCE = new CollectorHelper() {
     };
 

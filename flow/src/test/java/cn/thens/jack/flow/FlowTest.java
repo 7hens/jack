@@ -190,7 +190,7 @@ public class FlowTest {
                 .onEach(it -> Values.require(it <= 0))
                 .onCollect(TestX.collector("A"))
                 .flowOn(TestX.scheduler("a"))
-                .catchError(Flow.just(100))
+                .onErrorResume(Flow.just(100))
                 .onCollect(TestX.collector("B"))
                 .flowOn(TestX.scheduler("b"))
                 .to(TestX.collect());
@@ -199,7 +199,7 @@ public class FlowTest {
         Flow.single(Funcs.error(new NullPointerException()))
                 .onCollect(TestX.collector("C"))
                 .flowOn(TestX.scheduler("c"))
-                .catchError(Flow.just(100))
+                .onErrorResume(Flow.just(100))
                 .onCollect(TestX.collector("D"))
                 .flowOn(TestX.scheduler("d"))
                 .to(TestX.collect());

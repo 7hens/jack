@@ -44,7 +44,7 @@ class PolyFlowDelayErrors<T> extends PolyFlow<T> {
                                     onEachFlowTerminate();
                                 }
                             })
-                            .catchError(Flow.empty()));
+                            .catchError());
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

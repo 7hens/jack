@@ -88,4 +88,16 @@ public class SchedulerTest {
                 .flowOn(Schedulers.core())
                 .to(TestX.collect());
     }
+
+    @Test
+    public void stackTrace() {
+        TestX.Logger logger = TestX.logger();
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        Schedulers.core().schedule(() -> {
+            for (StackTraceElement element : stackTrace) {
+                logger.log(element.toString());
+            }
+        });
+        TestX.sleep(1000L);
+    }
 }

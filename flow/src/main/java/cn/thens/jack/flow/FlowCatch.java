@@ -4,7 +4,7 @@ package cn.thens.jack.flow;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Predicate;
 
@@ -38,7 +38,7 @@ abstract class FlowCatch<T> extends Flow<T> {
 
     abstract void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable;
 
-    static <T> Flow<T> catchError(Flow<T> upFlow, Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
+    static <T> Flow<T> onErrorResume(Flow<T> upFlow, Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
@@ -47,20 +47,21 @@ abstract class FlowCatch<T> extends Flow<T> {
         };
     }
 
-    static <T> Flow<T> catchError(Flow<T> upFlow, Action2<? super Throwable, ? super Emitter<? super T>> resumeConsumer) {
-        return new FlowCatch<T>(upFlow) {
-            @Override
-            void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
-                resumeConsumer.run(error, emitter);
-            }
-        };
-    }
-
-    static <T> Flow<T> catchError(Flow<T> upFlow, IFlow<T> resumeFlow) {
+    static <T> Flow<T> onErrorResume(Flow<T> upFlow, IFlow<T> resumeFlow) {
         return new FlowCatch<T>(upFlow) {
             @Override
             void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 resumeFlow.asFlow().onStartCollect(emitter);
+            }
+        };
+    }
+
+    static <T> Flow<T> catchError(Flow<T> upFlow, Action1<? super Throwable> onError) {
+        return new FlowCatch<T>(upFlow) {
+            @Override
+            void handleError(Emitter<? super T> emitter, Throwable error) throws Throwable {
+                onError.run(error);
+                emitter.complete();
             }
         };
     }

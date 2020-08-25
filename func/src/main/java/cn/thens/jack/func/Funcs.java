@@ -1,6 +1,6 @@
 package cn.thens.jack.func;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
         Func0<R>,
         Func1<P1, R>,
@@ -149,42 +149,42 @@ public class Funcs<P1, P2, P3, P4, P5, P6, P7, P8, P9, R> implements
 
     @Override
     public R call() {
-        return call((P1) null);
+        return call(null, null, null, null, null, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1) {
-        return call(p1, null);
+        return call(p1, null, null, null, null, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2) {
-        return call(p1, p2, null);
+        return call(p1, p2, null, null, null, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2, P3 p3) {
-        return call(p1, p2, p3, null);
+        return call(p1, p2, p3, null, null, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2, P3 p3, P4 p4) {
-        return call(p1, p2, p3, p4, null);
+        return call(p1, p2, p3, p4, null, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        return call(p1, p2, p3, p4, p5, null);
+        return call(p1, p2, p3, p4, p5, null, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        return call(p1, p2, p3, p4, p5, p6, null);
+        return call(p1, p2, p3, p4, p5, p6, null, null, null);
     }
 
     @Override
     public R call(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        return call(p1, p2, p3, p4, p5, p6, p7, null);
+        return call(p1, p2, p3, p4, p5, p6, p7, null, null);
     }
 
     @Override

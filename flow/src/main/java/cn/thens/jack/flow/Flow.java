@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 
 import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
-import cn.thens.jack.func.Action2;
+import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func0;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Func2;
@@ -397,21 +397,20 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowAutoSwitch.autoSwitch(this, timeoutFlow, fallback);
     }
 
-    public Flow<T> catchError(Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
-        return FlowCatch.catchError(this, resumeFunc);
+    public Flow<T> onErrorResume(Func1<? super Throwable, ? extends IFlow<T>> resumeFunc) {
+        return FlowCatch.onErrorResume(this, resumeFunc);
     }
 
-    @Deprecated
-    public Flow<T> catchError(Action2<? super Throwable, ? super Emitter<? super T>> resumeAction) {
-        return FlowCatch.catchError(this, resumeAction);
+    public Flow<T> onErrorResume(IFlow<T> resumeFlow) {
+        return FlowCatch.onErrorResume(this, resumeFlow);
     }
 
-    public Flow<T> catchError(IFlow<T> resumeFlow) {
-        return FlowCatch.catchError(this, resumeFlow);
+    public Flow<T> catchError(Action1<? super Throwable> onError) {
+        return FlowCatch.catchError(this, onError);
     }
 
     public Flow<T> catchError() {
-        return catchError(empty());
+        return catchError(Actions.empty());
     }
 
     public Flow<T> retry() {

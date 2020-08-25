@@ -17,6 +17,7 @@ class FlowOnCollect<T> extends Flow<T> {
         this.collector = collector;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         if (collector instanceof CollectorHelper) {
@@ -26,15 +27,12 @@ class FlowOnCollect<T> extends Flow<T> {
                 emitter.error(e);
             }
         }
-        upFlow.collectWith(emitter, new Collector<T>() {
-            @Override
-            public void post(Reply<? extends T> reply) {
-                try {
-                    collector.post(reply);
-                    emitter.post(reply);
-                } catch (Throwable e) {
-                    emitter.error(e);
-                }
+        upFlow.collectWith(emitter, reply -> {
+            try {
+                collector.post(reply);
+                emitter.post(reply);
+            } catch (Throwable e) {
+                emitter.error(e);
             }
         });
     }
