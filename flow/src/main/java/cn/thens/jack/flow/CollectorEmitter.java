@@ -22,13 +22,13 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     private final IScheduler scheduler;
     private final Collector<? super T> collector;
-    private final BackPressure<T> backpressure;
+    private final BackPressure<T> backPressure;
     private final Cancellable cancellable = Cancellables.create();
 
-    private CollectorEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backpressure) {
+    private CollectorEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
         this.scheduler = scheduler;
         this.collector = collector;
-        this.backpressure = backpressure;
+        this.backPressure = backPressure;
     }
 
     @Override
@@ -42,7 +42,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
                     terminalReply = reply;
                 } else {
                     buffer.add(reply.data());
-                    backpressure.apply(buffer);
+                    backPressure.apply(buffer);
                 }
                 if (bufferSize.getAndIncrement() == 0) {
                     schedule(this);
@@ -123,14 +123,15 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
         return scheduler.schedule(runnable);
     }
 
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backpressure) {
-        return new CollectorEmitter<>(scheduler, collector, backpressure);
+    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+        return new CollectorEmitter<>(scheduler, collector, backPressure);
     }
 
-    private static final BackPressure DEFAULT_BACKPRESSURE = BackPressures.success();
+    @SuppressWarnings("rawtypes")
+    private static final BackPressure DEFAULT_BACK_PRESSURE = BackPressures.success();
 
     @SuppressWarnings("unchecked")
     static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector) {
-        return create(scheduler, collector, DEFAULT_BACKPRESSURE);
+        return create(scheduler, collector, DEFAULT_BACK_PRESSURE);
     }
 }

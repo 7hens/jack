@@ -76,11 +76,6 @@ public final class Schedulers {
                 1, 1, 60, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(1024), threadFactory(name + "-x", true));
         fallbackExecutor.allowsCoreThreadTimeOut();
-        return new RejectedExecutionHandler() {
-            @Override
-            public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-                fallbackExecutor.execute(runnable);
-            }
-        };
+        return (runnable, threadPoolExecutor) -> fallbackExecutor.execute(runnable);
     }
 }
