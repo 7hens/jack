@@ -150,11 +150,18 @@ public class FlowTest {
 
     @Test
     public void timeout() {
-        Flow.timer(2, TimeUnit.SECONDS)
+        Flow.just(100L)
                 .onCollect(TestX.collector("A"))
                 .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
                 .take(3)
                 .onCollect(TestX.collector("B"))
+                .to(TestX.collect());
+
+        Flow.timer(2, TimeUnit.SECONDS)
+                .onCollect(TestX.collector("C"))
+                .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
+                .take(3)
+                .onCollect(TestX.collector("D"))
                 .to(TestX.collect());
     }
 

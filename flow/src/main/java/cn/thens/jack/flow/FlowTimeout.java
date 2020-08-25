@@ -42,7 +42,7 @@ class FlowTimeout<T> extends Flow<T> {
 
     private Cancellable startTimeoutFlow(Emitter<? super T> emitter) throws Throwable {
         return timeoutFlow.asFlow().collectWith(emitter, reply -> {
-            if (reply.isTerminal() && !emitter.isCancelled()) {
+            if (reply.isTerminal() && !reply.isCancel() && !emitter.isCancelled()) {
                 if (isTransferred.compareAndSet(false, true)) {
                     try {
                         upFlowCancellable.cancel();
