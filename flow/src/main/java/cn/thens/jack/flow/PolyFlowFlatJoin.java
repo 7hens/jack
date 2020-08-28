@@ -71,7 +71,7 @@ class PolyFlowFlatJoin<T> extends Flow<List<T>> {
                 for (ValueRef<T> valueRef : cachedDataQueue) {
                     result.add(valueRef.get());
                 }
-                emitter.data(result);
+                emitter.next(result);
             }
         });
     }

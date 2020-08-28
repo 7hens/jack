@@ -55,7 +55,7 @@ final class FlowCreate {
     static <T> Flow<T> fromArray(T[] elements) {
         return create(emitter -> {
             for (T item : elements) {
-                emitter.data(item);
+                emitter.next(item);
             }
             emitter.complete();
         });
@@ -64,7 +64,7 @@ final class FlowCreate {
     static <T> Flow<T> fromIterable(Iterable<T> iterable) {
         return create(emitter -> {
             for (T item : iterable) {
-                emitter.data(item);
+                emitter.next(item);
             }
             emitter.complete();
         });
@@ -72,14 +72,14 @@ final class FlowCreate {
 
     static <T> Flow<T> fromFuture(Future<? extends T> future) {
         return create(emitter -> {
-            emitter.data(future.get());
+            emitter.next(future.get());
             emitter.complete();
         });
     }
 
     static <T> Flow<T> fromFunc(Func0<? extends T> func) {
         return create(emitter -> {
-            emitter.data(func.call());
+            emitter.next(func.call());
             emitter.complete();
         });
     }
@@ -101,11 +101,11 @@ final class FlowCreate {
         return create(emitter -> {
             if (end > start) {
                 for (int i = start; i <= end; i += step) {
-                    emitter.data(i);
+                    emitter.next(i);
                 }
             } else {
                 for (int i = start; i >= end; i += step) {
-                    emitter.data(i);
+                    emitter.next(i);
                 }
             }
             emitter.complete();
@@ -119,7 +119,7 @@ final class FlowCreate {
     static Flow<Long> timer(long delay, TimeUnit unit) {
         return create(emitter -> {
             emitter.addCancellable(schedulerOf(emitter).schedule(() -> {
-                emitter.data(0L);
+                emitter.next(0L);
                 emitter.complete();
             }, delay, unit));
         });
@@ -129,7 +129,7 @@ final class FlowCreate {
         return create(emitter -> {
             final AtomicLong count = new AtomicLong(0);
             emitter.addCancellable(schedulerOf(emitter).schedulePeriodically(() ->
-                    emitter.data(count.getAndIncrement()), initialDelay, period, unit));
+                    emitter.next(count.getAndIncrement()), initialDelay, period, unit));
         });
     }
 
@@ -138,7 +138,7 @@ final class FlowCreate {
             try {
                 int bytes = input.read(buffer);
                 while (bytes >= 0) {
-                    emitter.data(bytes);
+                    emitter.next(bytes);
                     bytes = input.read(buffer);
                 }
                 emitter.complete();
@@ -156,7 +156,7 @@ final class FlowCreate {
                 int bytes = input.read(buffer);
                 while (bytes >= 0) {
                     output.write(buffer, 0, bytes);
-                    emitter.data(bytes);
+                    emitter.next(bytes);
                     bytes = input.read(buffer);
                 }
                 emitter.complete();

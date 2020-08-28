@@ -19,7 +19,7 @@ public final class LifecycleFlow {
             LifecycleEventObserver observer = new LifecycleEventObserver() {
                 @Override
                 public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                    emitter.data(event);
+                    emitter.next(event);
                     if (event == Lifecycle.Event.ON_DESTROY) {
                         emitter.complete();
                     }
@@ -35,16 +35,16 @@ public final class LifecycleFlow {
             View.OnAttachStateChangeListener listener = new View.OnAttachStateChangeListener() {
                 @Override
                 public void onViewAttachedToWindow(View v) {
-                    emitter.data(Lifecycle.Event.ON_CREATE);
-                    emitter.data(Lifecycle.Event.ON_START);
-                    emitter.data(Lifecycle.Event.ON_RESUME);
+                    emitter.next(Lifecycle.Event.ON_CREATE);
+                    emitter.next(Lifecycle.Event.ON_START);
+                    emitter.next(Lifecycle.Event.ON_RESUME);
                 }
 
                 @Override
                 public void onViewDetachedFromWindow(View v) {
-                    emitter.data(Lifecycle.Event.ON_PAUSE);
-                    emitter.data(Lifecycle.Event.ON_STOP);
-                    emitter.data(Lifecycle.Event.ON_DESTROY);
+                    emitter.next(Lifecycle.Event.ON_PAUSE);
+                    emitter.next(Lifecycle.Event.ON_STOP);
+                    emitter.next(Lifecycle.Event.ON_DESTROY);
                     emitter.complete();
                 }
             };

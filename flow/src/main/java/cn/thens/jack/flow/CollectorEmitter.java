@@ -89,7 +89,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     }
 
     @Override
-    public void data(T data) {
+    public void next(T data) {
         post(Reply.data(data));
     }
 

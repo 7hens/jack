@@ -197,7 +197,7 @@ public final class ActivityRequest {
             Contract contract = contracts.get(requestCode);
             if (contract != null) {
                 Emitter emitter = contract.emitter;
-                emitter.data(result);
+                emitter.next(result);
                 emitter.complete();
             }
         }

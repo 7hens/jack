@@ -32,7 +32,7 @@ public class FlowEmitterTest {
                 .collect();
 
         TestX.sleep(100);
-        emitter.data(-1L);
+        emitter.next(-1L);
 
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(emitter)

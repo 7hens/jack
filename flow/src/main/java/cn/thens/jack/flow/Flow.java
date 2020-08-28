@@ -96,8 +96,8 @@ public abstract class Flow<T> implements IFlow<T> {
         return FlowOnCollect.onStart(this, consumer);
     }
 
-    public Flow<T> onEach(Action1<? super T> consumer) {
-        return FlowOnCollect.onEach(this, consumer);
+    public Flow<T> onNext(Action1<? super T> consumer) {
+        return FlowOnCollect.onNext(this, consumer);
     }
 
     public Flow<T> onTerminate(Action1<? super Throwable> consumer) {

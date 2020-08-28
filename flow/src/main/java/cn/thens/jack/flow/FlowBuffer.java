@@ -50,7 +50,7 @@ abstract class FlowBuffer<T> extends Flow<T> {
             void onComplete(Emitter<? super T> emitter, List<T> buffer) {
                 if (count > 0) {
                     for (T data : buffer) {
-                        emitter.data(data);
+                        emitter.next(data);
                     }
                 }
             }
@@ -76,7 +76,7 @@ abstract class FlowBuffer<T> extends Flow<T> {
                     emitter.error(new NoSuchElementException());
                     return;
                 }
-                emitter.data(buffer.get(0));
+                emitter.next(buffer.get(0));
             }
         };
     }
@@ -86,7 +86,7 @@ abstract class FlowBuffer<T> extends Flow<T> {
             @Override
             void onBuffer(Emitter<? super T> emitter, List<T> buffer) {
                 if (buffer.size() > count) {
-                    emitter.data(buffer.remove(0));
+                    emitter.next(buffer.remove(0));
                 }
             }
 

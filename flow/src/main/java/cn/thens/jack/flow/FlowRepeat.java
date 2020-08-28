@@ -18,9 +18,9 @@ abstract class FlowRepeat<T> extends Flow<T> {
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         upFlow.collectWith(emitter, new CollectorHelper<T>() {
             @Override
-            protected void onEach(T data) throws Throwable {
-                super.onEach(data);
-                emitter.data(data);
+            protected void onNext(T data) throws Throwable {
+                super.onNext(data);
+                emitter.next(data);
             }
 
             @Override

@@ -35,9 +35,9 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
                 if (entryEmitter == null) {
                     entryEmitter = FlowEmitter.publish();
                     map.put(key, entryEmitter);
-                    emitter.data(newEntry(key, entryEmitter));
+                    emitter.next(newEntry(key, entryEmitter));
                 }
-                entryEmitter.data(value);
+                entryEmitter.next(value);
             } catch (Throwable e) {
                 emitter.error(e);
             }

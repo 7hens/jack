@@ -54,7 +54,7 @@ public class TestX {
 
             @Override
             protected void onEach(T data) throws Throwable {
-                super.onEach(data);
+                super.onNext(data);
                 logger.log("onEach: " + data);
             }
 

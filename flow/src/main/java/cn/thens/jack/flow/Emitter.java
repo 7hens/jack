@@ -11,7 +11,7 @@ public interface Emitter<T> extends Collector<T>, Cancellable, IScheduler {
     @Override
     void post(Reply<? extends T> reply);
 
-    void data(T data);
+    void next(T data);
 
     void error(Throwable error);
 

@@ -51,11 +51,11 @@ class FlowOnCollect<T> extends Flow<T> {
         });
     }
 
-    static <T> FlowOnCollect<T> onEach(Flow<T> upFlow, final Action1<? super T> consumer) {
+    static <T> FlowOnCollect<T> onNext(Flow<T> upFlow, final Action1<? super T> consumer) {
         return onCollect(upFlow, new CollectorHelper<T>() {
             @Override
-            protected void onEach(T data) throws Throwable {
-                super.onEach(data);
+            protected void onNext(T data) throws Throwable {
+                super.onNext(data);
                 consumer.run(data);
             }
         });

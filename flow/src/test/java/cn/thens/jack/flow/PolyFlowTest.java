@@ -22,7 +22,7 @@ public class PolyFlowTest {
                 .flowOn(TestX.scheduler("a"))
                 .mapToFlow(it -> Flow.interval(1, TimeUnit.SECONDS)
                         .take(5)
-                        .onEach(i -> Values.require(i < 4))
+                        .onNext(i -> Values.require(i < 4))
                         .map(i -> it + "." + i))
                 .polyTo(converter)
                 .onCollect(TestX.collector("B"))

@@ -10,7 +10,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     @Override
     public void post(Reply<? extends T> reply) throws Throwable {
         if (!reply.isTerminal()) {
-            onEach(reply.data());
+            onNext(reply.data());
             return;
         }
         Throwable error = reply.error();
@@ -29,7 +29,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     protected void onStart(Cancellable cancellable) throws Throwable {
     }
 
-    protected void onEach(T data) throws Throwable {
+    protected void onNext(T data) throws Throwable {
     }
 
     protected void onTerminate(Throwable error) throws Throwable {

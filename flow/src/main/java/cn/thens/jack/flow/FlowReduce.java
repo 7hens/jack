@@ -28,7 +28,7 @@ abstract class FlowReduce<T, R> extends Flow<R> {
                     Throwable error = reply.error();
                     if (error == null) {
                         if (hasValue.get()) {
-                            emitter.data(value.get());
+                            emitter.next(value.get());
                         }
                         emitter.complete();
                     } else {

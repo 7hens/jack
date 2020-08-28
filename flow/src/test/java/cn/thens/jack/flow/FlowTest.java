@@ -171,8 +171,8 @@ public class FlowTest {
             String threadName = Thread.currentThread().getName();
             TestX.logger().log("emitter (" + threadName + ")");
 
-            emitter.data("hello");
-            emitter.data("world");
+            emitter.next("hello");
+            emitter.next("world");
             emitter.cancel();
             emitter.complete();
         })/////////
@@ -187,7 +187,7 @@ public class FlowTest {
     @Test
     public void catchError() {
         Flow.just(0, 1)
-                .onEach(it -> Values.require(it <= 0))
+                .onNext(it -> Values.require(it <= 0))
                 .onCollect(TestX.collector("A"))
                 .flowOn(TestX.scheduler("a"))
                 .onErrorResume(Flow.just(100))
@@ -288,7 +288,7 @@ public class FlowTest {
     public void delayError() {
         Flow.interval(100, TimeUnit.MILLISECONDS)
                 .onCollect(TestX.collector("A"))
-                .onEach(it -> Values.require(it < 3L))
+                .onNext(it -> Values.require(it < 3L))
                 .delayError(Flow.timer(3, TimeUnit.SECONDS))
 //                .take(3)
                 .onCollect(TestX.collector("B"))
@@ -301,7 +301,7 @@ public class FlowTest {
         Flow.create(emitter -> {
             int data = i.incrementAndGet();
             for (int j = 0; j < 10; j++) {
-                emitter.data(data + "." + j);
+                emitter.next(data + "." + j);
                 if (j == 5) {
                     emitter.error(new NullPointerException());
                 }

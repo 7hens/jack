@@ -32,7 +32,7 @@ abstract class FlowFilter<T> extends Flow<T> {
                     }
                     T data = reply.data();
                     if (test(data)) {
-                        emitter.data(data);
+                        emitter.next(data);
                     }
                 } catch (Throwable e) {
                     emitter.error(e);
@@ -126,7 +126,7 @@ abstract class FlowFilter<T> extends Flow<T> {
             @Override
             void onTerminated(Emitter<? super T> emitter, Throwable error) throws Throwable {
                 if (hasLast.get()) {
-                    emitter.data(lastValue);
+                    emitter.next(lastValue);
                 }
                 super.onTerminated(emitter, error);
             }

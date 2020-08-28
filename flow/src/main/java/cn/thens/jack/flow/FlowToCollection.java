@@ -20,7 +20,7 @@ class FlowToCollection<T, C extends Collection<T>> extends Flow<C> {
             @Override
             public void post(Reply<? extends T> reply) {
                 if (reply.isTerminal()) {
-                    emitter.data(list);
+                    emitter.next(list);
                     emitter.error(reply.error());
                     return;
                 }

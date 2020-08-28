@@ -33,7 +33,7 @@ class FlowWindow<T> extends PolyFlow<T> {
     }
 
     private void emitNewFlow(Emitter<? super IFlow<T>> emitter) {
-        emitter.data(new Flow<T>() {
+        emitter.next(new Flow<T>() {
             @Override
             protected void onStartCollect(Emitter<? super T> innerEmitter) throws Throwable {
                 emitReply(Reply.complete());

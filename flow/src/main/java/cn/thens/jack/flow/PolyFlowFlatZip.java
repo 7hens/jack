@@ -72,7 +72,7 @@ class PolyFlowFlatZip<T> extends Flow<List<T>> {
                     for (Queue<T> queue : cachedDataQueue) {
                         result.add(queue.poll());
                     }
-                    emitter.data(result);
+                    emitter.next(result);
                 }
             }
         });

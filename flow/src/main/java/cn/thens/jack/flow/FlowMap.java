@@ -25,7 +25,7 @@ class FlowMap<T, R> extends Flow<R> {
                     return;
                 }
                 try {
-                    emitter.data(mapper.call(reply.data()));
+                    emitter.next(mapper.call(reply.data()));
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

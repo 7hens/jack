@@ -26,7 +26,7 @@ abstract class FlowWindowFilter<T> extends PolyFlow<T> {
                 if (currentEmitter != null) {
                     currentEmitter.error(error);
                 } else {
-                    emitter.data(Flow.error(error));
+                    emitter.next(Flow.error(error));
                 }
                 return;
             }
@@ -43,7 +43,7 @@ abstract class FlowWindowFilter<T> extends PolyFlow<T> {
 
     private void emitNewFlow(Emitter<? super Flow<T>> emitter) {
         emitInner(Reply.complete());
-        emitter.data(new Flow<T>() {
+        emitter.next(new Flow<T>() {
             @Override
             protected void onStartCollect(Emitter<? super T> innerEmitter) throws Throwable {
                 currentEmitter = innerEmitter;

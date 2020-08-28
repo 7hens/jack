@@ -30,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
             IntentRef.create(this, MainActivity.class)
                     .put(TITLE, "Hello, Jack")
                     .startActivityForResult(this)
-                    .onEach(data -> {
+                    .onNext(data -> {
                         data.get(TITLE);
                     })
                     .flowOn(AndroidSchedulers.mainThread())
                     .collect();
 
             Permissions.request(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    .onEach(isGranted -> {
+                    .onNext(isGranted -> {
                     })
                     .flowOn(AndroidSchedulers.mainThread())
                     .collect();

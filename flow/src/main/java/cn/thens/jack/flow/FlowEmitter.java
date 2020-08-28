@@ -16,7 +16,7 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
-    public void data(T data) {
+    public void next(T data) {
         post(Reply.data(data));
     }
 
