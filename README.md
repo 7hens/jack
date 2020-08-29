@@ -216,7 +216,7 @@ Flow.just(1, 2, 3, 4, 5)
         .flatMerge()
         .onCollect(new CollectorHelper<Integer>() {
             @Override
-            protected void onEach(Integer s) {
+            protected void onNext(Integer s) {
                 System.out.println(s);
             }
 

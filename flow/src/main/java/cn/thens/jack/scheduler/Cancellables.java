@@ -29,6 +29,10 @@ public final class Cancellables {
         return new CancellableSingle();
     }
 
+    public static Cancellable reusable() {
+        return new CancellableReusable();
+    }
+
     public static Cancellable of(final ICancellable cancellable) {
         if (cancellable instanceof Cancellable) {
             return (Cancellable) cancellable;

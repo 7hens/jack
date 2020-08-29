@@ -70,12 +70,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return new FlowFlowOn<>(this, upScheduler);
     }
 
-    @ApiStatus.Experimental
     public Flow<T> publish(Func0<? extends FlowEmitter<T>> emitterFactory) {
         return new FlowPublish<>(this, emitterFactory);
     }
 
-    @ApiStatus.Experimental
     public Flow<T> publish(FlowEmitter<T> emitter) {
         return publish(Funcs.always(emitter));
     }
