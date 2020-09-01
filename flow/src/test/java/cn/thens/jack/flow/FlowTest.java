@@ -318,6 +318,7 @@ public class FlowTest {
                 .repeat()
                 .ifEmpty(Flow.error(new NullPointerException()))
                 .skipAll()
+                .take(Flow.timer(30, TimeUnit.SECONDS))
                 .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }

@@ -53,7 +53,7 @@ public class TestX {
             }
 
             @Override
-            protected void onEach(T data) throws Throwable {
+            protected void onNext(T data) throws Throwable {
                 super.onNext(data);
                 logger.log("onEach: " + data);
             }

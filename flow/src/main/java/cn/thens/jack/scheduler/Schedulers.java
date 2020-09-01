@@ -34,7 +34,7 @@ public final class Schedulers {
     }
 
     private static Lazy<Scheduler> TIMER = Lazy.of(() ->
-            from(Executors.newScheduledThreadPool(1, threadFactory("timer", true))));
+            from(Executors.newScheduledThreadPool(1, threadFactory("timer", 0, true))));
 
     public static Scheduler timer() {
         return TIMER.get();
@@ -54,14 +54,16 @@ public final class Schedulers {
 
     private static Scheduler executorScheduler(String name, int expectedThreadCount) {
         int processorCount = Runtime.getRuntime().availableProcessors();
-        int maxThreadCount = Math.max(processorCount, expectedThreadCount);
-        return from(new ThreadPoolExecutor(processorCount, maxThreadCount,
+        int maxThreadCount = Math.max(processorCount + 1, expectedThreadCount);
+        return from(new ThreadPoolExecutor(
+                processorCount, processorCount,
                 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1),
-                threadFactory(name, false), rejectHandler(name)));
+                threadFactory(name, 0, false),
+                rejectHandler(processorCount, maxThreadCount, name)));
     }
 
-    private static ThreadFactory threadFactory(String name, boolean isSingle) {
-        final AtomicLong n = new AtomicLong();
+    private static ThreadFactory threadFactory(String name, int startIndex, boolean isSingle) {
+        final AtomicLong n = new AtomicLong(startIndex);
         return runnable -> {
             Thread thread = new Thread(runnable);
             thread.setName(name + (isSingle ? "" : "-" + n.incrementAndGet()));
@@ -71,10 +73,11 @@ public final class Schedulers {
         };
     }
 
-    private static RejectedExecutionHandler rejectHandler(String name) {
+    private static RejectedExecutionHandler rejectHandler(int coreCount, int maxCount, String name) {
+        int threadCount = Math.max(1, maxCount - coreCount);
         final ThreadPoolExecutor fallbackExecutor = new ThreadPoolExecutor(
-                1, 1, 60, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(1024), threadFactory(name + "-x", true));
+                threadCount, threadCount, 60, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(1024), threadFactory(name, coreCount, threadCount == 1));
         fallbackExecutor.allowsCoreThreadTimeOut();
         return (runnable, threadPoolExecutor) -> fallbackExecutor.execute(runnable);
     }
