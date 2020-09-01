@@ -59,7 +59,7 @@ public final class Schedulers {
                 processorCount, processorCount,
                 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1),
                 threadFactory(name, 0, false),
-                rejectHandler(processorCount, maxThreadCount, name)));
+                rejectHandler(name, processorCount, maxThreadCount)));
     }
 
     private static ThreadFactory threadFactory(String name, int startIndex, boolean isSingle) {
@@ -73,7 +73,7 @@ public final class Schedulers {
         };
     }
 
-    private static RejectedExecutionHandler rejectHandler(int coreCount, int maxCount, String name) {
+    private static RejectedExecutionHandler rejectHandler(String name, int coreCount, int maxCount) {
         int threadCount = Math.max(1, maxCount - coreCount);
         final ThreadPoolExecutor fallbackExecutor = new ThreadPoolExecutor(
                 threadCount, threadCount, 60, TimeUnit.SECONDS,
