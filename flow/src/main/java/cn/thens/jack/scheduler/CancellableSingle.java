@@ -1,15 +1,20 @@
 package cn.thens.jack.scheduler;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * @author 7hens
  */
 class CancellableSingle implements Cancellable {
-    private Cancellable lastCancellable = Cancellables.cancelled();
+    private AtomicReference<Cancellable> lastRef = new AtomicReference<>(Cancellables.cancelled());
 
     @Override
     public void addCancellable(ICancellable onCancel) {
-        lastCancellable.cancel();
-        lastCancellable = Cancellables.of(onCancel);
+        Cancellable last = lastCancellable();
+        last.cancel();
+        if (!lastRef.compareAndSet(last, Cancellables.of(onCancel))) {
+            onCancel.cancel();
+        }
     }
 
     @Override
@@ -19,11 +24,15 @@ class CancellableSingle implements Cancellable {
 
     @Override
     public boolean isCancelled() {
-        return lastCancellable.isCancelled();
+        return lastCancellable().isCancelled();
     }
 
     @Override
     public void cancel() {
-        lastCancellable.cancel();
+        lastCancellable().cancel();
+    }
+
+    private Cancellable lastCancellable() {
+        return lastRef.get();
     }
 }
