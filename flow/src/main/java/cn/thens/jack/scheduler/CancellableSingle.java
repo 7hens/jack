@@ -13,6 +13,11 @@ class CancellableSingle implements Cancellable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public boolean isCancelled() {
         return lastCancellable.isCancelled();
     }

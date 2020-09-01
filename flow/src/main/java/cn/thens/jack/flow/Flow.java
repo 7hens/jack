@@ -60,12 +60,6 @@ public abstract class Flow<T> implements IFlow<T> {
         return emitter;
     }
 
-    public Cancellable collectTo(Cancellable target) {
-        Cancellable job = collect();
-        target.addCancellable(job);
-        return job;
-    }
-
     public Flow<T> flowOn(IScheduler upScheduler) {
         return new FlowFlowOn<>(this, upScheduler);
     }

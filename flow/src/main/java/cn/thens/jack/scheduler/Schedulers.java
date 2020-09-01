@@ -76,8 +76,9 @@ public final class Schedulers {
     private static RejectedExecutionHandler rejectHandler(String name, int coreCount, int maxCount) {
         int threadCount = Math.max(1, maxCount - coreCount);
         final ThreadPoolExecutor fallbackExecutor = new ThreadPoolExecutor(
-                threadCount, threadCount, 60, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(1024), threadFactory(name, coreCount, threadCount == 1));
+                threadCount, threadCount,
+                60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
+                threadFactory(name, coreCount, threadCount == 1));
         fallbackExecutor.allowsCoreThreadTimeOut();
         return (runnable, threadPoolExecutor) -> fallbackExecutor.execute(runnable);
     }

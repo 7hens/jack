@@ -46,6 +46,11 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public Cancellable schedule(Runnable runnable) {
         return emitter().schedule(runnable);
     }

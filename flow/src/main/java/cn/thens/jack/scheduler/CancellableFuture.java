@@ -52,6 +52,11 @@ final class CancellableFuture<V> implements Future<V>, Cancellable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public void cancel() {
         cancel(false);
     }

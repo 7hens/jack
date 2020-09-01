@@ -119,6 +119,11 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public Cancellable schedule(Runnable runnable) {
         return scheduler.schedule(runnable);
     }

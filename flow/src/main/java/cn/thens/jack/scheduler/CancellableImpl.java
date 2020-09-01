@@ -53,4 +53,9 @@ class CancellableImpl implements Cancellable {
             }
         }
     }
+
+    @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
 }
