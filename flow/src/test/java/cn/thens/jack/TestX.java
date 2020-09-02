@@ -115,7 +115,7 @@ public class TestX {
                 CountDownLatch latch = new CountDownLatch(1);
                 flow.onTerminate(it -> latch.countDown()).collect();
                 latch.await();
-                sleep(100);
+                sleep(1000);
                 logger().log("==========================");
             } catch (Throwable e) {
                 e.printStackTrace();

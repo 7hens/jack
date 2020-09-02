@@ -34,8 +34,11 @@ final class FlowCreate {
         };
     }
 
+    private static Flow EMPTY = create(Emitter::complete);
+
+    @SuppressWarnings("unchecked")
     static <T> Flow<T> empty() {
-        return create(Emitter::complete);
+        return EMPTY;
     }
 
     static <T> Flow<T> never() {

@@ -72,8 +72,9 @@ public class FlowEmitterTest {
     @Test
     public void autoCancel() {
         Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
+                .take(1)
                 .onCollect(TestX.collector("publish"))
-                .publish(() -> FlowEmitter.<Long>publish().autoCancel());
+                .publish();
 
         Flow.timer(3, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("Delay 3s"))

@@ -47,7 +47,7 @@ public abstract class Reply<T> {
         };
     }
 
-    public static <T> Reply<T> data(final T data) {
+    public static <T> Reply<T> next(final T data) {
         return new Reply<T>() {
             @Override
             public boolean isTerminal() {
@@ -67,7 +67,7 @@ public abstract class Reply<T> {
     }
 
     public static <T> Reply<T> error(final Throwable error) {
-        final Throwable cause = Values.unwrap(error);
+        final Throwable cause = error != null ? Values.unwrap(error) : null;
         return new Reply<T>() {
             @Override
             public boolean isTerminal() {

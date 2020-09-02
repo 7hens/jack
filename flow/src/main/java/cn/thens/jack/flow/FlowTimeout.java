@@ -24,6 +24,7 @@ class FlowTimeout<T> extends Flow<T> {
 
     @Override
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
+        isTransferred.set(false);
         timeoutCancellable.addCancellable(startTimeoutFlow(emitter));
         upFlowCancellable.addCancellable(upFlow.collectWith(emitter, reply -> {
             if (isTransferred.get()) return;

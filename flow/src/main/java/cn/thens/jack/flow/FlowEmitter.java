@@ -17,7 +17,7 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     @Override
     public void next(T data) {
-        post(Reply.data(data));
+        post(Reply.next(data));
     }
 
     @Override
@@ -73,7 +73,7 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     public static <T> FlowEmitter<T> behavior(T initData) {
-        return new FlowEmitterBehavior<>(Reply.data(initData));
+        return new FlowEmitterBehavior<>(Reply.next(initData));
     }
 
     public static <T> FlowEmitter<T> replay() {

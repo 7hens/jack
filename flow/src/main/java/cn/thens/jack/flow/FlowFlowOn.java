@@ -19,7 +19,7 @@ class FlowFlowOn<T> extends Flow<T> {
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
         CollectorEmitter<T> upEmitter = CollectorEmitter.create(upScheduler, emitter);
         emitter.addCancellable(upEmitter);
-        upEmitter.addCancellable(upEmitter.schedule(() -> {
+        upEmitter.addCancellable(upScheduler.schedule(() -> {
             try {
                 upFlow.onStartCollect(upEmitter);
             } catch (Throwable e) {

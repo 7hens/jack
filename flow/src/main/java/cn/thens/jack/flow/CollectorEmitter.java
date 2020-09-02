@@ -33,12 +33,13 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     @Override
     public void post(Reply<? extends T> reply) {
-        if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
+        boolean isTerminal = reply.isTerminal();
+        if (isEmitterTerminated.compareAndSet(false, isTerminal)) {
             try {
                 if (reply.isCancel()) {
                     clearBuffer();
                 }
-                if (reply.isTerminal()) {
+                if (isTerminal) {
                     terminalReply = reply;
                 } else {
                     buffer.add(reply.data());
@@ -64,7 +65,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
         try {
             while (bufferSize.get() > 0) {
                 if (!buffer.isEmpty()) {
-                    handle(Reply.data(buffer.remove(0)));
+                    handle(Reply.next(buffer.remove(0)));
                 } else if (terminalReply != null) {
                     handle(terminalReply);
                 }
@@ -79,9 +80,10 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     }
 
     private void handle(Reply<? extends T> reply) throws Throwable {
-        if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
+        boolean isTerminal = reply.isTerminal();
+        if (isCollectorTerminated.compareAndSet(false, isTerminal)) {
             collector.post(reply);
-            if (reply.isTerminal()) {
+            if (isTerminal) {
                 clearBuffer();
                 cancellable.cancel();
             }
@@ -90,7 +92,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     @Override
     public void next(T data) {
-        post(Reply.data(data));
+        post(Reply.next(data));
     }
 
     @Override

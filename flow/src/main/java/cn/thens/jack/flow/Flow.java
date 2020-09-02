@@ -72,6 +72,10 @@ public abstract class Flow<T> implements IFlow<T> {
         return publish(Funcs.always(emitter));
     }
 
+    public Flow<T> publish() {
+        return publish(() -> FlowEmitter.<T>behavior().autoCancel());
+    }
+
     public <R> R to(Func1<? super Flow<T>, ? extends R> operator) {
         return Funcs.of(operator).call(this);
     }

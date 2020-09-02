@@ -15,6 +15,7 @@ import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Values;
+import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -150,12 +151,14 @@ public class FlowTest {
 
     @Test
     public void timeout() {
-        Flow.just(100L)
-                .onCollect(TestX.collector("A"))
-                .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
-                .take(3)
-                .onCollect(TestX.collector("B"))
-                .to(TestX.collect());
+        for (int i = 0; i < 1000; i++) {
+            Flow.just((long) i)
+                    .onCollect(TestX.collector("A"))
+                    .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
+                    .take(3)
+                    .onCollect(TestX.collector("B"))
+                    .to(TestX.collect());
+        }
 
         Flow.timer(2, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("C"))
@@ -296,9 +299,20 @@ public class FlowTest {
     }
 
     @Test
+    public void flatMap() {
+        Flow.interval(10, TimeUnit.MILLISECONDS)
+                .flatMap(it -> Flow.just(it, -it)
+                        .flowOn(TestX.scheduler("b")))
+                .onCollect(TestX.collector("A"))
+                .take(1000)
+                .flowOn(TestX.scheduler("a"))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void emitter() {
         AtomicInteger i = new AtomicInteger();
-        Flow.create(emitter -> {
+        Flow.<String>create(emitter -> {
             int data = i.incrementAndGet();
             for (int j = 0; j < 10; j++) {
                 emitter.next(data + "." + j);
@@ -309,7 +323,8 @@ public class FlowTest {
             emitter.complete();
         })////////
                 .delayStart(Flow.timer(10, TimeUnit.MILLISECONDS))
-                .onCollect(TestX.collector("A"))
+//                .mapToFlow(Flow::just).delayErrors().flatMerge()
+//                .onCollect(TestX.collector("A"))
                 .flowOn(Schedulers.io())
                 .delay(Flow.empty())
                 .onCollect(TestX.collector("B"))
@@ -318,8 +333,9 @@ public class FlowTest {
                 .repeat()
                 .ifEmpty(Flow.error(new NullPointerException()))
                 .skipAll()
+                .take(1000)
                 .take(Flow.timer(30, TimeUnit.SECONDS))
-                .onCollect(TestX.collector("C"))
+//                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 
