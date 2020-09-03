@@ -32,7 +32,7 @@ abstract class FlowWindowFilter<T> extends PolyFlow<T> {
             }
             try {
                 emitInner(reply);
-                if (shouldClose(reply.data())) {
+                if (shouldClose(reply.next())) {
                     emitNewFlow(emitter);
                 }
             } catch (Throwable e) {

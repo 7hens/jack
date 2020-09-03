@@ -29,7 +29,7 @@ class FlowGroupBy<K, V> extends MapFlow<K, V> {
                 return;
             }
             try {
-                V value = reply.data();
+                V value = reply.next();
                 K key = keySelector.call(value);
                 FlowEmitter<V> entryEmitter = map.get(key);
                 if (entryEmitter == null) {

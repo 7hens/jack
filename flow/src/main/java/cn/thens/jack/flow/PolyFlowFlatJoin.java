@@ -35,7 +35,7 @@ class PolyFlowFlatJoin<T> extends Flow<List<T>> {
                     return;
                 }
                 if (reply.isTerminal()) return;
-                IFlow<T> flow = reply.data();
+                IFlow<T> flow = reply.next();
                 ValueRef<T> dataQueue = new ValueRef<>();
                 cachedDataQueue.add(dataQueue);
                 try {
@@ -55,7 +55,7 @@ class PolyFlowFlatJoin<T> extends Flow<List<T>> {
                             return;
                         }
                         if (reply.isTerminal()) return;
-                        valueRef.set(reply.data());
+                        valueRef.set(reply.next());
                         tryZip();
                     }
                 };

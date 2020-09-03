@@ -37,7 +37,7 @@ abstract class FlowReduce<T, R> extends Flow<R> {
                     return;
                 }
                 try {
-                    accumulate(reply.data());
+                    accumulate(reply.next());
                     hasValue.set(true);
                 } catch (Throwable e) {
                     emitter.error(e);

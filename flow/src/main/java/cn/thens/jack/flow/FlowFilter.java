@@ -30,7 +30,7 @@ abstract class FlowFilter<T> extends Flow<T> {
                         onTerminated(emitter, reply.error());
                         return;
                     }
-                    T data = reply.data();
+                    T data = reply.next();
                     if (test(data)) {
                         emitter.next(data);
                     }

@@ -24,7 +24,7 @@ class FlowToCollection<T, C extends Collection<T>> extends Flow<C> {
                     emitter.error(reply.error());
                     return;
                 }
-                list.add(reply.data());
+                list.add(reply.next());
             }
         });
     }

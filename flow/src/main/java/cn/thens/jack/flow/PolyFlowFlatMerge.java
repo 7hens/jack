@@ -20,7 +20,7 @@ class PolyFlowFlatMerge<T> extends Flow<T> {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
                 try {
-                    reply.data().asFlow().collectWith(emitter, innerCollector);
+                    reply.next().asFlow().collectWith(emitter, innerCollector);
                 } catch (Throwable e) {
                     emitter.error(e);
                 }

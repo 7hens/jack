@@ -33,7 +33,7 @@ class PolyFlowDelayErrors<T> extends PolyFlow<T> {
                 }
                 restFlowCount.incrementAndGet();
                 try {
-                    emitter.next(reply.data().asFlow()
+                    emitter.next(reply.next().asFlow()
                             .onTerminate(error -> {
                                 if (error != null) {
                                     errors.add(error);

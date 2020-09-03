@@ -42,7 +42,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
                 if (isTerminal) {
                     terminalReply = reply;
                 } else {
-                    buffer.add(reply.data());
+                    buffer.add(reply.next());
                     onBackPressure(buffer);
                 }
                 if (bufferSize.getAndIncrement() == 0) {

@@ -23,7 +23,7 @@ class FlowElementAt<T> extends Flow<T> {
                 return;
             }
             try {
-                if (predicate.test(reply.data())) {
+                if (predicate.test(reply.next())) {
                     emitter.post(reply);
                     emitter.complete();
                 }

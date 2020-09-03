@@ -12,7 +12,7 @@ public abstract class Reply<T> {
 
     public abstract Throwable error();
 
-    public abstract T data();
+    public abstract T next();
 
     public final boolean isComplete() {
         return isTerminal() && error() == null;
@@ -41,7 +41,7 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public R data() {
+            public R next() {
                 return data;
             }
         };
@@ -60,7 +60,7 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public T data() {
+            public T next() {
                 return data;
             }
         };
@@ -80,7 +80,7 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public T data() {
+            public T next() {
                 return null;
             }
         };

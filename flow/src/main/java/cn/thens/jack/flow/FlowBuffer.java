@@ -28,7 +28,7 @@ abstract class FlowBuffer<T> extends Flow<T> {
                 emitter.post(reply);
                 return;
             }
-            buffer.add(reply.data());
+            buffer.add(reply.next());
             onBuffer(emitter, buffer);
         });
     }
