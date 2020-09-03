@@ -7,7 +7,7 @@ import cn.thens.jack.scheduler.IScheduler;
 /**
  * @author 7hens
  */
-public interface Emitter<T> extends Collector<T>, Cancellable, IScheduler {
+public interface Emitter<T> extends Collector<T>, Cancellable, IScheduler, BackPressure<T> {
     @Override
     void post(Reply<? extends T> reply);
 

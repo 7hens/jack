@@ -12,6 +12,6 @@ class FlowOnBackPressure<T> extends Flow<T> {
 
     @Override
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
-        upFlow.onStartCollect(CollectorEmitter.create(emitter, emitter, backPressure));
+        upFlow.onStartCollect(createEmitter(emitter, emitter, backPressure));
     }
 }

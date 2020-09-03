@@ -17,7 +17,7 @@ class FlowFlowOn<T> extends Flow<T> {
 
     @Override
     protected void onStartCollect(Emitter<? super T> emitter) throws Throwable {
-        CollectorEmitter<T> upEmitter = CollectorEmitter.create(upScheduler, emitter);
+        Emitter<T> upEmitter = createEmitter(upScheduler, emitter);
         emitter.addCancellable(upEmitter);
         upEmitter.addCancellable(upScheduler.schedule(() -> {
             try {

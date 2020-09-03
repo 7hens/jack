@@ -1,5 +1,7 @@
 package cn.thens.jack.flow;
 
+import java.util.List;
+
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.ICancellable;
 
@@ -8,7 +10,7 @@ import cn.thens.jack.scheduler.ICancellable;
  * @author 7hens
  */
 public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
-    protected abstract Emitter<? super T> emitter();
+    protected abstract Emitter<T> emitter();
 
     @Override
     public void post(Reply<? extends T> reply) {
@@ -53,6 +55,11 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     @Override
     public Cancellable schedule(Runnable runnable) {
         return emitter().schedule(runnable);
+    }
+
+    @Override
+    public void onBackPressure(List<T> buffer) throws Throwable {
+        emitter().onBackPressure(buffer);
     }
 
     @Override

@@ -13,6 +13,7 @@ import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func0;
+import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
 
@@ -34,11 +35,8 @@ final class FlowCreate {
         };
     }
 
-    private static Flow EMPTY = create(Emitter::complete);
-
-    @SuppressWarnings("unchecked")
     static <T> Flow<T> empty() {
-        return EMPTY;
+        return error(null);
     }
 
     static <T> Flow<T> never() {
@@ -46,7 +44,17 @@ final class FlowCreate {
     }
 
     static <T> Flow<T> error(final Throwable e) {
-        return create(emitter -> emitter.error(e));
+        return new Flow<T>() {
+            @Override
+            protected void onStartCollect(Emitter<? super T> emitter) {
+                emitter.error(e);
+            }
+
+            @Override
+            protected Emitter<T> createEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+                return super.createEmitter(Schedulers.unconfined(), collector, backPressure);
+            }
+        };
     }
 
     static <T> Flow<T> defer(final IFlow<T> flowFactory) {

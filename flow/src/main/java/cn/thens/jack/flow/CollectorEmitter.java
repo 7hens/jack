@@ -43,7 +43,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
                     terminalReply = reply;
                 } else {
                     buffer.add(reply.data());
-                    backPressure.apply(buffer);
+                    onBackPressure(buffer);
                 }
                 if (bufferSize.getAndIncrement() == 0) {
                     schedule(this);
@@ -130,15 +130,12 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
         return scheduler.schedule(runnable);
     }
 
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
-        return new CollectorEmitter<>(scheduler, collector, backPressure);
+    @Override
+    public void onBackPressure(List<T> buffer) throws Throwable {
+        backPressure.onBackPressure(buffer);
     }
 
-    @SuppressWarnings("rawtypes")
-    private static final BackPressure DEFAULT_BACK_PRESSURE = BackPressures.success();
-
-    @SuppressWarnings("unchecked")
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector) {
-        return create(scheduler, collector, DEFAULT_BACK_PRESSURE);
+    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+        return new CollectorEmitter<>(scheduler, collector, backPressure);
     }
 }
