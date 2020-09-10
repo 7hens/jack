@@ -9,7 +9,7 @@ public final class Once<R> {
     public static final int ENDED = 2;
 
     private final AtomicInteger state = new AtomicInteger(INITIALIZED);
-    private R result;
+    private volatile R result;
 
     private Once() {
     }
