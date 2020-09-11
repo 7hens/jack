@@ -1,10 +1,6 @@
 package cn.thens.jack.flow;
 
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -141,42 +137,6 @@ final class FlowCreate {
             final AtomicLong count = new AtomicLong(0);
             emitter.addCancellable(schedulerOf(emitter).schedulePeriodically(() ->
                     emitter.next(count.getAndIncrement()), initialDelay, period, unit));
-        });
-    }
-
-    static Flow<Integer> from(@NotNull InputStream input, byte[] buffer) {
-        return create(emitter -> {
-            try {
-                int bytes = input.read(buffer);
-                while (bytes >= 0) {
-                    emitter.next(bytes);
-                    bytes = input.read(buffer);
-                }
-                emitter.complete();
-            } catch (Throwable e) {
-                emitter.error(e);
-            } finally {
-                input.close();
-            }
-        });
-    }
-
-    static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
-        return create(emitter -> {
-            try {
-                int bytes = input.read(buffer);
-                while (bytes >= 0) {
-                    output.write(buffer, 0, bytes);
-                    emitter.next(bytes);
-                    bytes = input.read(buffer);
-                }
-                emitter.complete();
-            } catch (Throwable e) {
-                emitter.error(e);
-            } finally {
-                input.close();
-                output.close();
-            }
         });
     }
 }

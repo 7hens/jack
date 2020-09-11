@@ -2,10 +2,6 @@ package cn.thens.jack.flow;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,7 +11,6 @@ import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func1;
 import cn.thens.jack.func.Funcs;
 import cn.thens.jack.func.Values;
-import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.Schedulers;
 
 /**
@@ -468,15 +463,6 @@ public class FlowTest {
     @Test
     public void onBackpressureDropAll() {
         backPressure(BackPressures.<Long>buffer(2).dropAll());
-    }
-
-    @Test
-    public void copy() throws FileNotFoundException {
-        File sourceFile = new File("build.gradle");
-        File destFile = new File("build/build.gradle");
-        Flow.copy(new FileInputStream(sourceFile), new FileOutputStream(destFile))
-                .onCollect(TestX.collector("A"))
-                .to(TestX.collect());
     }
 
     @Test
