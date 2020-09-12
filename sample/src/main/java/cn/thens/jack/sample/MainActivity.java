@@ -11,7 +11,7 @@ import cn.thens.jack.app.IntentKey;
 import cn.thens.jack.app.IntentRef;
 import cn.thens.jack.app.Permissions;
 import cn.thens.jack.ref.Ref;
-import cn.thens.jack.scheduler.AndroidSchedulers;
+import cn.thens.jack.scheduler.Schedulers;
 import cn.thens.jack.view.LazyView;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,13 +33,13 @@ public class MainActivity extends AppCompatActivity {
                     .onNext(data -> {
                         data.get(TITLE);
                     })
-                    .flowOn(AndroidSchedulers.mainThread())
+                    .flowOn(Schedulers.mainThread())
                     .collect();
 
             Permissions.request(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     .onNext(isGranted -> {
                     })
-                    .flowOn(AndroidSchedulers.mainThread())
+                    .flowOn(Schedulers.mainThread())
                     .collect();
         });
 
