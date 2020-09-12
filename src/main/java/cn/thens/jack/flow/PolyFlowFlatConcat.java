@@ -25,7 +25,7 @@ class PolyFlowFlatConcat<T> extends Flow<T> {
             public void post(Reply<? extends IFlow<T>> reply) {
                 helper.onOuterCollect(reply);
                 if (reply.isTerminal()) return;
-                IFlow<T> flowable = reply.data();
+                IFlow<T> flowable = reply.next();
                 if (isCollecting.compareAndSet(false, true)) {
                     try {
                         flowable.asFlow().collectWith(emitter, innerCollector);

@@ -26,7 +26,7 @@ class FlowTakeUntil<T> extends Flow<T> {
                 }
                 try {
                     emitter.post(reply);
-                    if (predicate.test(reply.data())) {
+                    if (predicate.test(reply.next())) {
                         emitter.complete();
                     }
                 } catch (Throwable e) {

@@ -7,4 +7,6 @@ public interface Cancellable extends ICancellable {
     boolean isCancelled();
 
     void addCancellable(ICancellable onCancel);
+
+    void into(Cancellable cancellable);
 }

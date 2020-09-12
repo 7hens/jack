@@ -33,16 +33,12 @@ class PolyFlowDelayErrors<T> extends PolyFlow<T> {
                 }
                 restFlowCount.incrementAndGet();
                 try {
-                    emitter.next(reply.data().asFlow()
-                            .onCollect(new CollectorHelper<T>() {
-                                @Override
-                                protected void onTerminate(Throwable error) throws Throwable {
-                                    super.onTerminate(error);
-                                    if (error != null) {
-                                        errors.add(error);
-                                    }
-                                    onEachFlowTerminate();
+                    emitter.next(reply.next().asFlow()
+                            .onTerminate(error -> {
+                                if (error != null) {
+                                    errors.add(error);
                                 }
+                                onEachFlowTerminate();
                             })
                             .catchError());
                 } catch (Throwable e) {

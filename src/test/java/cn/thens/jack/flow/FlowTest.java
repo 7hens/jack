@@ -2,10 +2,6 @@ package cn.thens.jack.flow;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -150,12 +146,14 @@ public class FlowTest {
 
     @Test
     public void timeout() {
-        Flow.just(100L)
-                .onCollect(TestX.collector("A"))
-                .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
-                .take(3)
-                .onCollect(TestX.collector("B"))
-                .to(TestX.collect());
+        for (int i = 0; i < 1000; i++) {
+            Flow.just((long) i)
+                    .onCollect(TestX.collector("A"))
+                    .timeout(Flow.timer(1, TimeUnit.SECONDS), Flow.interval(1, TimeUnit.SECONDS))
+                    .take(3)
+                    .onCollect(TestX.collector("B"))
+                    .to(TestX.collect());
+        }
 
         Flow.timer(2, TimeUnit.SECONDS)
                 .onCollect(TestX.collector("C"))
@@ -296,9 +294,20 @@ public class FlowTest {
     }
 
     @Test
+    public void flatMap() {
+        Flow.interval(10, TimeUnit.MILLISECONDS)
+                .flatMap(it -> Flow.just(it, -it)
+                        .flowOn(TestX.scheduler("b")))
+                .onCollect(TestX.collector("A"))
+                .take(1000)
+                .flowOn(TestX.scheduler("a"))
+                .to(TestX.collect());
+    }
+
+    @Test
     public void emitter() {
         AtomicInteger i = new AtomicInteger();
-        Flow.create(emitter -> {
+        Flow.<String>create(emitter -> {
             int data = i.incrementAndGet();
             for (int j = 0; j < 10; j++) {
                 emitter.next(data + "." + j);
@@ -309,7 +318,8 @@ public class FlowTest {
             emitter.complete();
         })////////
                 .delayStart(Flow.timer(10, TimeUnit.MILLISECONDS))
-                .onCollect(TestX.collector("A"))
+//                .mapToFlow(Flow::just).delayErrors().flatMerge()
+//                .onCollect(TestX.collector("A"))
                 .flowOn(Schedulers.io())
                 .delay(Flow.empty())
                 .onCollect(TestX.collector("B"))
@@ -318,7 +328,9 @@ public class FlowTest {
                 .repeat()
                 .ifEmpty(Flow.error(new NullPointerException()))
                 .skipAll()
-                .onCollect(TestX.collector("C"))
+                .take(1000)
+                .take(Flow.timer(30, TimeUnit.SECONDS))
+//                .onCollect(TestX.collector("C"))
                 .to(TestX.collect());
     }
 
@@ -451,15 +463,6 @@ public class FlowTest {
     @Test
     public void onBackpressureDropAll() {
         backPressure(BackPressures.<Long>buffer(2).dropAll());
-    }
-
-    @Test
-    public void copy() throws FileNotFoundException {
-        File sourceFile = new File("build.gradle");
-        File destFile = new File("build/build.gradle");
-        Flow.copy(new FileInputStream(sourceFile), new FileOutputStream(destFile))
-                .onCollect(TestX.collector("A"))
-                .to(TestX.collect());
     }
 
     @Test

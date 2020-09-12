@@ -12,16 +12,16 @@ import cn.thens.jack.scheduler.Schedulers;
 class FlowEmitterPublish<T> extends FlowEmitter<T> {
     private final AtomicReference<Reply<? extends T>> terminalReplyRef = new AtomicReference<>();
     private final List<Collector<? super T>> collectors = new CopyOnWriteArrayList<>();
-    private final Emitter<? super T> emitter;
+    private final Emitter<T> emitter;
 
     FlowEmitterPublish() {
         Collector<T> collector = this::onCollect;
-        emitter = CollectorEmitter.create(Schedulers.unconfined(), collector);
+        emitter = CollectorEmitter.create(Schedulers.unconfined(), collector, BackPressures.success());
     }
 
 
     @Override
-    protected Emitter<? super T> emitter() {
+    protected Emitter<T> emitter() {
         return emitter;
     }
 

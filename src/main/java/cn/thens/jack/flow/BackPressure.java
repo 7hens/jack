@@ -8,15 +8,15 @@ import cn.thens.jack.func.Funcs;
 
 @SuppressWarnings("WeakerAccess")
 public interface BackPressure<T> {
-    void apply(List<T> buffer) throws Throwable;
+    void onBackPressure(List<T> buffer) throws Throwable;
 
     abstract class X<T> implements BackPressure<T>, Action1<List<T>> {
         @Override
-        public abstract void apply(List<T> buffer);
+        public abstract void onBackPressure(List<T> buffer);
 
         @Override
         public void run(List<T> buffer) {
-            apply(buffer);
+            onBackPressure(buffer);
         }
 
         private X() {
@@ -29,9 +29,9 @@ public interface BackPressure<T> {
         public final BackPressure.X<T> catchError(Func1<? super Throwable, ? extends BackPressure<T>> catchError) {
             return of(buffer -> {
                 try {
-                    apply(buffer);
+                    onBackPressure(buffer);
                 } catch (Throwable e) {
-                    catchError.call(e).apply(buffer);
+                    catchError.call(e).onBackPressure(buffer);
                 }
             });
         }
@@ -42,8 +42,8 @@ public interface BackPressure<T> {
 
         public final BackPressure.X<T> and(BackPressure<T> backpressure) {
             return of(buffer -> {
-                apply(buffer);
-                backpressure.apply(buffer);
+                onBackPressure(buffer);
+                backpressure.onBackPressure(buffer);
             });
         }
 
@@ -62,9 +62,9 @@ public interface BackPressure<T> {
         public static <T> BackPressure.X<T> of(BackPressure<T> backpressure) {
             return new BackPressure.X<T>() {
                 @Override
-                public void apply(List<T> buffer) {
+                public void onBackPressure(List<T> buffer) {
                     try {
-                        backpressure.apply(buffer);
+                        backpressure.onBackPressure(buffer);
                     } catch (Throwable e) {
                         throw new BackPressureException(e);
                     }

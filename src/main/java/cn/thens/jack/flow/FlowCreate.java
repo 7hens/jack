@@ -1,10 +1,6 @@
 package cn.thens.jack.flow;
 
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,6 +9,7 @@ import cn.thens.jack.func.Action0;
 import cn.thens.jack.func.Action1;
 import cn.thens.jack.func.Actions;
 import cn.thens.jack.func.Func0;
+import cn.thens.jack.scheduler.IScheduler;
 import cn.thens.jack.scheduler.Scheduler;
 import cn.thens.jack.scheduler.Schedulers;
 
@@ -35,7 +32,7 @@ final class FlowCreate {
     }
 
     static <T> Flow<T> empty() {
-        return create(Emitter::complete);
+        return error(null);
     }
 
     static <T> Flow<T> never() {
@@ -43,7 +40,17 @@ final class FlowCreate {
     }
 
     static <T> Flow<T> error(final Throwable e) {
-        return create(emitter -> emitter.error(e));
+        return new Flow<T>() {
+            @Override
+            protected void onStartCollect(Emitter<? super T> emitter) {
+                emitter.error(e);
+            }
+
+            @Override
+            protected Emitter<T> createEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+                return super.createEmitter(Schedulers.unconfined(), collector, backPressure);
+            }
+        };
     }
 
     static <T> Flow<T> defer(final IFlow<T> flowFactory) {
@@ -130,42 +137,6 @@ final class FlowCreate {
             final AtomicLong count = new AtomicLong(0);
             emitter.addCancellable(schedulerOf(emitter).schedulePeriodically(() ->
                     emitter.next(count.getAndIncrement()), initialDelay, period, unit));
-        });
-    }
-
-    static Flow<Integer> from(@NotNull InputStream input, byte[] buffer) {
-        return create(emitter -> {
-            try {
-                int bytes = input.read(buffer);
-                while (bytes >= 0) {
-                    emitter.next(bytes);
-                    bytes = input.read(buffer);
-                }
-                emitter.complete();
-            } catch (Throwable e) {
-                emitter.error(e);
-            } finally {
-                input.close();
-            }
-        });
-    }
-
-    static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
-        return create(emitter -> {
-            try {
-                int bytes = input.read(buffer);
-                while (bytes >= 0) {
-                    output.write(buffer, 0, bytes);
-                    emitter.next(bytes);
-                    bytes = input.read(buffer);
-                }
-                emitter.complete();
-            } catch (Throwable e) {
-                emitter.error(e);
-            } finally {
-                input.close();
-                output.close();
-            }
         });
     }
 }

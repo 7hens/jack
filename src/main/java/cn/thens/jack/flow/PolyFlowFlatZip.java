@@ -35,7 +35,7 @@ class PolyFlowFlatZip<T> extends Flow<List<T>> {
                     return;
                 }
                 if (reply.isTerminal()) return;
-                IFlow<T> flow = reply.data();
+                IFlow<T> flow = reply.next();
                 Queue<T> dataQueue = new LinkedList<>();
                 cachedDataQueue.add(dataQueue);
                 try {
@@ -55,7 +55,7 @@ class PolyFlowFlatZip<T> extends Flow<List<T>> {
                             return;
                         }
                         if (reply.isTerminal()) return;
-                        dataQueue.add(reply.data());
+                        dataQueue.add(reply.next());
                         tryZip();
                     }
                 };

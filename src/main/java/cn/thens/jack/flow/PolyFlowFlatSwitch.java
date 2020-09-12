@@ -28,7 +28,7 @@ class PolyFlowFlatSwitch<T> extends Flow<T> {
                 if (cancellable != null) {
                     cancellable.cancel();
                 }
-                IFlow<T> flow = reply.data();
+                IFlow<T> flow = reply.next();
                 try {
                     lastCancellable.set(flow.asFlow().collectWith(emitter, innerCollector));
                 } catch (Throwable e) {

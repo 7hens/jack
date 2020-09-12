@@ -11,7 +11,7 @@ class FlowEmitterAutoCancel<T> extends FlowEmitter<T> {
     }
 
     @Override
-    protected Emitter<? super T> emitter() {
+    protected Emitter<T> emitter() {
         return flowEmitter;
     }
 

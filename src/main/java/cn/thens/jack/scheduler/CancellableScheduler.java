@@ -47,6 +47,11 @@ public class CancellableScheduler extends Scheduler implements Cancellable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public void cancel() {
         cancellable.cancel();
     }

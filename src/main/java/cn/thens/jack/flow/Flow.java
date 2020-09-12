@@ -1,10 +1,7 @@
 package cn.thens.jack.flow;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,8 +36,16 @@ public abstract class Flow<T> implements IFlow<T> {
 
     protected abstract void onStartCollect(Emitter<? super T> emitter) throws Throwable;
 
+    protected final Emitter<T> createEmitter(IScheduler scheduler, Collector<? super T> collector) {
+        return createEmitter(scheduler, collector, BackPressures.success());
+    }
+
+    protected Emitter<T> createEmitter(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+        return CollectorEmitter.create(scheduler, collector, backPressure);
+    }
+
     Cancellable collectWith(Emitter<?> downEmitter, Collector<? super T> collector) throws Throwable {
-        CollectorEmitter<T> upEmitter = CollectorEmitter.create(downEmitter, collector);
+        Emitter<T> upEmitter = createEmitter(downEmitter, collector);
         downEmitter.addCancellable(upEmitter);
         onStartCollect(upEmitter);
         return upEmitter;
@@ -49,7 +54,7 @@ public abstract class Flow<T> implements IFlow<T> {
     public Cancellable collect() {
         IScheduler scheduler = Schedulers.unconfined();
         Collector<T> collector = CollectorHelper.empty();
-        CollectorEmitter<T> emitter = CollectorEmitter.create(scheduler, collector);
+        Emitter<T> emitter = createEmitter(scheduler, collector);
         emitter.addCancellable(emitter.schedule(() -> {
             try {
                 onStartCollect(emitter);
@@ -58,12 +63,6 @@ public abstract class Flow<T> implements IFlow<T> {
             }
         }));
         return emitter;
-    }
-
-    public Cancellable collectTo(Cancellable target) {
-        Cancellable job = collect();
-        target.addCancellable(job);
-        return job;
     }
 
     public Flow<T> flowOn(IScheduler upScheduler) {
@@ -76,6 +75,10 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public Flow<T> publish(FlowEmitter<T> emitter) {
         return publish(Funcs.always(emitter));
+    }
+
+    public Flow<T> publish() {
+        return publish(() -> FlowEmitter.<T>behavior().autoCancel());
     }
 
     public <R> R to(Func1<? super Flow<T>, ? extends R> operator) {
@@ -518,17 +521,5 @@ public abstract class Flow<T> implements IFlow<T> {
 
     public static Flow<Long> interval(long period, TimeUnit unit) {
         return interval(period, period, unit);
-    }
-
-    public static Flow<Integer> from(@NotNull InputStream input, byte[] buffer) {
-        return FlowCreate.from(input, buffer);
-    }
-
-    public static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output, byte[] buffer) {
-        return FlowCreate.copy(input, output, buffer);
-    }
-
-    public static Flow<Integer> copy(@NotNull InputStream input, @NotNull OutputStream output) {
-        return copy(input, output, new byte[8 * 1024]);
     }
 }

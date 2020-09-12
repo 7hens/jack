@@ -1,5 +1,7 @@
 package cn.thens.jack.flow;
 
+import java.util.List;
+
 import cn.thens.jack.scheduler.Cancellable;
 import cn.thens.jack.scheduler.ICancellable;
 
@@ -8,7 +10,7 @@ import cn.thens.jack.scheduler.ICancellable;
  * @author 7hens
  */
 public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
-    protected abstract Emitter<? super T> emitter();
+    protected abstract Emitter<T> emitter();
 
     @Override
     public void post(Reply<? extends T> reply) {
@@ -17,7 +19,7 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
 
     @Override
     public void next(T data) {
-        post(Reply.data(data));
+        post(Reply.next(data));
     }
 
     @Override
@@ -46,8 +48,18 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public Cancellable schedule(Runnable runnable) {
         return emitter().schedule(runnable);
+    }
+
+    @Override
+    public void onBackPressure(List<T> buffer) throws Throwable {
+        emitter().onBackPressure(buffer);
     }
 
     @Override
@@ -68,7 +80,7 @@ public abstract class FlowEmitter<T> implements Emitter<T>, IFlow<T> {
     }
 
     public static <T> FlowEmitter<T> behavior(T initData) {
-        return new FlowEmitterBehavior<>(Reply.data(initData));
+        return new FlowEmitterBehavior<>(Reply.next(initData));
     }
 
     public static <T> FlowEmitter<T> replay() {

@@ -10,7 +10,7 @@ public abstract class CollectorHelper<T> implements Collector<T> {
     @Override
     public void post(Reply<? extends T> reply) throws Throwable {
         if (!reply.isTerminal()) {
-            onNext(reply.data());
+            onNext(reply.next());
             return;
         }
         Throwable error = reply.error();

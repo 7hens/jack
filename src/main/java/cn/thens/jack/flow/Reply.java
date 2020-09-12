@@ -12,7 +12,7 @@ public abstract class Reply<T> {
 
     public abstract Throwable error();
 
-    public abstract T data();
+    public abstract T next();
 
     public final boolean isComplete() {
         return isTerminal() && error() == null;
@@ -41,13 +41,13 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public R data() {
+            public R next() {
                 return data;
             }
         };
     }
 
-    public static <T> Reply<T> data(final T data) {
+    public static <T> Reply<T> next(final T data) {
         return new Reply<T>() {
             @Override
             public boolean isTerminal() {
@@ -60,14 +60,14 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public T data() {
+            public T next() {
                 return data;
             }
         };
     }
 
     public static <T> Reply<T> error(final Throwable error) {
-        final Throwable cause = Values.unwrap(error);
+        final Throwable cause = error != null ? Values.unwrap(error) : null;
         return new Reply<T>() {
             @Override
             public boolean isTerminal() {
@@ -80,7 +80,7 @@ public abstract class Reply<T> {
             }
 
             @Override
-            public T data() {
+            public T next() {
                 return null;
             }
         };

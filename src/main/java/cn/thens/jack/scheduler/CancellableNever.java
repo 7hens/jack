@@ -14,6 +14,10 @@ final class CancellableNever implements Cancellable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+    }
+
+    @Override
     public void cancel() {
     }
 }

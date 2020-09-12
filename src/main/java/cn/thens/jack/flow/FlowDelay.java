@@ -22,13 +22,14 @@ class FlowDelay<T> extends Flow<T> {
         upFlow.collectWith(emitter, new Collector<T>() {
             @Override
             public void post(Reply<? extends T> reply) throws Throwable {
-                delayFunc.call(reply).asFlow().collectWith(emitter, new CollectorHelper() {
-                    @Override
-                    protected void onTerminate(Throwable error) throws Throwable {
-                        super.onTerminate(error);
-                        emitter.post(reply);
-                    }
-                });
+                delayFunc.call(reply).asFlow()
+                        .collectWith(emitter, new CollectorHelper() {
+                            @Override
+                            protected void onTerminate(Throwable error) throws Throwable {
+                                super.onTerminate(error);
+                                emitter.post(reply);
+                            }
+                        });
             }
         });
     }

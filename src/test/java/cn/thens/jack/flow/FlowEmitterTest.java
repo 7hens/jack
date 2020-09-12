@@ -71,22 +71,23 @@ public class FlowEmitterTest {
 
     @Test
     public void autoCancel() {
-        Flow<Long> publishFlow = Flow.interval(1, TimeUnit.SECONDS)
+        Flow<Long> publishFlow = Flow.interval(100, TimeUnit.MILLISECONDS)
+                .take(2)
+//                .concatWith(Flow.error(new NullPointerException()))
                 .onCollect(TestX.collector("publish"))
-                .publish(() -> FlowEmitter.<Long>publish().autoCancel());
+                .publish(() -> FlowEmitter.<Long>behavior().autoCancel());
 
-        Flow.timer(3, TimeUnit.SECONDS)
-                .onCollect(TestX.collector("Delay 3s"))
-                .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("3s"))
-                .take(2)
-                .collect();
+//        Flow.timer(400, TimeUnit.MILLISECONDS)
+////                .onCollect(TestX.collector("Delay 4"))
+//                .flatMap(it -> publishFlow)
+//                .onCollect(TestX.collector("4"))
+//                .collect();
 
-        Flow.timer(6, TimeUnit.SECONDS)
-                .onCollect(TestX.collector("Delay 6s"))
+        Flow.timer(800, TimeUnit.MILLISECONDS)
+//                .onCollect(TestX.collector("Delay 8"))
                 .flatMap(it -> publishFlow)
-                .onCollect(TestX.collector("6s"))
-                .take(2)
+                .take(1)
+                .onCollect(TestX.collector("8"))
                 .to(TestX.collect());
     }
 }

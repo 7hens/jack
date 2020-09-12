@@ -33,16 +33,17 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     @Override
     public void post(Reply<? extends T> reply) {
-        if (isEmitterTerminated.compareAndSet(false, reply.isTerminal())) {
+        boolean isTerminal = reply.isTerminal();
+        if (isEmitterTerminated.compareAndSet(false, isTerminal)) {
             try {
                 if (reply.isCancel()) {
                     clearBuffer();
                 }
-                if (reply.isTerminal()) {
+                if (isTerminal) {
                     terminalReply = reply;
                 } else {
-                    buffer.add(reply.data());
-                    backPressure.apply(buffer);
+                    buffer.add(reply.next());
+                    onBackPressure(buffer);
                 }
                 if (bufferSize.getAndIncrement() == 0) {
                     schedule(this);
@@ -64,7 +65,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
         try {
             while (bufferSize.get() > 0) {
                 if (!buffer.isEmpty()) {
-                    handle(Reply.data(buffer.remove(0)));
+                    handle(Reply.next(buffer.remove(0)));
                 } else if (terminalReply != null) {
                     handle(terminalReply);
                 }
@@ -79,9 +80,10 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     }
 
     private void handle(Reply<? extends T> reply) throws Throwable {
-        if (isCollectorTerminated.compareAndSet(false, reply.isTerminal())) {
+        boolean isTerminal = reply.isTerminal();
+        if (isCollectorTerminated.compareAndSet(false, isTerminal)) {
             collector.post(reply);
-            if (reply.isTerminal()) {
+            if (isTerminal) {
                 clearBuffer();
                 cancellable.cancel();
             }
@@ -90,7 +92,7 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
 
     @Override
     public void next(T data) {
-        post(Reply.data(data));
+        post(Reply.next(data));
     }
 
     @Override
@@ -119,19 +121,21 @@ class CollectorEmitter<T> implements Emitter<T>, Runnable {
     }
 
     @Override
+    public void into(Cancellable cancellable) {
+        cancellable.addCancellable(this);
+    }
+
+    @Override
     public Cancellable schedule(Runnable runnable) {
         return scheduler.schedule(runnable);
     }
 
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
-        return new CollectorEmitter<>(scheduler, collector, backPressure);
+    @Override
+    public void onBackPressure(List<T> buffer) throws Throwable {
+        backPressure.onBackPressure(buffer);
     }
 
-    @SuppressWarnings("rawtypes")
-    private static final BackPressure DEFAULT_BACK_PRESSURE = BackPressures.success();
-
-    @SuppressWarnings("unchecked")
-    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector) {
-        return create(scheduler, collector, DEFAULT_BACK_PRESSURE);
+    static <T> CollectorEmitter<T> create(IScheduler scheduler, Collector<? super T> collector, BackPressure<T> backPressure) {
+        return new CollectorEmitter<>(scheduler, collector, backPressure);
     }
 }
