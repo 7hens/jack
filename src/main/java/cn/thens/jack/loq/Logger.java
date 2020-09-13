@@ -26,7 +26,7 @@ public interface Logger<T> {
         @Override
         public void log(int priority, String tag, String message) {
             tagPrefix = (tagPrefix + 1) % 10;
-            Log.println(priority, tagPrefix + "'" + tag, message);
+            Log.println(priority, tagPrefix + "/" + tag, message);
         }
     };
 

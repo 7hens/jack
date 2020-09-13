@@ -5,7 +5,6 @@ import android.os.Looper;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,13 +54,18 @@ public final class Schedulers {
     }
 
     private static Scheduler executorScheduler(String name, int expectedThreadCount) {
-        int processorCount = Runtime.getRuntime().availableProcessors();
-        int maxThreadCount = Math.max(processorCount + 1, expectedThreadCount);
+        int coreThreadCount = Runtime.getRuntime().availableProcessors();
+        int extraThreadCount = Math.max(1, expectedThreadCount - coreThreadCount);
+        final ThreadPoolExecutor extraExecutor = new ThreadPoolExecutor(
+                extraThreadCount, extraThreadCount,
+                60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
+                threadFactory(name, coreThreadCount, extraThreadCount == 1));
+        extraExecutor.allowsCoreThreadTimeOut();
         return from(new ThreadPoolExecutor(
-                processorCount, processorCount,
+                coreThreadCount, coreThreadCount,
                 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1),
                 threadFactory(name, 0, false),
-                rejectHandler(name, processorCount, maxThreadCount)));
+                (runnable, threadPoolExecutor) -> extraExecutor.execute(runnable)));
     }
 
     private static ThreadFactory threadFactory(String name, int startIndex, boolean isSingle) {
@@ -73,16 +77,6 @@ public final class Schedulers {
             thread.setDaemon(true);
             return thread;
         };
-    }
-
-    private static RejectedExecutionHandler rejectHandler(String name, int coreCount, int maxCount) {
-        int threadCount = Math.max(1, maxCount - coreCount);
-        final ThreadPoolExecutor fallbackExecutor = new ThreadPoolExecutor(
-                threadCount, threadCount,
-                60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(1024),
-                threadFactory(name, coreCount, threadCount == 1));
-        fallbackExecutor.allowsCoreThreadTimeOut();
-        return (runnable, threadPoolExecutor) -> fallbackExecutor.execute(runnable);
     }
 
     public static Scheduler from(Looper looper) {

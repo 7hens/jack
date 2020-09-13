@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 @PrettyLogger.Ignored
 public final class LoqX {
-    private static final String DEFAULT_TAG = "Loq";
+    private static final String DEFAULT_TAG = "$";
 
     private final String tag;
     private final Logger<? super Object> logger;
