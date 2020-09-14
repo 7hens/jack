@@ -6,43 +6,46 @@ public final class Loq {
     }
 
     public static LoqX tag(String tag) {
-        return LoqX.getDefaultInstance().tag(tag);
+        return get().tag(tag);
     }
 
     public static LoqX onlyIf(boolean sure) {
-        return LoqX.getDefaultInstance().onlyIf(sure);
+        return get().onlyIf(sure);
     }
 
     public static LoqX logger(Logger<? super Object> logger) {
-        return LoqX.getDefaultInstance().logger(logger);
+        return get().logger(logger);
     }
 
     public static LoqX v(Object msg) {
-        return LoqX.getDefaultInstance().v(msg);
+        return get().v(msg);
     }
 
     public static LoqX d(Object msg) {
-        return LoqX.getDefaultInstance().d(msg);
+        return get().d(msg);
     }
 
     public static LoqX i(Object msg) {
-        return LoqX.getDefaultInstance().i(msg);
+        return get().i(msg);
     }
 
     public static LoqX w(Object msg) {
-        return LoqX.getDefaultInstance().w(msg);
+        return get().w(msg);
     }
 
     public static LoqX e(Object msg) {
-        return LoqX.getDefaultInstance().e(msg);
+        return get().e(msg);
     }
 
     public static LoqX wtf(Object msg) {
-        return LoqX.getDefaultInstance().wtf(msg);
+        return get().wtf(msg);
     }
 
     public static LoqX log(int priority, Object msg) {
-        return LoqX.getDefaultInstance().log(priority, msg);
+        return get().log(priority, msg);
     }
 
+    private static LoqX get() {
+        return LoqX.getDefaultInstance();
+    }
 }
