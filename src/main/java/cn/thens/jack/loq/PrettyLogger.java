@@ -14,7 +14,7 @@ import cn.thens.jack.func.Values;
  */
 @SuppressWarnings("WeakerAccess")
 public class PrettyLogger implements Logger<Object> {
-    private static final int CHUNK_SIZE = 1024;
+    private static final int CHUNK_SIZE = 70;
     private final Logger<String> lineLogger;
 
     public PrettyLogger(Logger<String> lineLogger) {

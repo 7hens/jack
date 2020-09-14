@@ -12,7 +12,7 @@ public class LoqTest {
     @Test
     public void longText() {
         Loq.d(LoqX.time("longText"));
-        Loq.e(LONG_TEXT + LONG_TEXT + LONG_TEXT + LONG_TEXT + LONG_TEXT);
+        Loq.e(LONG_TEXT + LONG_TEXT + LONG_TEXT + LONG_TEXT + "\n" + LONG_TEXT);
         Loq.d(LoqX.time("longText"));
     }
 
