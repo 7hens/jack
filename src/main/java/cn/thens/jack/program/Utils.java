@@ -6,12 +6,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
+
+import cn.thens.jack.func.Values;
 
 public final class Utils {
     public static File dir(File file) {
         if (!file.exists()) {
             //noinspection ResultOfMethodCallIgnored
             file.mkdirs();
+        }
+        if (file.isFile()) {
+            throw new RuntimeException("NOT a directory: " + file.getAbsolutePath());
         }
         return file;
     }
