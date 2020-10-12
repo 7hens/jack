@@ -15,7 +15,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ class MergedResources extends Resources {
         this.secondary = secondary;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public CharSequence[] getTextArray(int id) throws NotFoundException {
         try {
@@ -41,7 +42,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public TypedArray obtainTypedArray(int id) {
         try {
@@ -51,7 +52,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public XmlResourceParser getAnimation(int id) {
         try {
@@ -61,7 +62,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public CharSequence getText(int id) {
         try {
@@ -126,7 +127,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public int[] getIntArray(int id) {
         try {
@@ -154,7 +155,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getQuantityString(int id, int quantity, Object... formatArgs) {
         try {
@@ -164,7 +165,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getQuantityString(int id, int quantity) {
         try {
@@ -183,7 +184,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String[] getStringArray(int id) {
         try {
@@ -211,7 +212,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public ColorStateList getColorStateList(int id) {
         try {
@@ -221,7 +222,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     public ColorStateList getColorStateList(int id, Theme theme) {
@@ -250,7 +251,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public CharSequence getQuantityText(int id, int quantity) {
         try {
@@ -279,7 +280,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public InputStream openRawResource(int id) {
         try {
@@ -289,7 +290,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public InputStream openRawResource(int id, TypedValue value) {
         try {
@@ -364,7 +365,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public XmlResourceParser getLayout(int id) {
         try {
@@ -374,7 +375,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @TargetApi(Build.VERSION_CODES.O)
     @Override
     public Typeface getFont(int id) {
@@ -385,7 +386,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public XmlResourceParser getXml(int id) {
         try {
@@ -395,7 +396,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getString(int id) {
         try {
@@ -405,7 +406,7 @@ class MergedResources extends Resources {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getString(int id, Object... formatArgs) {
         try {

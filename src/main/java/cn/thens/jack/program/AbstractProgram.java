@@ -2,7 +2,8 @@ package cn.thens.jack.program;
 
 import android.text.TextUtils;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+
 
 abstract class AbstractProgram implements Program {
     @Override
@@ -21,7 +22,7 @@ abstract class AbstractProgram implements Program {
         return getPackageName().hashCode();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return getClass().getName() + "(" + getPackageName() + ")";
