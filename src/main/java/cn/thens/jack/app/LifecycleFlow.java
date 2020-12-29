@@ -1,9 +1,9 @@
 package cn.thens.jack.app;
 
-import android.os.Build;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -48,10 +48,8 @@ public final class LifecycleFlow {
                     emitter.complete();
                 }
             };
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (view.isAttachedToWindow()) {
-                    listener.onViewAttachedToWindow(view);
-                }
+            if (ViewCompat.isAttachedToWindow(view)) {
+                listener.onViewAttachedToWindow(view);
             }
             view.addOnAttachStateChangeListener(listener);
             emitter.addCancellable(() -> view.removeOnAttachStateChangeListener(listener));
